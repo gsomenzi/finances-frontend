@@ -9,24 +9,25 @@ import {
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useAuth } from "../providers/AuthProvider";
-import { Link } from "react-router-dom";
 const validationSchema = Yup.object().shape({
+  name: Yup.string().required('Por favor informe o seu nome'),
   email: Yup.string()
     .required("Por favor informe o seu e-mail")
     .email("Por favor informe um e-mail válido"),
   password: Yup.string().required("Por favor informe a sua senha"),
 });
 
-export default function LoginView() {
-  const { loading, authenticate } = useAuth();
+export default function RegisterView() {
+  const { loading, register } = useAuth();
   const { values, handleChange, handleSubmit, errors } = useFormik({
     initialValues: {
+      name: "",
       email: "",
       password: "",
     },
     onSubmit: async (values) => {
-      const { email, password } = values;
-      authenticate(email, password);
+      const { name, email, password } = values;
+      register(name, email, password);
     },
     validationSchema,
   });
@@ -34,6 +35,18 @@ export default function LoginView() {
   return (
     <div>
       <Form>
+        <FormGroup>
+          <FormLabel>Nome</FormLabel>
+          <FormControl
+            name="name"
+            value={values.name}
+            onChange={handleChange}
+            isInvalid={!!errors.name}
+          />
+          <FormControl.Feedback type="invalid">
+            {errors.name}
+          </FormControl.Feedback>
+        </FormGroup>
         <FormGroup>
           <FormLabel>E-mail</FormLabel>
           <FormControl
@@ -64,9 +77,8 @@ export default function LoginView() {
           className="mt-3 w-100"
           disabled={loading}
         >
-          Login
+          Cadastrar
         </Button>
-        <Link to="/cadastro">Cadastre-se</Link>
       </Form>
     </div>
   );

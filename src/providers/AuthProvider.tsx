@@ -8,19 +8,21 @@ const DEFAULT_VALUE: {
   accessToken: string | null;
   loadAccessToken(): void;
   authenticate(email: string, password: string): void;
+  register(name: string, email: string, password: string): void;
 } = {
   loading: false,
   accessToken: null,
   loadAccessToken: () => {},
   authenticate: () => {},
+  register: () => {}
 };
 
 export const AuthContext = createContext(DEFAULT_VALUE);
 
 export const useAuth = () => {
-  const { accessToken, loading, loadAccessToken, authenticate } =
+  const { accessToken, loading, loadAccessToken, authenticate, register } =
     React.useContext(AuthContext);
-  return { accessToken, loading, loadAccessToken, authenticate };
+  return { accessToken, loading, loadAccessToken, authenticate, register };
 };
 
 export function AuthProvider(props: { children: any }) {
@@ -50,12 +52,31 @@ export function AuthProvider(props: { children: any }) {
     }
   };
 
+  const register = async (name: string, email: string, password: string) => {
+    try {
+      setLoading(true);
+      const { data } = await httpClient.post("/register", {
+        name,
+        email,
+        password,
+        device_name: "app",
+      });
+      localStorage.setItem(ACCESS_TOKEN_STORAGE_KEY, data.auth_data.access_token);
+      setAccessToken(data.auth_data.access_token);
+      setLoading(false);
+    } catch (e) {
+      setLoading(false);
+      throw e;
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
         loading,
         accessToken,
         authenticate,
+        register,
         loadAccessToken,
       }}
     >
