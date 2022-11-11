@@ -9,20 +9,35 @@ const DEFAULT_VALUE: {
   loadAccessToken(): void;
   authenticate(email: string, password: string): void;
   register(name: string, email: string, password: string): void;
+  signOut(): void;
 } = {
   loading: false,
   accessToken: null,
   loadAccessToken: () => {},
   authenticate: () => {},
-  register: () => {}
+  register: () => {},
+  signOut: () => {},
 };
 
 export const AuthContext = createContext(DEFAULT_VALUE);
 
 export const useAuth = () => {
-  const { accessToken, loading, loadAccessToken, authenticate, register } =
-    React.useContext(AuthContext);
-  return { accessToken, loading, loadAccessToken, authenticate, register };
+  const {
+    accessToken,
+    loading,
+    loadAccessToken,
+    authenticate,
+    register,
+    signOut,
+  } = React.useContext(AuthContext);
+  return {
+    accessToken,
+    loading,
+    loadAccessToken,
+    authenticate,
+    register,
+    signOut,
+  };
 };
 
 export function AuthProvider(props: { children: any }) {
@@ -61,13 +76,21 @@ export function AuthProvider(props: { children: any }) {
         password,
         device_name: "app",
       });
-      localStorage.setItem(ACCESS_TOKEN_STORAGE_KEY, data.auth_data.access_token);
+      localStorage.setItem(
+        ACCESS_TOKEN_STORAGE_KEY,
+        data.auth_data.access_token
+      );
       setAccessToken(data.auth_data.access_token);
       setLoading(false);
     } catch (e) {
       setLoading(false);
       throw e;
     }
+  };
+
+  const signOut = () => {
+    localStorage.removeItem(ACCESS_TOKEN_STORAGE_KEY);
+    setAccessToken(null);
   };
 
   return (
@@ -78,6 +101,7 @@ export function AuthProvider(props: { children: any }) {
         authenticate,
         register,
         loadAccessToken,
+        signOut,
       }}
     >
       {props.children}

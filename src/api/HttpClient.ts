@@ -84,10 +84,10 @@ export default class HttpClient {
 
     private configureInterceptors() {
         this.client.interceptors.request.use(
-            async (config: any) => {
-                if (config?.headers?.common) {
+            async (config: AxiosRequestConfig) => {
+                if (config?.headers) {
                     const accessToken: string | null = this.getStoredAccessToken();
-                    config.headers.common.Authorization = accessToken ? `Bearer ${accessToken}` : null;
+                    config.headers.Authorization = accessToken ? `Bearer ${accessToken}` : null;
                 }
                 return config;
             },

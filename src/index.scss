@@ -1,7 +1,21 @@
+$body-bg: #f4f4f4;
+$body-color: #666666;
+$link-color: #666666;
+$link-hover-color: #333333;
+$link-decoration: none;
+$headings-color: #333333;
+
+
 @import "~bootstrap/scss/bootstrap";
+@import "~bootstrap-icons/font/bootstrap-icons.scss";
+@import "./src/components/Sidebar/styles.scss";
 
 html,body {
-    background-color: #f6f6f6;
+    background-color: #f4f4f4;
+}
+
+.form-control {
+    background-color: #ffffff;
 }
 
 #auth-template main {
@@ -13,4 +27,17 @@ html,body {
     #auth-card {
         width: 450px;
     }
+}
+
+#default-template {
+    display: flex;
+}
+
+#default-template main {
+    width: 100vw;
+    height: 100vh;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    padding-left: 2rem;
+    padding-right: 2rem;
 }

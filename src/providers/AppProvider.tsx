@@ -1,4 +1,5 @@
 import React, { createContext, ReactNode } from "react";
+import { AccountsProvider } from "./AccountsProvider";
 import { ApiProvider } from "./ApiProvider";
 import { AuthProvider } from "./AuthProvider";
 
@@ -14,7 +15,9 @@ export function AppProvider({ children }: Props) {
   return (
     <AppContext.Provider value={null}>
       <ApiProvider>
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          <AccountsProvider>{children}</AccountsProvider>
+        </AuthProvider>
       </ApiProvider>
     </AppContext.Provider>
   );
