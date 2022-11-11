@@ -1,11 +1,12 @@
 import AccountCard from "components/Accounts/AccountCard";
+import AddAccountModal from "components/Accounts/AddAccountModal";
 import { useAccounts } from "providers/AccountsProvider";
-import React, { useEffect } from "react";
-import { Card, Col, Row } from "react-bootstrap";
-import { BRLformatter, normalizePrice } from "tools";
+import React, { useEffect, useState } from "react";
+import { Col, Row, Button } from "react-bootstrap";
 
 export default function AccountsView() {
   const { getAll, accounts } = useAccounts();
+  const [showAddModal, setShowAddModal] = useState(false);
 
   useEffect(() => {
     getAll();
@@ -13,7 +14,12 @@ export default function AccountsView() {
 
   return (
     <div>
-      <h1>Contas</h1>
+      <div className="d-flex align-items-center justify-content-between">
+        <h1>Contas</h1>
+        <div>
+          <Button onClick={() => setShowAddModal(true)}>Adicionar</Button>
+        </div>
+      </div>
       <div>
         <Row>
           {accounts.map((account) => (
@@ -23,6 +29,7 @@ export default function AccountsView() {
           ))}
         </Row>
       </div>
+      <AddAccountModal show={showAddModal} setShow={setShowAddModal} />
     </div>
   );
 }

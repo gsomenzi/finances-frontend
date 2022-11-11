@@ -4,8 +4,6 @@ import { useAuth } from "./providers/AuthProvider";
 import HomeView from "views/Home";
 import LoginView from "views/Login";
 import RegisterView from "views/Register";
-import AuthTemplate from "views/_templates/AuthTemplate";
-import DefaultTemplate from "views/_templates/DefaultTemplate";
 import AccountsView from "views/Accounts";
 import RootStack from "routes/RootStack";
 import AuthStack from "routes/AuthStack";

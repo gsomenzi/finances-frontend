@@ -2,7 +2,7 @@ export interface Account {
     id: number;
     description: string;
     type: string;
-    opening_balance: string;
+    opening_balance: string | number;
     currency: string;
     created_at: Date;
     updated_at: Date;

@@ -6,20 +6,27 @@ const DEFAULT_VALUE: {
   loading: boolean;
   accounts: Account[];
   getAll(): void;
+  create(newAccountData: Partial<Account>): void;
+  remove(id: number): void;
 } = {
   loading: false,
   accounts: [],
   getAll: () => {},
+  create: () => {},
+  remove: () => {},
 };
 
 export const AccountsContext = createContext(DEFAULT_VALUE);
 
 export const useAccounts = () => {
-  const { loading, accounts, getAll } = React.useContext(AccountsContext);
+  const { loading, accounts, getAll, create, remove } =
+    React.useContext(AccountsContext);
   return {
     loading,
     accounts,
     getAll,
+    create,
+    remove,
   };
 };
 
@@ -40,12 +47,41 @@ export function AccountsProvider(props: { children: any }) {
     }
   };
 
+  const create = async (newAccountData: Partial<Account>) => {
+    try {
+      setLoading(true);
+      const { data } = await httpClient.post(
+        "/financial-accounts",
+        newAccountData
+      );
+      setAccounts([...accounts, data]);
+      setLoading(false);
+    } catch (e) {
+      setLoading(false);
+      throw e;
+    }
+  };
+
+  const remove = async (id: number) => {
+    try {
+      setLoading(true);
+      const { data } = await httpClient.delete(`/financial-accounts/${id}`);
+      setAccounts([...accounts].filter((a) => a.id !== id));
+      setLoading(false);
+    } catch (e) {
+      setLoading(false);
+      throw e;
+    }
+  };
+
   return (
     <AccountsContext.Provider
       value={{
         loading,
         accounts,
         getAll,
+        create,
+        remove,
       }}
     >
       {props.children}
