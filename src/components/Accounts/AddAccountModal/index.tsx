@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Button, Form, Modal } from "react-bootstrap";
 import Select from "react-select";
 import { useFormik } from "formik";
@@ -28,19 +28,29 @@ type Props = {
 export default function AddAccountModal(props: Props) {
   const { show, setShow } = props;
   const { create, loading } = useAccounts();
-  const { values, handleChange, setFieldValue, handleSubmit, errors } =
-    useFormik({
-      initialValues: {
-        description: "",
-        type: "checking",
-        opening_balance: 0.0,
-      },
-      onSubmit: async (values) => {
-        await create(values);
-        setShow(false);
-      },
-      validationSchema,
-    });
+  const {
+    values,
+    handleChange,
+    setFieldValue,
+    handleSubmit,
+    errors,
+    resetForm,
+  } = useFormik({
+    initialValues: {
+      description: "",
+      type: "checking",
+      opening_balance: 0.0,
+    },
+    onSubmit: async (values) => {
+      await create(values);
+      setShow(false);
+    },
+    validationSchema,
+  });
+
+  useEffect(() => {
+    resetForm();
+  }, [show]);
   return (
     <Modal show={show} onHide={() => setShow(false)}>
       <Modal.Header closeButton>
