@@ -17,6 +17,7 @@ const validationSchema = Yup.object().shape({
     ["checking", "investiment", "other"],
     "Por favor selecione um tipo válido"
   ),
+  default: Yup.boolean(),
   opening_balance: Yup.number().required("Por favor informe um saldo inicial"),
 });
 
@@ -39,6 +40,7 @@ export default function AddAccountModal(props: Props) {
     initialValues: {
       description: "",
       type: "checking",
+      default: false,
       opening_balance: 0.0,
     },
     onSubmit: async (values) => {
@@ -95,6 +97,15 @@ export default function AddAccountModal(props: Props) {
             <Form.Control.Feedback type="invalid">
               {errors.type}
             </Form.Control.Feedback>
+          </Form.Group>
+          <Form.Group className="mb-3" controlId="formBasicCheckbox">
+            <Form.Check
+              type="checkbox"
+              name="default"
+              label="Default"
+              checked={values.default}
+              onChange={handleChange}
+            />
           </Form.Group>
         </Form>
       </Modal.Body>

@@ -2,6 +2,7 @@ import React, { createContext, ReactNode } from "react";
 import { AccountsProvider } from "./AccountsProvider";
 import { ApiProvider } from "./ApiProvider";
 import { AuthProvider } from "./AuthProvider";
+import { CategoryProvider } from "./CategoryProvider";
 
 const DEFAULT_VALUE = null;
 
@@ -16,7 +17,9 @@ export function AppProvider({ children }: Props) {
     <AppContext.Provider value={null}>
       <ApiProvider>
         <AuthProvider>
-          <AccountsProvider>{children}</AccountsProvider>
+          <CategoryProvider>
+            <AccountsProvider>{children}</AccountsProvider>
+          </CategoryProvider>
         </AuthProvider>
       </ApiProvider>
     </AppContext.Provider>

@@ -20,8 +20,8 @@ export default function AccountCard(props: Props) {
   }
 
   return (
-    <Card className="mb-3">
-      <Card.Header className="d-flex align-items-center">
+    <Card className="mb-3 shadow-sm">
+      <Card.Header className="d-flex align-items-center bg-white">
         <h4 className="px-0 py-0 mx-0 my-0">
           {account.type === "checking" ? (
             <i className="bi bi-cash-coin me-2"></i>
@@ -44,12 +44,13 @@ export default function AccountCard(props: Props) {
               "text-danger": account.current_balance < 0,
             })}
           >
-            {BRLformatter(normalizePrice(account.current_balance))}
+            {BRLformatter(normalizePrice(account?.current_balance || 0))}
           </span>
         </Card.Text>
       </Card.Body>
-      <Card.Footer>
-        <Button color="danger" onClick={handleRemove}>
+      <Card.Footer className="d-flex align-items-center justify-content-between bg-white">
+        <span className="flex-1" />
+        <Button variant="outline-danger" size="sm" onClick={handleRemove}>
           <i className="bi bi-trash"></i>
         </Button>
       </Card.Footer>

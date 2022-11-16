@@ -38,6 +38,7 @@ $sidebar-expanded-width: 240px;
         transform: translate(50%);
         background-color: $bg-default;
         transition: $transition-default;
+        z-index: 2;
     }
 
     #app-sidebar-toggle:hover {
@@ -58,6 +59,7 @@ $sidebar-expanded-width: 240px;
             font-size: 1.5rem;
             padding-left: 1.5rem;
             padding-right: 1.5rem;
+            transition: $transition-default;
         }
 
         .app-sidebar-item-title {
@@ -71,6 +73,15 @@ $sidebar-expanded-width: 240px;
 
     .app-sidebar-item.active {
         border-left: 3px solid #666666;
+    }
+
+    // ADD BTN
+    .app-sidebar-item-add {
+        background-color: $primary;
+        color: $light;
+    }
+    .app-sidebar-item-add:hover {
+        background-color: lighten($primary, 15%);
     }
 
     #app-sidebar.expanded {

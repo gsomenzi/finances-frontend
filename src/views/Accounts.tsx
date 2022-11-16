@@ -2,10 +2,10 @@ import AccountCard from "components/Accounts/AccountCard";
 import AddAccountModal from "components/Accounts/AddAccountModal";
 import { useAccounts } from "providers/AccountsProvider";
 import React, { useEffect, useState } from "react";
-import { Col, Row, Button } from "react-bootstrap";
+import { Col, Row, Button, Spinner } from "react-bootstrap";
 
 export default function AccountsView() {
-  const { getAll, accounts } = useAccounts();
+  const { getAll, accounts, loading } = useAccounts();
   const [showAddModal, setShowAddModal] = useState(false);
 
   useEffect(() => {
@@ -14,8 +14,18 @@ export default function AccountsView() {
 
   return (
     <div>
-      <div className="d-flex align-items-center justify-content-between">
-        <h1>Contas</h1>
+      <div className="d-flex align-items-center justify-content-between mb-2">
+        <div className="d-flex align-items-center">
+          <h1>Contas</h1>
+          {loading ? (
+            <Spinner
+              as="span"
+              role="status"
+              aria-hidden="true"
+              className="ms-2"
+            />
+          ) : null}
+        </div>
         <div>
           <Button onClick={() => setShowAddModal(true)}>Adicionar</Button>
         </div>

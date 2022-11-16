@@ -5,13 +5,13 @@ import { useApi } from "./ApiProvider";
 const DEFAULT_VALUE: {
   loading: boolean;
   accounts: Account[];
-  getAll(): void;
+  getAll(): Promise<void>;
   create(newAccountData: Partial<Account>): void;
   remove(id: number): void;
 } = {
   loading: false,
   accounts: [],
-  getAll: () => {},
+  getAll: async () => {},
   create: () => {},
   remove: () => {},
 };

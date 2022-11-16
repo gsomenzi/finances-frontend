@@ -4,6 +4,11 @@ $link-color: #666666;
 $link-hover-color: #333333;
 $link-decoration: none;
 $headings-color: #333333;
+$dark: #333333;
+$blue: #0466c8;
+$primary: $dark;
+$secondary: $blue;
+$enable-caret: false;
 
 
 @import "~bootstrap/scss/bootstrap";
