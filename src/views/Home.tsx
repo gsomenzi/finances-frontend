@@ -1,10 +1,13 @@
 import Drawer from "components/UI/Drawer";
-import React from "react";
+import React, { useState } from "react";
+import { Button } from "react-bootstrap";
 
 export default function HomeView() {
+  const [open, setOpen] = useState(false);
   return (
     <div>
-      <Drawer />
+      <Button onClick={() => setOpen(true)}>Abrir</Button>
+      <Drawer open={open} onClose={() => setOpen(false)} />
     </div>
   );
 }
