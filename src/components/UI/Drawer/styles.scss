@@ -1,0 +1,31 @@
+$transition-default: all 150ms;
+
+.ui-drawer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 2;
+
+    .ui-drawer-overlay {
+        width: 100vw;
+        height: 100vh;
+        background-color: #00000066;
+    }
+
+    .ui-drawer-container {
+        position: absolute;
+        top: 0;
+        right: 0;
+        background-color: #ffffff;
+        max-width: calc(100% - 16px);
+        width: 320px;
+        height: 100vh;
+        box-shadow: 0px -2px 4px #22222222;
+        transition: $transition-default;
+    }
+    .ui-drawer-container.expanded {
+        width: 540px;
+    }
+}

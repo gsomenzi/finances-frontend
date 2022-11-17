@@ -14,6 +14,7 @@ $enable-caret: false;
 @import "~bootstrap/scss/bootstrap";
 @import "~bootstrap-icons/font/bootstrap-icons.scss";
 @import "./src/components/Sidebar/styles.scss";
+@import "./src/components/UI/Drawer/styles.scss";
 
 html,body {
     background-color: #f4f4f4;

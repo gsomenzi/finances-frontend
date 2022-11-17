@@ -1,5 +1,10 @@
+import Drawer from "components/UI/Drawer";
 import React from "react";
 
 export default function HomeView() {
-  return <div>HomeView</div>;
+  return (
+    <div>
+      <Drawer />
+    </div>
+  );
 }
