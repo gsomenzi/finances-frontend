@@ -1,6 +1,6 @@
 import Drawer from "components/UI/Drawer";
 import React, { useState } from "react";
-import { Button } from "react-bootstrap";
+import Button from "components/UI/Button";
 
 export default function HomeView() {
   const [open, setOpen] = useState(false);

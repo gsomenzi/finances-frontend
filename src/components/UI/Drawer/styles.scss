@@ -9,6 +9,28 @@ $transition-default: all 250ms;
     z-index: 2;
     pointer-events: none;
 
+    #ui-drawer-expanded-toggle {
+        position: absolute;
+        top: 2rem;
+        left: 0;
+        border: 1px solid #22222222;
+        width: 1.5rem;
+        height: 1.5rem;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0px 2px 4px #22222222;
+        transform: translate(-50%);
+        background-color: $bg-default;
+        transition: $transition-default;
+        z-index: 3;
+    }
+
+    #ui-drawer-expanded-toggle:hover {
+        box-shadow: 0px 3px 8px #22222233;
+    }
+
     .ui-drawer-overlay {
         width: 100vw;
         height: 100vh;
@@ -29,9 +51,11 @@ $transition-default: all 250ms;
         box-shadow: 0px -2px 4px #22222222;
         transition: $transition-default;
         transform: translate(100%);
+        display: flex;
+        flex-direction: column;
     }
     .ui-drawer-container.expanded {
-        width: 540px;
+        width: 768px;
     }
 
     .ui-drawer-header {
@@ -46,6 +70,12 @@ $transition-default: all 250ms;
         .ui-drawer-close-btn {
             font-size: 2rem;
         }
+    }
+    .ui-drawer-body {
+        flex: 1;
+    }
+    .ui-drawer-footer {
+        border-top: 1px solid #22222222;
     }
 }
 

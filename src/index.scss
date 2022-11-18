@@ -9,6 +9,7 @@ $blue: #0466c8;
 $primary: $dark;
 $secondary: $blue;
 $enable-caret: false;
+$border-radius: 0;
 
 
 @import "~bootstrap/scss/bootstrap";
@@ -46,4 +47,7 @@ html,body {
     padding-bottom: 1rem;
     padding-left: 2rem;
     padding-right: 2rem;
+}
+.form-group {
+    margin-bottom: 1rem;
 }

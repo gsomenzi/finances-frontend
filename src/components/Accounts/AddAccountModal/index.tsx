@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { Button, Form } from "react-bootstrap";
-import Select from "react-select";
+import Select, { StylesConfig } from "react-select";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useAccounts } from "providers/AccountsProvider";
@@ -55,9 +55,28 @@ export default function AddAccountModal(props: Props) {
     resetForm();
   }, [show]);
   return (
-    <Drawer title="Nova conta" open={show} onClose={() => setShow(false)}>
+    <Drawer
+      title="Nova conta"
+      open={show}
+      onClose={() => setShow(false)}
+      FooterComponent={
+        <div className="d-flex justify-content-end">
+          <Button variant="secondary" onClick={() => setShow(false)}>
+            Cancelar
+          </Button>
+          <Button
+            onClick={() => handleSubmit()}
+            disabled={loading}
+            variant="primary"
+            className="ms-2"
+          >
+            Adicionar
+          </Button>
+        </div>
+      }
+    >
       <Form>
-        <Form.Group>
+        <Form.Group className="form-group">
           <Form.Label>Nome</Form.Label>
           <Form.Control
             name="description"
@@ -69,7 +88,7 @@ export default function AddAccountModal(props: Props) {
             {errors.description}
           </Form.Control.Feedback>
         </Form.Group>
-        <Form.Group>
+        <Form.Group className="form-group">
           <Form.Label>Saldo inicial</Form.Label>
           <Form.Control
             name="opening_balance"
@@ -83,7 +102,7 @@ export default function AddAccountModal(props: Props) {
             {errors.description}
           </Form.Control.Feedback>
         </Form.Group>
-        <Form.Group>
+        <Form.Group className="form-group">
           <Form.Label>Tipo</Form.Label>
           <Select
             defaultValue={{ value: "checking", label: "Conta corrente" }}
@@ -94,7 +113,7 @@ export default function AddAccountModal(props: Props) {
             {errors.type}
           </Form.Control.Feedback>
         </Form.Group>
-        <Form.Group className="mb-3" controlId="formBasicCheckbox">
+        <Form.Group className="form-group" controlId="formBasicCheckbox">
           <Form.Check
             type="checkbox"
             name="default"
@@ -104,19 +123,6 @@ export default function AddAccountModal(props: Props) {
           />
         </Form.Group>
       </Form>
-      <div className="d-flex justify-content-end">
-        <Button variant="secondary" onClick={() => setShow(false)}>
-          Cancelar
-        </Button>
-        <Button
-          onClick={() => handleSubmit()}
-          disabled={loading}
-          variant="primary"
-          className="ms-2"
-        >
-          Adicionar
-        </Button>
-      </div>
     </Drawer>
   );
 }
