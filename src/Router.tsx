@@ -8,6 +8,7 @@ import AccountsView from "views/Accounts";
 import RootStack from "routes/RootStack";
 import AuthStack from "routes/AuthStack";
 import TransactionsView from "views/Transactions";
+import CreditCardsView from "views/CreditCards";
 
 const authRouter = createBrowserRouter([
   {
@@ -38,6 +39,10 @@ const rootRouter = createBrowserRouter([
       {
         path: "/contas",
         element: <AccountsView />,
+      },
+      {
+        path: "/cartoes-de-credito",
+        element: <CreditCardsView />,
       },
       {
         path: "/transacoes",

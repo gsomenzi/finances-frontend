@@ -55,14 +55,14 @@ export default function Drawer(props: Props) {
             <i className="bi bi-arrow-left-short"></i>
           )}
         </a>
-        <div className="ui-drawer-header px-3 mb-2">
+        <div className="ui-drawer-header px-4 mb-2">
           <h3 className="mb-0">{title}</h3>
           <a href="/" className="ui-drawer-close-btn" onClick={handleClose}>
             <i className="bi bi-x"></i>
           </a>
         </div>
-        <div className="ui-drawer-body px-3">{children}</div>
-        <div className="ui-drawer-footer px-3 py-3">{FooterComponent}</div>
+        <div className="ui-drawer-body px-4">{children}</div>
+        <div className="ui-drawer-footer px-4 py-3">{FooterComponent}</div>
       </div>
     </div>
   );

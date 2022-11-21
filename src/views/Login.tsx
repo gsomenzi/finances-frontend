@@ -5,6 +5,7 @@ import {
   FormControl,
   FormGroup,
   FormLabel,
+  Alert,
 } from "react-bootstrap";
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -34,7 +35,7 @@ export default function LoginView() {
   return (
     <div>
       <Form>
-        <FormGroup>
+        <FormGroup className="form-group">
           <FormLabel>E-mail</FormLabel>
           <FormControl
             name="email"
@@ -46,7 +47,7 @@ export default function LoginView() {
             {errors.email}
           </FormControl.Feedback>
         </FormGroup>
-        <FormGroup className="mt-1">
+        <FormGroup className="form-group">
           <FormLabel>Senha</FormLabel>
           <FormControl
             name="password"
@@ -61,7 +62,7 @@ export default function LoginView() {
         </FormGroup>
         <Button
           onClick={() => handleSubmit()}
-          className="mt-3 w-100"
+          className="mt-1 mb-2 w-100"
           disabled={loading}
         >
           Login

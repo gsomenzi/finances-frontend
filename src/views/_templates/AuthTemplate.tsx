@@ -9,7 +9,7 @@ export default function AuthTemplate({ children }: Props) {
   return (
     <div id="auth-template">
       <main>
-        <Card id="auth-card" className="p-3 mw-100">
+        <Card id="auth-card" className="p-3 mw-100 shadow-sm">
           {children}
         </Card>
       </main>

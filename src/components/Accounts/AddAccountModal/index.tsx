@@ -117,7 +117,7 @@ export default function AddAccountModal(props: Props) {
           <Form.Check
             type="checkbox"
             name="default"
-            label="Default"
+            label="Conta padrão"
             checked={values.default}
             onChange={handleChange}
           />

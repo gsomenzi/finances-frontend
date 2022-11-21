@@ -7,4 +7,6 @@ export interface Account {
     created_at: Date;
     updated_at: Date;
     current_balance: number;
+    expected_balance: number;
+    default: boolean;
 }

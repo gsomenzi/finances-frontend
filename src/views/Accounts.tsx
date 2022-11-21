@@ -1,16 +1,27 @@
-import AccountCard from "components/Accounts/AccountCard";
+import classNames from "classnames";
 import AddAccountModal from "components/Accounts/AddAccountModal";
 import { useAccounts } from "providers/AccountsProvider";
 import React, { useEffect, useState } from "react";
-import { Col, Row, Button, Spinner } from "react-bootstrap";
+import { Button, Spinner, Table } from "react-bootstrap";
+import { BRLformatter, normalizePrice } from "tools";
 
 export default function AccountsView() {
-  const { getAll, accounts, loading } = useAccounts();
+  const { getAll, accounts, loading, remove, markAsFavorite } = useAccounts();
   const [showAddModal, setShowAddModal] = useState(false);
 
   useEffect(() => {
     getAll();
   }, []);
+
+  function handleFavorite(id: number) {
+    markAsFavorite(id);
+  }
+
+  function handleRemove(id: number) {
+    if (confirm("Você realmente deseja remover esta conta?")) {
+      remove(id);
+    }
+  }
 
   return (
     <div>
@@ -31,13 +42,97 @@ export default function AccountsView() {
         </div>
       </div>
       <div>
-        <Row>
-          {accounts.map((account) => (
-            <Col key={account.id} lg="3" md="4" sm="6" xs="12">
-              <AccountCard account={account} />
-            </Col>
-          ))}
-        </Row>
+        <Table striped bordered responsive>
+          <thead>
+            <tr>
+              <td className="compact">#</td>
+              <td>Descrição</td>
+              <td>Saldo atual</td>
+              <td>Saldo previsto</td>
+              <td className="text-end compact">Ações</td>
+            </tr>
+          </thead>
+          <tbody>
+            {accounts.map((account, i) => (
+              <tr key={account.id}>
+                <td className="compact">{i + 1}</td>
+                <td>
+                  {account.description}{" "}
+                  {account.default ? (
+                    <i className="bi bi-star-fill text-warning"></i>
+                  ) : null}
+                </td>
+
+                <td>
+                  <span
+                    className={classNames({
+                      "text-success": account.current_balance > 0,
+                      "text-danger": account.current_balance < 0,
+                    })}
+                  >
+                    {BRLformatter(
+                      normalizePrice(account?.current_balance || 0)
+                    )}
+                  </span>
+                </td>
+                <td>
+                  <span
+                    className={classNames({
+                      "text-success": account.expected_balance > 0,
+                      "text-danger": account.expected_balance < 0,
+                    })}
+                  >
+                    {BRLformatter(
+                      normalizePrice(account?.expected_balance || 0)
+                    )}
+                  </span>
+                </td>
+                <td className="text-end compact">
+                  <Button
+                    disabled={account.default}
+                    onClick={() => handleFavorite(account.id)}
+                  >
+                    <i className="bi bi-star-fill"></i>
+                  </Button>
+                  <Button onClick={() => handleFavorite(account.id)}>
+                    <i className="bi bi-pencil"></i>
+                  </Button>
+                  <Button
+                    variant="danger"
+                    onClick={() => handleRemove(account.id)}
+                  >
+                    <i className="bi bi-trash"></i>
+                  </Button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colSpan={2}>
+                <h5 className="mb-0">Total</h5>
+              </td>
+              <td>
+                {BRLformatter(
+                  accounts.reduce(
+                    (previous, current) =>
+                      (previous += normalizePrice(current.current_balance)),
+                    0
+                  )
+                )}
+              </td>
+              <td colSpan={2}>
+                {BRLformatter(
+                  accounts.reduce(
+                    (previous, current) =>
+                      (previous += normalizePrice(current.expected_balance)),
+                    0
+                  )
+                )}
+              </td>
+            </tr>
+          </tfoot>
+        </Table>
       </div>
       <AddAccountModal show={showAddModal} setShow={setShowAddModal} />
     </div>

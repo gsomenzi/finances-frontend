@@ -80,6 +80,11 @@ export default function Sidebar(props: Props) {
         <SidebarItem iconName="house-door" title="Dashboard" to="/" />
         <SidebarItem iconName="bank" title="Contas" to="/contas" />
         <SidebarItem
+          iconName="credit-card"
+          title="Cartões de crédito"
+          to="/cartoes-de-credito"
+        />
+        <SidebarItem
           iconName="list-check"
           title="Transações"
           to="/transacoes"
