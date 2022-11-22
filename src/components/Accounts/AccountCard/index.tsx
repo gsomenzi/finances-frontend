@@ -2,7 +2,7 @@ import classNames from "classnames";
 import { useAccounts } from "providers/AccountsProvider";
 import React from "react";
 import { Card, Button } from "react-bootstrap";
-import { BRLformatter, normalizePrice } from "tools";
+import { CurrencyFormatter, normalizePrice } from "tools";
 import { Account } from "types/Account";
 
 type Props = {
@@ -44,7 +44,7 @@ export default function AccountCard(props: Props) {
               "text-danger": account.current_balance < 0,
             })}
           >
-            {BRLformatter(normalizePrice(account?.current_balance || 0))}
+            {CurrencyFormatter(normalizePrice(account?.current_balance || 0))}
           </span>
         </Card.Text>
       </Card.Body>

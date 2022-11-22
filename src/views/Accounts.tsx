@@ -3,11 +3,18 @@ import AddAccountModal from "components/Accounts/AddAccountModal";
 import { useAccounts } from "providers/AccountsProvider";
 import React, { useEffect, useState } from "react";
 import { Button, Spinner, Table } from "react-bootstrap";
-import { BRLformatter, normalizePrice } from "tools";
+import {
+  CurrencyFormatter,
+  getCurrencyData,
+  getTranslatedAccountType,
+  normalizePrice,
+} from "tools";
+import { Account } from "types/Account";
 
 export default function AccountsView() {
   const { getAll, accounts, loading, remove, markAsFavorite } = useAccounts();
   const [showAddModal, setShowAddModal] = useState(false);
+  const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
 
   useEffect(() => {
     getAll();
@@ -15,6 +22,16 @@ export default function AccountsView() {
 
   function handleFavorite(id: number) {
     markAsFavorite(id);
+  }
+
+  function handleAdd() {
+    setSelectedAccount(null);
+    setShowAddModal(true);
+  }
+
+  function handleEdit(account: Account) {
+    setSelectedAccount(account);
+    setShowAddModal(true);
   }
 
   function handleRemove(id: number) {
@@ -38,7 +55,7 @@ export default function AccountsView() {
           ) : null}
         </div>
         <div>
-          <Button onClick={() => setShowAddModal(true)}>Adicionar</Button>
+          <Button onClick={() => handleAdd()}>Adicionar</Button>
         </div>
       </div>
       <div>
@@ -57,10 +74,13 @@ export default function AccountsView() {
               <tr key={account.id}>
                 <td className="compact">{i + 1}</td>
                 <td>
-                  {account.description}{" "}
-                  {account.default ? (
-                    <i className="bi bi-star-fill text-warning"></i>
-                  ) : null}
+                  <h5 className="mb-0">
+                    {account.description}{" "}
+                    {account.default ? (
+                      <i className="bi bi-star-fill text-warning"></i>
+                    ) : null}
+                  </h5>
+                  <span>{getTranslatedAccountType(account.type)}</span>
                 </td>
 
                 <td>
@@ -70,8 +90,9 @@ export default function AccountsView() {
                       "text-danger": account.current_balance < 0,
                     })}
                   >
-                    {BRLformatter(
-                      normalizePrice(account?.current_balance || 0)
+                    {CurrencyFormatter(
+                      normalizePrice(account?.current_balance || 0),
+                      getCurrencyData(account?.currency)?.symbol || ""
                     )}
                   </span>
                 </td>
@@ -82,8 +103,9 @@ export default function AccountsView() {
                       "text-danger": account.expected_balance < 0,
                     })}
                   >
-                    {BRLformatter(
-                      normalizePrice(account?.expected_balance || 0)
+                    {CurrencyFormatter(
+                      normalizePrice(account?.expected_balance || 0),
+                      getCurrencyData(account?.currency)?.symbol || ""
                     )}
                   </span>
                 </td>
@@ -94,7 +116,7 @@ export default function AccountsView() {
                   >
                     <i className="bi bi-star-fill"></i>
                   </Button>
-                  <Button onClick={() => handleFavorite(account.id)}>
+                  <Button onClick={() => handleEdit(account)}>
                     <i className="bi bi-pencil"></i>
                   </Button>
                   <Button
@@ -113,7 +135,7 @@ export default function AccountsView() {
                 <h5 className="mb-0">Total</h5>
               </td>
               <td>
-                {BRLformatter(
+                {CurrencyFormatter(
                   accounts.reduce(
                     (previous, current) =>
                       (previous += normalizePrice(current.current_balance)),
@@ -122,7 +144,7 @@ export default function AccountsView() {
                 )}
               </td>
               <td colSpan={2}>
-                {BRLformatter(
+                {CurrencyFormatter(
                   accounts.reduce(
                     (previous, current) =>
                       (previous += normalizePrice(current.expected_balance)),
@@ -134,7 +156,11 @@ export default function AccountsView() {
           </tfoot>
         </Table>
       </div>
-      <AddAccountModal show={showAddModal} setShow={setShowAddModal} />
+      <AddAccountModal
+        show={showAddModal}
+        setShow={setShowAddModal}
+        account={selectedAccount}
+      />
     </div>
   );
 }

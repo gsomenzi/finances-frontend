@@ -61,7 +61,7 @@ export default function Drawer(props: Props) {
             <i className="bi bi-x"></i>
           </a>
         </div>
-        <div className="ui-drawer-body px-4">{children}</div>
+        {open ? <div className="ui-drawer-body px-4">{children}</div> : null}
         <div className="ui-drawer-footer px-4 py-3">{FooterComponent}</div>
       </div>
     </div>

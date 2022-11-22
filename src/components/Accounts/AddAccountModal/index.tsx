@@ -1,12 +1,14 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Form } from "react-bootstrap";
-import Select, { StylesConfig } from "react-select";
+import Select from "react-select";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useAccounts } from "providers/AccountsProvider";
 import Drawer from "components/UI/Drawer";
+import { Account } from "types/Account";
+import { normalizePrice } from "tools";
 
-const options = [
+const options: OptionProp[] = [
   { value: "checking", label: "Conta corrente" },
   { value: "investiment", label: "Investimento" },
   { value: "other", label: "Outro" },
@@ -25,11 +27,21 @@ const validationSchema = Yup.object().shape({
 type Props = {
   show: boolean;
   setShow: any;
+  account?: Account | null;
+};
+
+type OptionProp = {
+  value: string;
+  label: string;
 };
 
 export default function AddAccountModal(props: Props) {
-  const { show, setShow } = props;
-  const { create, loading } = useAccounts();
+  const { show, setShow, account } = props;
+  const { create, update, loading } = useAccounts();
+  const [defaultValue, setDefaultValue] = useState<OptionProp>({
+    value: "checking",
+    label: "Conta corrente",
+  });
   const {
     values,
     handleChange,
@@ -37,6 +49,7 @@ export default function AddAccountModal(props: Props) {
     handleSubmit,
     errors,
     resetForm,
+    setValues,
   } = useFormik({
     initialValues: {
       description: "",
@@ -45,15 +58,36 @@ export default function AddAccountModal(props: Props) {
       opening_balance: 0.0,
     },
     onSubmit: async (values) => {
-      await create(values);
+      if (account) {
+        await update(account.id, values);
+      } else {
+        await create(values);
+      }
       setShow(false);
     },
     validationSchema,
   });
 
   useEffect(() => {
-    resetForm();
-  }, [show]);
+    if (account) {
+      setValues({
+        description: account.description,
+        type: account.type,
+        default: account.default,
+        opening_balance: normalizePrice(account.opening_balance),
+      });
+      setDefaultValue(
+        options.find((o) => o.value === account.type) || options[0]
+      );
+    } else {
+      resetForm();
+    }
+  }, [account]);
+
+  useEffect(() => {
+    console.log(defaultValue);
+  }, [defaultValue]);
+
   return (
     <Drawer
       title="Nova conta"
@@ -70,7 +104,7 @@ export default function AddAccountModal(props: Props) {
             variant="primary"
             className="ms-2"
           >
-            Adicionar
+            Salvar
           </Button>
         </div>
       }
@@ -105,7 +139,11 @@ export default function AddAccountModal(props: Props) {
         <Form.Group className="form-group">
           <Form.Label>Tipo</Form.Label>
           <Select
-            defaultValue={{ value: "checking", label: "Conta corrente" }}
+            defaultValue={
+              account
+                ? options.find((o) => o.value === account.type)
+                : options[0]
+            }
             options={options}
             onChange={(selected) => setFieldValue("type", selected?.value)}
           />

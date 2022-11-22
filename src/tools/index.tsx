@@ -1,4 +1,6 @@
 import currency from "currency.js";
+import currencyList from "./currencyList";
+import CurrencyList, { CurrencyData } from "./currencyList";
 
 /**
  * Recebe a string de um preço, com casas decimais ou não, e retorna em um float
@@ -37,8 +39,9 @@ export function normalizePrice(price: string | number): number {
 /**
  * Formata um número ou string representando um número para o formato de reais brasileiros
  */
-export function BRLformatter(
-  value: string | number | null | undefined
+export function CurrencyFormatter(
+  value: string | number | null | undefined,
+  symbol?: string
 ): string {
   if (value === null || value === undefined) {
     return "0,00";
@@ -62,9 +65,29 @@ export function BRLformatter(
     value = parseFloat(value);
   }
   const c = currency(value, {
-    symbol: "",
+    symbol: symbol || "",
     decimal: ",",
     separator: ".",
   });
   return c.format();
+}
+
+export function getTranslatedAccountType(type: string): string {
+  switch (type) {
+    case "checking":
+      return "conta corrente";
+    case "investiment":
+      return "investimento";
+    case "other":
+      return "outro";
+    default:
+      return type;
+  }
+}
+
+export function getCurrencyData(code: string): CurrencyData | null {
+  const data = currencyList.find(
+    (c) => c.code.toLowerCase() === code.toLowerCase()
+  );
+  return data || null;
 }
