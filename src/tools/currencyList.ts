@@ -163,7 +163,7 @@ export default [
     namePlural: "Bolivian bolivianos",
   },
   {
-    name: "Brazilian Real",
+    name: "Real brasileiro",
     symbol: "R$",
     symbolNative: "R$",
     decimalDigits: 2,

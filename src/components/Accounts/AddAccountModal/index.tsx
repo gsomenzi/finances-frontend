@@ -7,12 +7,15 @@ import { useAccounts } from "providers/AccountsProvider";
 import Drawer from "components/UI/Drawer";
 import { Account } from "types/Account";
 import { normalizePrice } from "tools";
+import currencyList from "tools/currencyList";
 
 const options: OptionProp[] = [
   { value: "checking", label: "Conta corrente" },
   { value: "investiment", label: "Investimento" },
   { value: "other", label: "Outro" },
 ];
+
+const currencyOpts: OptionProp[] = currencyList.map(c => ({value: c.code, label: c.name}))
 
 const validationSchema = Yup.object().shape({
   description: Yup.string().required("Por favor informe um nome para a conta"),
@@ -38,10 +41,6 @@ type OptionProp = {
 export default function AddAccountModal(props: Props) {
   const { show, setShow, account } = props;
   const { create, update, loading } = useAccounts();
-  const [defaultValue, setDefaultValue] = useState<OptionProp>({
-    value: "checking",
-    label: "Conta corrente",
-  });
   const {
     values,
     handleChange,
@@ -54,6 +53,7 @@ export default function AddAccountModal(props: Props) {
     initialValues: {
       description: "",
       type: "checking",
+      currency: "BRL",
       default: false,
       opening_balance: 0.0,
     },
@@ -73,20 +73,14 @@ export default function AddAccountModal(props: Props) {
       setValues({
         description: account.description,
         type: account.type,
+        currency: account.currency,
         default: account.default,
         opening_balance: normalizePrice(account.opening_balance),
       });
-      setDefaultValue(
-        options.find((o) => o.value === account.type) || options[0]
-      );
     } else {
       resetForm();
     }
   }, [account]);
-
-  useEffect(() => {
-    console.log(defaultValue);
-  }, [defaultValue]);
 
   return (
     <Drawer
@@ -146,6 +140,21 @@ export default function AddAccountModal(props: Props) {
             }
             options={options}
             onChange={(selected) => setFieldValue("type", selected?.value)}
+          />
+          <Form.Control.Feedback type="invalid">
+            {errors.type}
+          </Form.Control.Feedback>
+        </Form.Group>
+        <Form.Group className="form-group">
+          <Form.Label>Moeda</Form.Label>
+          <Select
+            defaultValue={
+              account
+                ? currencyOpts.find((o) => o.value === account.currency)
+                : currencyOpts.find((o) => o.value === 'BRL')
+            }
+            options={currencyOpts}
+            onChange={(selected) => setFieldValue("currency", selected?.value)}
           />
           <Form.Control.Feedback type="invalid">
             {errors.type}
