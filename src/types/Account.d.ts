@@ -8,5 +8,7 @@ export interface Account {
     updated_at: Date;
     current_balance: number;
     expected_balance: number;
+    converted_balance: number;
+    converted_expected_balance: number;
     default: boolean;
 }

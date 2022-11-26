@@ -84,7 +84,7 @@ export default function AccountsView() {
                 </td>
 
                 <td>
-                  <span
+                  <div
                     className={classNames({
                       "text-success": account.current_balance > 0,
                       "text-danger": account.current_balance < 0,
@@ -94,10 +94,17 @@ export default function AccountsView() {
                       normalizePrice(account?.current_balance || 0),
                       getCurrencyData(account?.currency)?.symbol || ""
                     )}
-                  </span>
+                  </div>
+                  {account.currency !== 'BRL' ? (
+                    <span className="money-subtitle">
+                    {CurrencyFormatter(
+                        normalizePrice(account?.converted_balance || 0), 'R$'
+                      )}
+                    </span>
+                  ) : null}
                 </td>
                 <td>
-                  <span
+                  <div
                     className={classNames({
                       "text-success": account.expected_balance > 0,
                       "text-danger": account.expected_balance < 0,
@@ -107,7 +114,14 @@ export default function AccountsView() {
                       normalizePrice(account?.expected_balance || 0),
                       getCurrencyData(account?.currency)?.symbol || ""
                     )}
-                  </span>
+                  </div>
+                  {account.currency !== 'BRL' ? (
+                    <span className="money-subtitle">
+                    {CurrencyFormatter(
+                        normalizePrice(account?.converted_expected_balance || 0), 'R$'
+                      )}
+                    </span>
+                  ) : null}
                 </td>
                 <td className="text-end compact">
                   <Button
@@ -138,18 +152,18 @@ export default function AccountsView() {
                 {CurrencyFormatter(
                   accounts.reduce(
                     (previous, current) =>
-                      (previous += normalizePrice(current.current_balance)),
+                      (previous += normalizePrice(current.converted_balance)),
                     0
-                  )
+                  ), 'R$'
                 )}
               </td>
               <td colSpan={2}>
                 {CurrencyFormatter(
                   accounts.reduce(
                     (previous, current) =>
-                      (previous += normalizePrice(current.expected_balance)),
+                      (previous += normalizePrice(current.converted_expected_balance)),
                     0
-                  )
+                  ), 'R$'
                 )}
               </td>
             </tr>

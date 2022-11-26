@@ -6,8 +6,9 @@ export default class HttpClient {
     client: AxiosInstance;
     constructor() {
         this.client = axios.create({
-            baseURL: 'https://finances.somenzi.me/api',
+            baseURL: 'http://192.168.0.107/api',
             timeout: 30000,
+            withCredentials: false,
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
