@@ -1,26 +1,29 @@
+import { createTheme, ThemeOptions, ThemeProvider } from '@mui/material';
+import AuthProvider from 'providers/AuthProvider';
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
+import Router from './Router';
+
+const theme = createTheme({
+    components: {
+        MuiLink: {
+            defaultProps: {
+                underline: 'none',
+            },
+        },
+    },
+} as ThemeOptions);
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    return (
+        <div className="App">
+            <AuthProvider>
+                <ThemeProvider theme={theme}>
+                    <Router />
+                </ThemeProvider>
+            </AuthProvider>
+        </div>
+    );
 }
 
 export default App;
