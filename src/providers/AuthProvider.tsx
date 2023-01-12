@@ -2,19 +2,11 @@ import React, { createContext, ReactNode, useContext, useEffect, useState } from
 import { normalizeError } from 'tools';
 import HttpClient from 'tools/HttpClient';
 
-type NewUserdata = {
-    name: string;
-    email: string;
-    password: string;
-    password_confirmation: string;
-};
-
 type AuthContextProps = {
     loaded: boolean;
     loggedIn: boolean;
-    getting: boolean;
     authenticate(email: string, password: string): void;
-    register(newUserData: NewUserdata): void;
+    persistAuthData(authData: any): void;
     signOut(): void;
     authenticating: boolean;
 };
@@ -22,9 +14,8 @@ type AuthContextProps = {
 const props: AuthContextProps = {
     loaded: false,
     loggedIn: false,
-    getting: false,
     authenticate: () => {},
-    register: () => {},
+    persistAuthData: () => {},
     signOut: () => {},
     authenticating: false,
 };
@@ -39,7 +30,6 @@ export const useAuth = () => {
 export default function AuthProvider(props: { children: ReactNode }) {
     const { children } = props;
     const [loggedIn, setLoggedIn] = useState<boolean>(false);
-    const [getting, setGetting] = useState<boolean>(true);
     const [loaded, setLoaded] = useState<boolean>(false);
     const [authenticating, setAuthenticating] = useState(false);
 
@@ -56,8 +46,8 @@ export default function AuthProvider(props: { children: ReactNode }) {
     const authenticate = async (email: string, password: string): Promise<any> => {
         try {
             setAuthenticating(true);
-            const { data } = await HttpClient.post('/auth', { email, password, device_name: 'frontend' });
-            localStorage.setItem('auth_data', JSON.stringify(data));
+            const data = await HttpClient.post('/auth', { email, password, device_name: 'frontend' });
+            persistAuthData(data);
             setLoggedIn(true);
             setAuthenticating(false);
             return;
@@ -67,34 +57,19 @@ export default function AuthProvider(props: { children: ReactNode }) {
         }
     };
 
-    const register = async (newUserData: NewUserdata): Promise<any> => {
-        try {
-            const { email, password, name } = newUserData;
-            setAuthenticating(true);
-            // const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-            // if (auth.currentUser) {
-            //     await updateProfile(auth.currentUser, {
-            //         displayName: name,
-            //     });
-            // }
-            // const user = userCredential.user;
-            setAuthenticating(false);
-            return;
-        } catch (e: any) {
-            setAuthenticating(false);
-            return Promise.reject(normalizeError(e));
-        }
+    const persistAuthData = (authData: any) => {
+        localStorage.setItem('auth_data', JSON.stringify(authData));
+        setLoggedIn(true);
     };
 
     return (
         <AuthContext.Provider
             value={{
                 loggedIn,
-                getting,
                 loaded,
                 authenticate,
+                persistAuthData,
                 authenticating,
-                register,
                 signOut,
             }}>
             {children}

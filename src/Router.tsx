@@ -1,10 +1,11 @@
 import { useAuth } from 'providers/AuthProvider';
 import React from 'react';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import AuthTemplate from 'views/_templates/AuthTemplate';
+import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom';
+import DashboardView from 'views/Dashboard';
 import LoginView from 'views/auth/Login';
 import RegisterView from 'views/auth/Register';
-import DashboardView from 'views/Dashboard';
+import AuthTemplate from 'views/_templates/AuthTemplate';
+import DefaultTemplate from 'views/_templates/DefaultTemplate';
 
 const authRouter = createBrowserRouter([
     {
@@ -19,6 +20,10 @@ const authRouter = createBrowserRouter([
                 path: '/cadastro',
                 element: <RegisterView />,
             },
+            {
+                path: '*',
+                element: <Navigate to="/" replace />,
+            },
         ],
     },
 ]);
@@ -26,7 +31,17 @@ const authRouter = createBrowserRouter([
 const rootRouter = createBrowserRouter([
     {
         path: '/',
-        element: <DashboardView />,
+        element: <DefaultTemplate />,
+        children: [
+            {
+                path: '/',
+                element: <DashboardView />,
+            },
+            {
+                path: '*',
+                element: <Navigate to="/" replace />,
+            },
+        ],
     },
 ]);
 

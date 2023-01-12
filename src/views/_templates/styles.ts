@@ -9,3 +9,11 @@ export const AuthWrapper = styled(Box).attrs({
     alignItems: 'center',
     justifyContent: 'center'
 } as BoxProps)``;
+
+export const DefaultWrapper = styled(Box).attrs({
+    width: '100vw',
+    height: '100vh',
+} as BoxProps)`
+    padding-left: 280px;
+    transition: all 150ms;
+`;
