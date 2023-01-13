@@ -82,3 +82,12 @@ export function normalizeValue(value: string | number): number {
         return parseFloat(value);
     }
 }
+
+export function getCurrencyString(value: string | number, currency?: string): string {
+    const floatValue = normalizeValue(value);
+    const formatter = new Intl.NumberFormat('pt-BR', {
+        style: 'currency',
+        currency: currency || 'BRL',
+    });
+    return formatter.format(floatValue);
+}
