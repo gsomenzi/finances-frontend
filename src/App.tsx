@@ -1,7 +1,7 @@
 import React from 'react';
 import Router from './Router';
 import AuthProvider from 'providers/AuthProvider';
-import { createTheme, ThemeOptions, ThemeProvider } from '@mui/material';
+import { createTheme, Paper, ThemeOptions, ThemeProvider } from '@mui/material';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import './App.css';
 
@@ -12,6 +12,12 @@ const theme = createTheme({
         MuiLink: {
             defaultProps: {
                 underline: 'none',
+            },
+        },
+        MuiTableContainer: {
+            defaultProps: {
+                component: Paper,
+                elevation: 1,
             },
         },
     },

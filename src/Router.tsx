@@ -1,9 +1,10 @@
 import { useAuth } from 'providers/AuthProvider';
 import React from 'react';
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom';
-import DashboardView from 'views/Dashboard';
+import AccountsList from 'views/accounts/List';
 import LoginView from 'views/auth/Login';
 import RegisterView from 'views/auth/Register';
+import DashboardView from 'views/Dashboard';
 import AuthTemplate from 'views/_templates/AuthTemplate';
 import DefaultTemplate from 'views/_templates/DefaultTemplate';
 
@@ -36,6 +37,10 @@ const rootRouter = createBrowserRouter([
             {
                 path: '/',
                 element: <DashboardView />,
+            },
+            {
+                path: '/contas',
+                element: <AccountsList />,
             },
             {
                 path: '*',

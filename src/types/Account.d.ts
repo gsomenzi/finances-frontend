@@ -6,7 +6,7 @@ export type Account = {
     current_balance: string;
     expected_balance: string;
     currency: string;
-    default: number;
+    default: boolean;
     created_at: Date;
     updated_at: Date;
     converted_balance: string;

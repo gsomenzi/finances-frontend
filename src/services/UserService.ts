@@ -1,4 +1,3 @@
-import { AxiosResponse } from 'axios';
 import HttpClient from 'tools/HttpClient';
 import { AuthData } from 'types/AuthData';
 import { User } from 'types/User';

@@ -1,5 +1,5 @@
-import { Box, BoxProps, Stack } from '@mui/material';
-import { blue } from '@mui/material/colors';
+import { Box, BoxProps, Stack, Typography, TypographyProps } from '@mui/material';
+import { blue, grey } from '@mui/material/colors';
 import styled from 'styled-components';
 
 
@@ -27,10 +27,16 @@ export const MenuItem = styled(Box).attrs({
     textAlign: 'left',
     display: 'flex',
     alignItems: 'center',
+    color: grey[700]
 } as BoxProps)`
 border-left: 4px solid transparent;
     transition: all 150ms;
     &:hover {
         border-left: 4px solid ${blue[500]};
+        color: ${grey[900]}
     }
 `;
+
+export const MenuItemTitle = styled(Typography).attrs({
+    marginLeft: 2
+} as TypographyProps)``;

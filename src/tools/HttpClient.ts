@@ -1,12 +1,9 @@
 import axios, { AxiosRequestConfig } from 'axios';
 import { addQueryString } from 'tools';
 import { AuthData } from 'types/AuthData';
+import { QueryStrings } from 'types/QueryStrings';
 
-const DEFAULT_API_BASEURL = 'http://192.168.0.150/api';
-
-type QueryStrings = {
-    [key: string]: string | number;
-};
+const DEFAULT_API_BASEURL = 'https://finances.somenzi.me/api';
 
 export default class HttpClient {
     protected static client = axios.create({

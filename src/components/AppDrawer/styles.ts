@@ -7,7 +7,7 @@ export const Wrapper = styled(Box).attrs({
     width: 540px;
     display: flex;
     flex-direction: column;
-    height: 100%;
+    height: 100vh;
 `
 
 export const DrawerHeader = styled(Box).attrs({

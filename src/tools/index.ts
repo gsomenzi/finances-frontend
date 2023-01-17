@@ -91,3 +91,12 @@ export function getCurrencyString(value: string | number, currency?: string): st
     });
     return formatter.format(floatValue);
 }
+
+export function getTranslatedAccountType(type: string): string {
+    switch (type.toLowerCase()) {
+        case 'checking': return 'conta corrente';
+        case 'investiment': return 'investimento';
+        case 'other': return 'outro';
+        default: return type;
+    }
+}
