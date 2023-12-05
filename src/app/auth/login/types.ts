@@ -1,3 +1,5 @@
 export type LoginViewProps = {
-    loading: boolean;
+    authenticating: boolean;
+    errorMessage: string;
+    authenticate: (email: string, password: string) => void;
 };

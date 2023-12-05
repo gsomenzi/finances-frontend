@@ -1,12 +1,19 @@
 import React from 'react';
-import { LoginViewProps } from './types';
+import { RegisterViewProps } from './types';
 import { Button, Card, Divider, Form, Input, Typography } from 'antd';
 import { Rule } from 'antd/es/form';
 import ErrorAlert from '@/components/ErrorAlert';
 import Link from 'next/link';
+
 const { Title } = Typography;
 
 const rules: { [key: string]: Rule[] } = {
+    name: [
+        {
+            required: true,
+            message: 'Por favor informe seu nome',
+        },
+    ],
     email: [
         {
             type: 'email',
@@ -25,18 +32,18 @@ const rules: { [key: string]: Rule[] } = {
     ],
 };
 
-export default function LoginView(props: LoginViewProps) {
+export default function RegisterView(props: RegisterViewProps) {
     const [form] = Form.useForm();
-    const { errorMessage, authenticating } = props;
+    const { errorMessage, registering } = props;
     return (
         <div>
             <Card>
-                <Title level={2}>Login</Title>
+                <Title level={2}>Cadastro</Title>
                 <Divider />
-                <Form
-                    form={form}
-                    onFinish={() => props.authenticate(form.getFieldValue('email'), form.getFieldValue('password'))}
-                    layout="vertical">
+                <Form form={form} onFinish={() => props.register(form.getFieldsValue())} layout="vertical">
+                    <Form.Item name="name" label="Nome" rules={rules.name}>
+                        <Input />
+                    </Form.Item>
                     <Form.Item name="email" label="E-mail" rules={rules.email}>
                         <Input />
                     </Form.Item>
@@ -49,12 +56,12 @@ export default function LoginView(props: LoginViewProps) {
                         </Form.Item>
                     )}
                     <Form.Item>
-                        <Button type="primary" htmlType="submit" block loading={authenticating}>
-                            Entrar
+                        <Button type="primary" htmlType="submit" block loading={registering}>
+                            Cadastrar
                         </Button>
                     </Form.Item>
                 </Form>
-                <Link href="/auth/register">Cadastre-se</Link>
+                <Link href="/auth/login">Faça login</Link>
             </Card>
         </div>
     );
