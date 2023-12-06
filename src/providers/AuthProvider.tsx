@@ -1,4 +1,4 @@
-import { useApi } from '@/hooks/useApi';
+import { useApi } from '@/providers/ApiProvider';
 import { User } from '@/types/User';
 import React, { useEffect } from 'react';
 

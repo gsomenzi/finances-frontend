@@ -4,7 +4,7 @@ import './globals.css';
 
 import { ConfigProvider } from 'antd';
 import StyledComponentsRegistry from '@/lib/AntdRegistry';
-import { ApiProvider } from '@/hooks/useApi';
+import { ApiProvider } from '@/providers/ApiProvider';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import theme from '../theme/themeConfig';
 import { AuthProvider } from '@/providers/AuthProvider';
