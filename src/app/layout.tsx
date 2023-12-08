@@ -8,6 +8,7 @@ import { ApiProvider } from '@/providers/ApiProvider';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import theme from '../theme/themeConfig';
 import { AuthProvider } from '@/providers/AuthProvider';
+import { ConfirmProvider } from '@/providers/ConfirmProvider';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
     const queryClient = new QueryClient();
@@ -16,11 +17,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <body>
                 <StyledComponentsRegistry>
                     <ConfigProvider theme={theme}>
-                        <ApiProvider>
-                            <AuthProvider>
-                                <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-                            </AuthProvider>
-                        </ApiProvider>
+                        <ConfirmProvider>
+                            <ApiProvider>
+                                <AuthProvider>
+                                    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+                                </AuthProvider>
+                            </ApiProvider>
+                        </ConfirmProvider>
                     </ConfigProvider>
                 </StyledComponentsRegistry>
             </body>
