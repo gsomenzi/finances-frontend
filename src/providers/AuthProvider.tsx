@@ -9,7 +9,7 @@ export type RegisterPayload = {
 };
 
 const AuthContextProps: {
-    authenticated: boolean;
+    authenticated?: boolean;
     authenticating: boolean;
     errorMessage: string;
     registering: boolean;
@@ -31,7 +31,7 @@ const AuthContext = React.createContext(AuthContextProps);
 export const useAuth = () => React.useContext(AuthContext);
 
 export function AuthProvider({ children }: any) {
-    const [authenticated, setAuthenticated] = React.useState(false);
+    const [authenticated, setAuthenticated] = React.useState<boolean>();
     const [authenticating, setAuthenticating] = React.useState(false);
     const [errorMessage, setErrorMessage] = React.useState('');
     const [registering, setRegistering] = React.useState(false);
@@ -41,6 +41,8 @@ export function AuthProvider({ children }: any) {
         const accessToken = localStorage.getItem('accessToken');
         if (accessToken) {
             setAuthenticated(true);
+        } else {
+            setAuthenticated(false);
         }
     }, []);
 

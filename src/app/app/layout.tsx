@@ -14,7 +14,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
     const router = useRouter();
     const { authenticated } = useAuth();
     useEffect(() => {
-        if (!authenticated) {
+        if (authenticated === false) {
             router.push('/auth/login');
         }
     }, [authenticated]);
@@ -26,10 +26,10 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
                     <SiderMenu />
                 </Sider>
                 <Layout>
-                    <Header style={{ backgroundColor: '#fff' }}>
+                    <Header style={{ paddingLeft: 24, paddingRight: 24, backgroundColor: '#fff' }}>
                         <AppHeader />
                     </Header>
-                    <Content style={{ height: '100vh' }}>{children}</Content>
+                    <Content style={{ height: '100vh', padding: 24 }}>{children}</Content>
                 </Layout>
             </Layout>
         </>
