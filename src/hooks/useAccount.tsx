@@ -2,9 +2,9 @@ import React from 'react';
 import { useApi } from '@/providers/ApiProvider';
 import { Account } from '@/types/Account';
 import { ListResponseData } from '@/types/ListResponseData';
-import { QueryKey } from 'react-query';
+import { QueryFunctionContext, QueryKey } from 'react-query';
 
-type GetAccountsProps = {
+type GetAccountQueryParams = {
     page?: number;
     limit?: number;
     search?: string;
@@ -13,7 +13,8 @@ type GetAccountsProps = {
 export function useAccount() {
     const { get } = useApi();
 
-    function getAccounts(key: any, { page, limit, search }: GetAccountsProps = {}): Promise<ListResponseData<Account>> {
+    function getAccounts(queryParams: GetAccountQueryParams): Promise<ListResponseData<Account>> {
+        const { page, limit, search } = queryParams;
         return get('/accounts', {
             page: page ?? 1,
             limit: limit ?? 25,
@@ -21,9 +22,9 @@ export function useAccount() {
         });
     }
 
-    function getAccountsBalances({ queryKey }: any): Promise<any> {
+    function getAccountsBalances(accountIds: number[]): Promise<any> {
         return get('/accounts/balances', {
-            accountIds: queryKey[1]?.accountIds || '',
+            accountIds: accountIds.join(',') || '',
         });
     }
 

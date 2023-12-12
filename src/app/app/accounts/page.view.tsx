@@ -3,9 +3,11 @@
 import React, { useEffect } from 'react';
 import { AccountsViewProps } from './types';
 import { Table } from 'antd';
+import { currencyFormatter } from '@/lib/currencyFormatter';
+import { accountTypeTranslator } from '@/lib/accountTypeTranslator';
 
 export default function AccountsView(props: AccountsViewProps) {
-    const { accounts, balances, isLoading, getTranslatedType } = props;
+    const { accounts, balances, isLoading } = props;
 
     return (
         <div>
@@ -24,7 +26,7 @@ export default function AccountsView(props: AccountsViewProps) {
                         title: 'Tipo',
                         dataIndex: 'type',
                         key: 'type',
-                        render: (type: string) => getTranslatedType(type),
+                        render: (type: string) => accountTypeTranslator(type),
                     },
                     {
                         title: 'Moeda',
@@ -33,7 +35,8 @@ export default function AccountsView(props: AccountsViewProps) {
                     },
                     {
                         title: 'Saldo',
-                        render: (value, record) => `${balances.find((b) => b.accountId === record.id)?.balance ?? 0}`,
+                        render: (value, record) =>
+                            `${currencyFormatter(balances.find((b) => b.accountId === record.id)?.balance ?? 0)}`,
                     },
                 ]}
             />
