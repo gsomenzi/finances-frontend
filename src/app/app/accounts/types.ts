@@ -1,4 +1,6 @@
 export type AccountsViewProps = {
-    loading: boolean;
+    accounts: any[];
+    balances: any[];
+    isLoading: boolean;
+    getTranslatedType: (type: string) => string;
 };
-

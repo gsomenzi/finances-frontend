@@ -30,6 +30,14 @@ export function ApiProvider({ children }: { children: React.ReactNode }) {
         },
     });
 
+    apiClient.interceptors.request.use((config) => {
+        const accessToken = localStorage.getItem('accessToken');
+        if (accessToken) {
+            config.headers.Authorization = `Bearer ${accessToken}`;
+        }
+        return config;
+    });
+
     async function get<T>(url: string, queryParams?: RequestQueryParams): Promise<T> {
         const res = await apiClient.get<T>(url, { params: queryParams });
         return res.data;

@@ -45,7 +45,7 @@ export default function AppHeader() {
         ];
         path.forEach((p) => {
             items.push({
-                href: `/app/${p}`,
+                href: `/app/${p}` !== pathname ? `/app/${p}` : undefined,
                 title: getTranslatedBreadcrumTitle(p),
             });
         });
