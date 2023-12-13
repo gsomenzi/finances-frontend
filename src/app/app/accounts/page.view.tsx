@@ -2,10 +2,10 @@
 
 import React, { useEffect, useState } from 'react';
 import { AccountsViewProps } from './types';
-import { Button, FloatButton, Popconfirm, Space, Table, Typography } from 'antd';
+import { Button, FloatButton, Popconfirm, Space, Table, Tooltip, Typography } from 'antd';
 import { currencyFormatter } from '@/lib/currencyFormatter';
 import { accountTypeTranslator } from '@/lib/accountTypeTranslator';
-import { PlusOutlined } from '@ant-design/icons';
+import { PlusOutlined, StarOutlined } from '@ant-design/icons';
 import AddEditForm from './components/AddEditForm';
 import { Account } from '@/types/Account';
 
@@ -35,6 +35,16 @@ export default function AccountsView(props: AccountsViewProps) {
                         title: 'Nome',
                         dataIndex: 'name',
                         key: 'name',
+                        render: (name: string, record) => (
+                            <div>
+                                {name}{' '}
+                                {record.default ? (
+                                    <Tooltip title="Conta padrão">
+                                        <StarOutlined style={{ color: 'gold' }} />
+                                    </Tooltip>
+                                ) : null}
+                            </div>
+                        ),
                     },
                     {
                         title: 'Tipo',

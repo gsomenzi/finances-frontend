@@ -1,17 +1,18 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { AddEditFormProps } from './types';
 import { Button, Checkbox, Drawer, Flex, Form, Input, Select, Space } from 'antd';
 import { useMutation, useQueryClient } from 'react-query';
 import { useApi } from '@/providers/ApiProvider';
 import ErrorAlert from '@/components/ErrorAlert';
+import { Account } from '@/types/Account';
 
 export default function AddEditForm(props: AddEditFormProps) {
     const { account, open, onClose } = props;
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const queryClient = useQueryClient();
-    const { post } = useApi();
+    const { post, put } = useApi();
     const [form] = Form.useForm();
     const addAccount = useMutation(
         (accountData) => {
@@ -29,12 +30,44 @@ export default function AddEditForm(props: AddEditFormProps) {
         },
     );
 
+    const updateAccount = useMutation(
+        (accountData: Account) => {
+            setErrorMessage(null);
+            return put(`/accounts/${accountData.id}`, { ...accountData });
+        },
+        {
+            onSuccess: () => {
+                queryClient.invalidateQueries('accounts');
+                queryClient.invalidateQueries('balances');
+                onClose();
+            },
+            onError: (e: any) => {
+                setErrorMessage(e?.response?.data?.message || 'Erro ao atualizar a conta');
+            },
+        },
+    );
+
     function handleCancel() {
         form.resetFields();
         onClose();
     }
 
-    useEffect(() => {
+    function handleSubmit(values: any) {
+        if (account?.id) {
+            updateAccount.mutate({
+                ...values,
+                initialBalance: String(values.initialBalance),
+                id: account.id,
+            });
+        } else {
+            addAccount.mutate({
+                ...values,
+                initialBalance: String(values.initialBalance),
+            });
+        }
+    }
+
+    useLayoutEffect(() => {
         let initialBalance = 0;
         if (account?.relatedTransactions && account.relatedTransactions.length > 0) {
             initialBalance = Number(account.relatedTransactions[0].transaction?.value) || 0;
@@ -45,7 +78,7 @@ export default function AddEditForm(props: AddEditFormProps) {
             initialBalance,
             default: account?.default || false,
         });
-    }, [account, form]);
+    }, [account]);
 
     return (
         <Drawer
@@ -63,7 +96,7 @@ export default function AddEditForm(props: AddEditFormProps) {
                     </Space>
                 </Flex>
             }>
-            <Form form={form} onFinish={addAccount.mutate} layout="vertical">
+            <Form form={form} onFinish={handleSubmit} layout="vertical">
                 <Form.Item name="name" label="Nome" rules={[{ required: true }]}>
                     <Input />
                 </Form.Item>
@@ -71,7 +104,7 @@ export default function AddEditForm(props: AddEditFormProps) {
                     <Select
                         options={[
                             { value: 'checkings', label: 'Conta Corrente' },
-                            { value: 'investiment', label: 'Investimento' },
+                            { value: 'investment', label: 'Investimento' },
                             { value: 'other', label: 'Outros' },
                         ]}
                     />
@@ -79,8 +112,8 @@ export default function AddEditForm(props: AddEditFormProps) {
                 <Form.Item name="initialBalance" label="Saldo Inicial" rules={[{ required: true }]}>
                     <Input addonBefore="R$" type="number" />
                 </Form.Item>
-                <Form.Item name="default">
-                    <Checkbox>Conta padrão</Checkbox>
+                <Form.Item name="default" valuePropName="checked">
+                    <Checkbox defaultChecked={account?.default}>Conta padrão</Checkbox>
                 </Form.Item>
                 <ErrorAlert show={!!errorMessage} title="Falha ao salvar a conta" description={errorMessage} />
             </Form>
