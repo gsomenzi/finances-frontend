@@ -1,22 +1,39 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { AccountsViewProps } from './types';
-import { Button, FloatButton, Popconfirm, Space, Table, Tooltip, Typography } from 'antd';
+import { Button, Flex, FloatButton, Input, Popconfirm, Space, Table, Tooltip, Typography } from 'antd';
 import { currencyFormatter } from '@/lib/currencyFormatter';
 import { accountTypeTranslator } from '@/lib/accountTypeTranslator';
 import { PlusOutlined, StarOutlined } from '@ant-design/icons';
 import AddEditForm from './components/AddEditForm';
 import { Account } from '@/types/Account';
 
+const { Search } = Input;
+
 export default function AccountsView(props: AccountsViewProps) {
-    const { accounts, balances, isLoading, isRemoving, remove } = props;
+    const {
+        accounts,
+        balances,
+        isLoading,
+        isRemoving,
+        page,
+        limit,
+        total,
+        remove,
+        onPageChange,
+        onSizeChange,
+        onSearch,
+    } = props;
     const [open, setOpen] = useState(false);
     const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
 
     return (
         <div>
-            <Typography.Title level={2}>Contas</Typography.Title>
+            <Flex justify="space-between" align="center">
+                <Typography.Title level={2}>Contas</Typography.Title>
+                <Search placeholder="input search text" onSearch={onSearch} style={{ width: 200 }} />
+            </Flex>
             <FloatButton
                 type="primary"
                 icon={<PlusOutlined />}
@@ -104,6 +121,14 @@ export default function AccountsView(props: AccountsViewProps) {
                         ),
                     },
                 ]}
+                pagination={{
+                    defaultCurrent: page,
+                    defaultPageSize: limit,
+                    total: total,
+                    onChange: onPageChange,
+                    showSizeChanger: true,
+                    onShowSizeChange: (_, newSize) => onSizeChange(newSize),
+                }}
             />
         </div>
     );

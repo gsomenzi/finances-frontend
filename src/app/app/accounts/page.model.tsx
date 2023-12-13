@@ -12,7 +12,7 @@ export default function AccountsViewModel(): AccountsViewProps {
     const { getAccounts, getAccountsBalances, removeAccount } = useAccount();
     const queryClient = useQueryClient();
     const [page, setPage] = useState(1);
-    const [limit, setLimit] = useState(25);
+    const [limit, setLimit] = useState(20);
     const [search, setSearch] = useState('');
 
     const { data: accounts, isLoading: gettingAccounts } = useQuery<ListResponseData<Account>>(
@@ -45,11 +45,29 @@ export default function AccountsViewModel(): AccountsViewProps {
 
     const isLoading = gettingAccounts || gettingBalances;
 
+    function onPageChange(newPage: number) {
+        setPage(newPage);
+    }
+
+    function onSizeChange(newSize: number) {
+        setLimit(newSize);
+    }
+
+    function onSearch(newSearch: string) {
+        setSearch(newSearch);
+    }
+
     return {
         accounts: accounts?.data || [],
         balances: balanceData || [],
         isLoading,
         isRemoving,
+        page,
+        limit,
+        total: accounts?.total || 0,
         remove,
+        onPageChange,
+        onSizeChange,
+        onSearch,
     };
 }

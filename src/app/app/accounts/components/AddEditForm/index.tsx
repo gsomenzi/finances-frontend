@@ -1,19 +1,37 @@
 'use client';
 
-import React, { useEffect, useLayoutEffect, useMemo, useState } from 'react';
+import React, { useLayoutEffect, useMemo, useState } from 'react';
+import { Account } from '@/types/Account';
 import { AddEditFormProps } from './types';
 import { Button, Checkbox, Drawer, Flex, Form, Input, Select, Space } from 'antd';
-import { useMutation, useQueryClient } from 'react-query';
 import { useApi } from '@/providers/ApiProvider';
+import { useMutation, useQueryClient } from 'react-query';
 import ErrorAlert from '@/components/ErrorAlert';
-import { Account } from '@/types/Account';
 
 export default function AddEditForm(props: AddEditFormProps) {
     const { account, open, onClose } = props;
-    const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const queryClient = useQueryClient();
-    const { post, put } = useApi();
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [form] = Form.useForm();
+    const { post, put } = useApi();
+
+    const initialBalanceTransaction = useMemo(() => {
+        if (account?.relatedTransactions?.length && account.relatedTransactions.length > 0) {
+            return account.relatedTransactions[0].transaction;
+        } else {
+            return null;
+        }
+    }, [account]);
+
+    useLayoutEffect(() => {
+        form.setFieldsValue({
+            name: account?.name || '',
+            type: account?.type || 'checkings',
+            initialBalance: initialBalanceTransaction?.value || 0,
+            default: account?.default || false,
+        });
+    }, [account, initialBalanceTransaction]);
+
     const addAccount = useMutation(
         (accountData) => {
             setErrorMessage(null);
@@ -22,10 +40,11 @@ export default function AddEditForm(props: AddEditFormProps) {
         {
             onSuccess: () => {
                 queryClient.invalidateQueries('accounts');
+                queryClient.invalidateQueries('balances');
                 onClose();
             },
-            onError: () => {
-                setErrorMessage('Erro ao adicionar conta');
+            onError: (e: any) => {
+                setErrorMessage(e?.response?.data?.message || 'Erro ao criar a conta');
             },
         },
     );
@@ -53,32 +72,20 @@ export default function AddEditForm(props: AddEditFormProps) {
     }
 
     function handleSubmit(values: any) {
+        const updatedValues = {
+            ...values,
+            initialBalance: String(values.initialBalance),
+        };
+
         if (account?.id) {
             updateAccount.mutate({
-                ...values,
-                initialBalance: String(values.initialBalance),
+                ...updatedValues,
                 id: account.id,
             });
         } else {
-            addAccount.mutate({
-                ...values,
-                initialBalance: String(values.initialBalance),
-            });
+            addAccount.mutate(updatedValues);
         }
     }
-
-    useLayoutEffect(() => {
-        let initialBalance = 0;
-        if (account?.relatedTransactions && account.relatedTransactions.length > 0) {
-            initialBalance = Number(account.relatedTransactions[0].transaction?.value) || 0;
-        }
-        form.setFieldsValue({
-            name: account?.name || '',
-            type: account?.type || 'checkings',
-            initialBalance,
-            default: account?.default || false,
-        });
-    }, [account]);
 
     return (
         <Drawer
@@ -90,7 +97,10 @@ export default function AddEditForm(props: AddEditFormProps) {
                 <Flex justify="end">
                     <Space>
                         <Button onClick={handleCancel}>Cancelar</Button>
-                        <Button type="primary" onClick={() => form.submit()} loading={addAccount.isLoading}>
+                        <Button
+                            type="primary"
+                            onClick={() => form.submit()}
+                            loading={addAccount.isLoading || updateAccount.isLoading}>
                             Salvar
                         </Button>
                     </Space>

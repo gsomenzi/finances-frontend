@@ -6,5 +6,11 @@ export type AccountsViewProps = {
     balances: any[];
     isLoading: boolean;
     isRemoving: boolean;
+    page: number;
+    limit: number;
+    total: number;
     remove: UseMutateFunction<any, unknown, number, unknown>;
+    onPageChange: (newPage: number) => void;
+    onSizeChange: (newSize: number) => void;
+    onSearch: (newSearch: string) => void;
 };
