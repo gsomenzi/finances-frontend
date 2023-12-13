@@ -9,6 +9,7 @@ import { QueryClient, QueryClientProvider } from 'react-query';
 import theme from '../theme/themeConfig';
 import { AuthProvider } from '@/providers/AuthProvider';
 import { ConfirmProvider } from '@/providers/ConfirmProvider';
+import ptBR from 'antd/lib/locale/pt_BR';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
     const queryClient = new QueryClient();
@@ -16,7 +17,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <html lang="pt-BR">
             <body>
                 <StyledComponentsRegistry>
-                    <ConfigProvider theme={theme}>
+                    <ConfigProvider locale={ptBR} theme={theme}>
                         <ConfirmProvider>
                             <ApiProvider>
                                 <AuthProvider>

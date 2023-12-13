@@ -21,7 +21,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
 
     return (
         <>
-            <Layout>
+            <Layout style={{ minHeight: '100vh' }}>
                 <Sider collapsible>
                     <SiderMenu />
                 </Sider>
@@ -29,7 +29,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
                     <Header style={{ paddingLeft: 24, paddingRight: 24, backgroundColor: '#fff' }}>
                         <AppHeader />
                     </Header>
-                    <Content style={{ height: '100vh', padding: 24 }}>{children}</Content>
+                    <Content style={{ paddingLeft: 24, paddingRight: 24 }}>{children}</Content>
                 </Layout>
             </Layout>
         </>

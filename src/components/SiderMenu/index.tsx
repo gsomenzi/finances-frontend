@@ -1,54 +1,57 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Menu } from 'antd';
 import { ItemType, MenuItemType } from 'antd/es/menu/hooks/useItems';
 import { BankOutlined, CreditCardOutlined, HomeOutlined, UnorderedListOutlined } from '@ant-design/icons';
 import { Wrapper } from './styles';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 
 export default function SiderMenu() {
+    const pathname = usePathname();
     const router = useRouter();
+    const [selectedKeys, setSelectedKeys] = useState(['1']);
     const items: ItemType<MenuItemType>[] = [
         {
-            key: '1',
+            key: '/app/dashboard',
             icon: <HomeOutlined />,
             label: 'Dashboard',
         },
         {
-            key: '2',
+            key: '/app/transactions',
             icon: <UnorderedListOutlined />,
             label: 'Transações',
         },
         {
-            key: '3',
+            key: '/app/accounts',
             icon: <BankOutlined />,
             label: 'Contas',
         },
         {
-            key: '4',
+            key: '/app/credit-cards',
             icon: <CreditCardOutlined />,
             label: 'Cartões de crédito',
         },
     ];
 
     function handleSelect(item: ItemType<MenuItemType>) {
-        switch (item?.key) {
-            case '1': {
-                return router.push('/app/dashboard');
-            }
-            case '2': {
-                return router.push('/app/transactions');
-            }
-            case '3': {
-                return router.push('/app/accounts');
-            }
-            case '4': {
-                return router.push('/app/credit-cards');
-            }
-        }
+        return router.push(String(item?.key) || '/app/dashboard');
     }
+
+    useEffect(() => {
+        if (pathname) {
+            setSelectedKeys([pathname]);
+        }
+    }, [pathname]);
+
     return (
         <Wrapper>
-            <Menu theme="dark" mode="inline" multiple={false} defaultSelectedKeys={['1']} items={items} onSelect={handleSelect} />
+            <Menu
+                theme="dark"
+                mode="inline"
+                multiple={false}
+                selectedKeys={selectedKeys}
+                items={items}
+                onSelect={handleSelect}
+            />
         </Wrapper>
     );
 }

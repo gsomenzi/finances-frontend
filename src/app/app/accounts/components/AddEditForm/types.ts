@@ -1,3 +1,7 @@
-import { ReactNode } from 'react';
+import { Account } from '@/types/Account';
 
-export type AddEditFormProps = {};
+export type AddEditFormProps = {
+    account?: Account | null;
+    open: boolean;
+    onClose: () => void;
+};

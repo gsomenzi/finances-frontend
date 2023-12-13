@@ -1,15 +1,21 @@
-import React, { useEffect, useState } from 'react';
+'use client';
+
+import React, { useState } from 'react';
 import { AccountsViewProps } from './types';
-import { useQuery } from 'react-query';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { useAccount } from '@/hooks/useAccount';
+import { Account } from '@/types/Account';
+import { AccountBalance } from '@/types/AccountBalance';
+import { ListResponseData } from '@/types/ListResponseData';
 
 export default function AccountsViewModel(): AccountsViewProps {
-    const { getAccounts, getAccountsBalances } = useAccount();
+    const { getAccounts, getAccountsBalances, removeAccount } = useAccount();
+    const queryClient = useQueryClient();
     const [page, setPage] = useState(1);
     const [limit, setLimit] = useState(25);
     const [search, setSearch] = useState('');
 
-    const { data: accountsData, isLoading: gettingAccounts } = useQuery(
+    const { data: accounts, isLoading: gettingAccounts } = useQuery<ListResponseData<Account>>(
         ['accounts', { page, limit, search }],
         () => getAccounts({ page, limit, search }),
         {
@@ -17,25 +23,33 @@ export default function AccountsViewModel(): AccountsViewProps {
         },
     );
 
-    const accounts = accountsData?.data || [];
-    const accountIds = accounts.map((a: any) => a.id);
+    const accountIds: number[] = (accounts?.data || []).map((a: any) => a.id);
 
-    const { data: balanceData, isLoading: gettingBalances } = useQuery(
+    const { data: balanceData, isLoading: gettingBalances } = useQuery<AccountBalance[], Error>(
         ['balances', { accountIds }],
-        () => getAccountsBalances(accountIds),
+        ({ queryKey }) => {
+            const { accountIds } = queryKey[1] as any;
+            return getAccountsBalances(accountIds as number[]);
+        },
         {
-            enabled: accounts && accounts.length > 0,
+            enabled: Number(accounts?.data?.length) > 0,
             refetchOnWindowFocus: false,
         },
     );
 
-    const balances = balanceData || [];
+    const { mutate: remove, isLoading: isRemoving } = useMutation((id: number) => removeAccount(id), {
+        onSuccess: () => {
+            queryClient.invalidateQueries('accounts');
+        },
+    });
 
     const isLoading = gettingAccounts || gettingBalances;
 
     return {
-        accounts,
-        balances,
+        accounts: accounts?.data || [],
+        balances: balanceData || [],
         isLoading,
+        isRemoving,
+        remove,
     };
 }

@@ -11,7 +11,7 @@ type GetAccountQueryParams = {
 };
 
 export function useAccount() {
-    const { get } = useApi();
+    const { get, delete: _delete } = useApi();
 
     function getAccounts(queryParams: GetAccountQueryParams): Promise<ListResponseData<Account>> {
         const { page, limit, search } = queryParams;
@@ -28,8 +28,13 @@ export function useAccount() {
         });
     }
 
+    function removeAccount(id: number | string) {
+        return _delete(`/accounts/${id}`);
+    }
+
     return {
         getAccounts,
         getAccountsBalances,
+        removeAccount,
     };
 }
