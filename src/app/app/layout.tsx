@@ -8,6 +8,7 @@ import Sider from 'antd/es/layout/Sider';
 import { Header } from 'antd/es/layout/layout';
 import SiderMenu from '@/components/SiderMenu';
 import AppHeader from '@/components/AppHeader';
+import AppLoader from '@/components/AppLoader';
 const Content = Layout.Content;
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
@@ -21,17 +22,21 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
 
     return (
         <>
-            <Layout style={{ minHeight: '100vh' }}>
-                <Sider collapsible>
-                    <SiderMenu />
-                </Sider>
-                <Layout>
-                    <Header style={{ paddingLeft: 24, paddingRight: 24, backgroundColor: '#fff' }}>
-                        <AppHeader />
-                    </Header>
-                    <Content style={{ paddingLeft: 24, paddingRight: 24 }}>{children}</Content>
+            {authenticated === true ? (
+                <Layout style={{ minHeight: '100vh' }}>
+                    <Sider collapsible>
+                        <SiderMenu />
+                    </Sider>
+                    <Layout>
+                        <Header style={{ paddingLeft: 24, paddingRight: 24, backgroundColor: '#fff' }}>
+                            <AppHeader />
+                        </Header>
+                        <Content style={{ paddingLeft: 24, paddingRight: 24 }}>{children}</Content>
+                    </Layout>
                 </Layout>
-            </Layout>
+            ) : (
+                <AppLoader />
+            )}
         </>
     );
 }

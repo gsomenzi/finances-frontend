@@ -1,8 +1,7 @@
 'use client';
 
+import AppLoader from '@/components/AppLoader';
 import { useAuth } from '@/providers/AuthProvider';
-import { LoadingOutlined } from '@ant-design/icons';
-import { Flex, Spin } from 'antd';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
@@ -20,11 +19,7 @@ export default function Home() {
     }, [authenticated, router]);
     return (
         <main>
-            <Flex style={{ height: '100vh', width: '100vw' }} justify="center" align="center" vertical>
-                <div>
-                    <Spin indicator={<LoadingOutlined spin />} size="large" />
-                </div>
-            </Flex>
+            <AppLoader />
         </main>
     );
 }

@@ -6,6 +6,7 @@ import { WidthLimiter, Wrapper } from './styles';
 import { AuthLayoutProps } from './types';
 import { useAuth } from '@/providers/AuthProvider';
 import { useRouter } from 'next/navigation';
+import AppLoader from '@/components/AppLoader';
 const Content = Layout.Content;
 
 export default function AuthLayout({ children }: AuthLayoutProps) {
@@ -18,13 +19,17 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
     }, [authenticated]);
     return (
         <>
-            <Layout>
-                <Content>
-                    <Wrapper>
-                        <WidthLimiter>{children}</WidthLimiter>
-                    </Wrapper>
-                </Content>
-            </Layout>
+            {authenticated === false ? (
+                <Layout>
+                    <Content>
+                        <Wrapper>
+                            <WidthLimiter>{children}</WidthLimiter>
+                        </Wrapper>
+                    </Content>
+                </Layout>
+            ) : (
+                <AppLoader />
+            )}
         </>
     );
 }
