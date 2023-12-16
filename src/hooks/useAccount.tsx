@@ -17,7 +17,7 @@ export function useAccount() {
         const { page, limit, search } = queryParams;
         return get('/accounts', {
             page: page ?? 1,
-            limit: limit ?? 25,
+            limit: limit ?? 20,
             search: search ?? '',
         });
     }

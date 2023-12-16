@@ -10,6 +10,10 @@ import theme from '../theme/themeConfig';
 import { AuthProvider } from '@/providers/AuthProvider';
 import { ConfirmProvider } from '@/providers/ConfirmProvider';
 import ptBR from 'antd/lib/locale/pt_BR';
+import 'dayjs/locale/pt-br';
+import dayjs from 'dayjs';
+
+dayjs.locale('pt-br');
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
     const queryClient = new QueryClient();

@@ -23,7 +23,7 @@ export default function AccountsViewModel(): AccountsViewProps {
         },
     );
 
-    const accountIds: number[] = (accounts?.data || []).map((a: any) => a.id);
+    const accountIds: number[] = (accounts?.data || []).map((a: any) => a.id) || [];
 
     const { data: balanceData, isLoading: gettingBalances } = useQuery<AccountBalance[], Error>(
         ['balances', { accountIds }],
@@ -32,7 +32,7 @@ export default function AccountsViewModel(): AccountsViewProps {
             return getAccountsBalances(accountIds as number[]);
         },
         {
-            enabled: Number(accounts?.data?.length) > 0,
+            enabled: accountIds.length > 0,
             refetchOnWindowFocus: false,
         },
     );

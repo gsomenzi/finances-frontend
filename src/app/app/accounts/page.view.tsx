@@ -32,7 +32,7 @@ export default function AccountsView(props: AccountsViewProps) {
         <div>
             <Flex justify="space-between" align="center">
                 <Typography.Title level={2}>Contas</Typography.Title>
-                <Search placeholder="input search text" onSearch={onSearch} style={{ width: 200 }} />
+                <Search placeholder="Pesquisa" onSearch={onSearch} style={{ width: 200 }} />
             </Flex>
             <FloatButton
                 type="primary"
