@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { TransactionsViewProps } from './types';
 import { DatePicker, Flex, Typography, Input, FloatButton, Space, Popconfirm, Button, Table } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
+import { ArrowDownOutlined, ArrowUpOutlined, PlusOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import AddEditForm from './components/AddEditForm';
 import { Transaction } from '@/types/Transaction';
@@ -21,6 +21,7 @@ export default function TransactionsView(props: TransactionsViewProps) {
         onSizeChange,
         onSearch,
         onDateFilterChange,
+        getTransactionTypeIcon,
     } = props;
     const [open, setOpen] = useState(false);
     const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
@@ -63,6 +64,7 @@ export default function TransactionsView(props: TransactionsViewProps) {
                         title: 'Descrição',
                         dataIndex: 'description',
                         key: 'description',
+                        width: 400,
                     },
                     {
                         title: 'Conta',
@@ -77,9 +79,21 @@ export default function TransactionsView(props: TransactionsViewProps) {
                         render: (_, record) => record.category?.name,
                     },
                     {
+                        title: 'Data',
+                        dataIndex: 'date',
+                        key: 'date',
+                        render: (_, record) => <span>{dayjs(record.date).format('DD/MM/YYYY')}</span>,
+                    },
+                    {
                         title: 'Valor',
                         dataIndex: 'value',
                         key: 'value',
+                        render: (_, record) => (
+                            <Space>
+                                <span>{getTransactionTypeIcon(record.relatedAccounts[0].relation)}</span>
+                                <span>{record.value}</span>
+                            </Space>
+                        ),
                     },
                     {
                         title: 'Ações',

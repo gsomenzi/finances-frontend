@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { ReactNode, useEffect, useState } from 'react';
 import { DateFilter, TransactionsViewProps } from './types';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { useTransaction } from '@/hooks/useTransaction';
 import { ListResponseData } from '@/types/ListResponseData';
 import { Transaction } from '@/types/Transaction';
 import dayjs from 'dayjs';
+import { Tooltip } from 'antd';
+import { ArrowDownOutlined, ArrowUpOutlined } from '@ant-design/icons';
 
 export default function TransactionsViewModel(): TransactionsViewProps {
     const { getTransactions, removeTransaction } = useTransaction();
@@ -49,6 +51,25 @@ export default function TransactionsViewModel(): TransactionsViewProps {
         setDateFilter(newDateFilter);
     }
 
+    function getTransactionTypeIcon(type: string): ReactNode {
+        switch (type) {
+            case 'income':
+                return (
+                    <Tooltip title="Receita">
+                        <ArrowUpOutlined style={{ color: 'green' }} />
+                    </Tooltip>
+                );
+            case 'expense':
+                return (
+                    <Tooltip title="Despesa">
+                        <ArrowDownOutlined style={{ color: 'red' }} />
+                    </Tooltip>
+                );
+            default:
+                return null;
+        }
+    }
+
     return {
         transactions: transactions?.data || [],
         isLoading,
@@ -61,5 +82,6 @@ export default function TransactionsViewModel(): TransactionsViewProps {
         onSizeChange,
         onSearch,
         onDateFilterChange,
+        getTransactionTypeIcon,
     };
 }

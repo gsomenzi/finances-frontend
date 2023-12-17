@@ -13,6 +13,7 @@ export type TransactionsViewProps = {
     onSizeChange: (newSize: number) => void;
     onSearch: (newSearch: string) => void;
     onDateFilterChange: (newDateFilter: DateFilter) => void;
+    getTransactionTypeIcon: (type: string) => React.ReactNode;
 };
 
 export type DateFilter = {
