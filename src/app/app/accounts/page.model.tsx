@@ -3,13 +3,13 @@
 import React, { useState } from 'react';
 import { AccountsViewProps } from './types';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
-import { useAccount } from '@/hooks/useAccount';
 import { Account } from '@/types/Account';
 import { AccountBalance } from '@/types/AccountBalance';
 import { ListResponseData } from '@/types/ListResponseData';
+import AccountModel from '@/models/AccountModel';
 
 export default function AccountsViewModel(): AccountsViewProps {
-    const { getAccounts, getAccountsBalances, removeAccount } = useAccount();
+    const accountModel = new AccountModel();
     const queryClient = useQueryClient();
     const [page, setPage] = useState(1);
     const [limit, setLimit] = useState(20);
@@ -17,7 +17,7 @@ export default function AccountsViewModel(): AccountsViewProps {
 
     const { data: accounts, isLoading: gettingAccounts } = useQuery<ListResponseData<Account>>(
         ['accounts', { page, limit, search }],
-        () => getAccounts({ page, limit, search }),
+        () => accountModel.findMany({ page, limit, search }),
         {
             refetchOnWindowFocus: false,
         },
@@ -29,7 +29,7 @@ export default function AccountsViewModel(): AccountsViewProps {
         ['balances', { accountIds }],
         ({ queryKey }) => {
             const { accountIds } = queryKey[1] as any;
-            return getAccountsBalances(accountIds as number[]);
+            return accountModel.getAccountsBalances(accountIds as number[]);
         },
         {
             enabled: accountIds.length > 0,
@@ -37,7 +37,7 @@ export default function AccountsViewModel(): AccountsViewProps {
         },
     );
 
-    const { mutate: remove, isLoading: isRemoving } = useMutation((id: number) => removeAccount(id), {
+    const { mutate: remove, isLoading: isRemoving } = useMutation((id: number) => accountModel.delete(id), {
         onSuccess: () => {
             queryClient.invalidateQueries('accounts');
         },

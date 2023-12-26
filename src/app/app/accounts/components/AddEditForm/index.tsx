@@ -6,14 +6,14 @@ import { AddEditFormProps } from './types';
 import { Button, Checkbox, Drawer, Flex, Form, Input, Select, Space } from 'antd';
 import { useMutation, useQueryClient } from 'react-query';
 import ErrorAlert from '@/components/ErrorAlert';
-import ApiClient from '@/lib/ApiClient';
+import AccountModel from '@/models/AccountModel';
 
 export default function AddEditForm(props: AddEditFormProps) {
     const { account, open, onClose } = props;
     const queryClient = useQueryClient();
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [form] = Form.useForm();
-    const apiClient = new ApiClient();
+    const accountModel = new AccountModel();
 
     const initialBalanceTransaction = useMemo(() => {
         if (account?.relatedTransactions?.length && account.relatedTransactions.length > 0) {
@@ -35,7 +35,7 @@ export default function AddEditForm(props: AddEditFormProps) {
     const addAccount = useMutation(
         (accountData) => {
             setErrorMessage(null);
-            return apiClient.post('/accounts', accountData);
+            return accountModel.create(accountData);
         },
         {
             onSuccess: () => {
@@ -52,7 +52,7 @@ export default function AddEditForm(props: AddEditFormProps) {
     const updateAccount = useMutation(
         (accountData: Account) => {
             setErrorMessage(null);
-            return apiClient.put(`/accounts/${accountData.id}`, { ...accountData });
+            return accountModel.update(accountData.id, { ...accountData });
         },
         {
             onSuccess: () => {

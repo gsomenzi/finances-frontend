@@ -5,19 +5,19 @@ import { AddEditFormProps } from './types';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { Button, Checkbox, DatePicker, Drawer, Flex, Form, Input, Radio, Select, Space } from 'antd';
 import { Transaction } from '@/types/Transaction';
-import dayjs from 'dayjs';
 import ErrorAlert from '@/components/ErrorAlert';
-import { useAccount } from '@/hooks/useAccount';
 import { useCategory } from '@/hooks/useCategory';
 import ApiClient from '@/lib/ApiClient';
+import AccountModel from '@/models/AccountModel';
+import dayjs from 'dayjs';
 
 export default function AddEditForm(props: AddEditFormProps) {
     const apiClient = new ApiClient();
+    const accountModel = new AccountModel();
     const { transaction, open, onClose } = props;
     const queryClient = useQueryClient();
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [form] = Form.useForm();
-    const { getAccounts } = useAccount();
     const { getCategories } = useCategory();
     const [accountSearch, setAccountSearch] = useState<string>('');
     const [categorySearch, setCategorySearch] = useState<string>('');
@@ -54,7 +54,7 @@ export default function AddEditForm(props: AddEditFormProps) {
 
     const { data: accounts, isLoading: gettingAccounts } = useQuery(
         ['accounts', { page: 1, limit: 20, search: accountSearch }],
-        () => getAccounts({ page: 1, limit: 20, search: accountSearch }),
+        () => accountModel.findMany({ page: 1, limit: 20, search: accountSearch }),
     );
 
     const addTransaction = useMutation(
