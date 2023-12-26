@@ -1,8 +1,6 @@
-import React from 'react';
-import { useApi } from '@/providers/ApiProvider';
 import { Account } from '@/types/Account';
 import { ListResponseData } from '@/types/ListResponseData';
-import { QueryFunctionContext, QueryKey } from 'react-query';
+import ApiClient from '@/lib/ApiClient';
 
 type GetAccountQueryParams = {
     page?: number;
@@ -11,11 +9,11 @@ type GetAccountQueryParams = {
 };
 
 export function useAccount() {
-    const { get, delete: _delete } = useApi();
+    const apiClient = new ApiClient();
 
     function getAccounts(queryParams: GetAccountQueryParams): Promise<ListResponseData<Account>> {
         const { page, limit, search } = queryParams;
-        return get('/accounts', {
+        return apiClient.get('/accounts', {
             page: page ?? 1,
             limit: limit ?? 20,
             search: search ?? '',
@@ -23,13 +21,13 @@ export function useAccount() {
     }
 
     function getAccountsBalances(accountIds: number[]): Promise<any> {
-        return get('/accounts/balances', {
+        return apiClient.get('/accounts/balances', {
             accountIds: accountIds.join(',') || '',
         });
     }
 
     function removeAccount(id: number | string) {
-        return _delete(`/accounts/${id}`);
+        return apiClient._delete(`/accounts/${id}`);
     }
 
     return {

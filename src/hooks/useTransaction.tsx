@@ -1,5 +1,4 @@
-import React from 'react';
-import { useApi } from '@/providers/ApiProvider';
+import ApiClient from '@/lib/ApiClient';
 import { ListResponseData } from '@/types/ListResponseData';
 import { Transaction } from '@/types/Transaction';
 
@@ -12,11 +11,11 @@ type GetTransactionQueryParams = {
 };
 
 export function useTransaction() {
-    const { get, delete: _delete } = useApi();
+    const apiClient = new ApiClient();
 
     function getTransactions(queryParams: GetTransactionQueryParams): Promise<ListResponseData<Transaction>> {
         const { page, limit, search, startDate, endDate } = queryParams;
-        return get('/transactions', {
+        return apiClient.get('/transactions', {
             page: page ?? 1,
             limit: limit ?? 20,
             search: search ?? '',
@@ -26,7 +25,7 @@ export function useTransaction() {
     }
 
     function removeTransaction(id: number | string) {
-        return _delete(`/transactions/${id}`);
+        return apiClient._delete(`/transactions/${id}`);
     }
 
     return {

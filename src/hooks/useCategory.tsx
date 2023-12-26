@@ -1,7 +1,6 @@
-import React from 'react';
-import { useApi } from '@/providers/ApiProvider';
 import { ListResponseData } from '@/types/ListResponseData';
 import { Category } from '@/types/Category';
+import ApiClient from '@/lib/ApiClient';
 
 type GetCategoryQueryParams = {
     type: 'income' | 'expense';
@@ -11,11 +10,11 @@ type GetCategoryQueryParams = {
 };
 
 export function useCategory() {
-    const { get, delete: _delete } = useApi();
+    const apiClient = new ApiClient();
 
     function getCategories(queryParams: GetCategoryQueryParams): Promise<ListResponseData<Category>> {
         const { type, page, limit, search } = queryParams;
-        return get(`/categories/${type}`, {
+        return apiClient.get(`/categories/${type}`, {
             page: page ?? 1,
             limit: limit ?? 20,
             search: search ?? '',
@@ -23,7 +22,7 @@ export function useCategory() {
     }
 
     function removeCategory(id: number | string) {
-        return _delete(`/categories/${id}`);
+        return apiClient._delete(`/categories/${id}`);
     }
 
     return {

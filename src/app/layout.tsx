@@ -3,15 +3,14 @@
 import './globals.css';
 
 import { ConfigProvider } from 'antd';
-import StyledComponentsRegistry from '@/providers/AntdRegistry';
-import { ApiProvider } from '@/providers/ApiProvider';
-import { QueryClient, QueryClientProvider } from 'react-query';
-import theme from '../theme/themeConfig';
 import { AuthProvider } from '@/providers/AuthProvider';
+import { QueryClient, QueryClientProvider } from 'react-query';
 import { ConfirmProvider } from '@/providers/ConfirmProvider';
+import StyledComponentsRegistry from '@/providers/AntdRegistry';
+import theme from '../theme/themeConfig';
 import ptBR from 'antd/lib/locale/pt_BR';
-import 'dayjs/locale/pt-br';
 import dayjs from 'dayjs';
+import 'dayjs/locale/pt-br';
 
 dayjs.locale('pt-br');
 
@@ -23,11 +22,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <StyledComponentsRegistry>
                     <ConfigProvider locale={ptBR} theme={theme}>
                         <ConfirmProvider>
-                            <ApiProvider>
-                                <AuthProvider>
-                                    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-                                </AuthProvider>
-                            </ApiProvider>
+                            <AuthProvider>
+                                <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+                            </AuthProvider>
                         </ConfirmProvider>
                     </ConfigProvider>
                 </StyledComponentsRegistry>

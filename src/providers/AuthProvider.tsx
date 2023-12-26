@@ -1,4 +1,4 @@
-import { useApi } from '@/providers/ApiProvider';
+import ApiClient from '@/lib/ApiClient';
 import { User } from '@/types/User';
 import React, { useEffect } from 'react';
 
@@ -35,7 +35,7 @@ export function AuthProvider({ children }: any) {
     const [authenticating, setAuthenticating] = React.useState(false);
     const [errorMessage, setErrorMessage] = React.useState('');
     const [registering, setRegistering] = React.useState(false);
-    const { post } = useApi();
+    const apiClient = new ApiClient();
 
     useEffect(() => {
         const accessToken = localStorage.getItem('accessToken');
@@ -50,7 +50,10 @@ export function AuthProvider({ children }: any) {
         try {
             setAuthenticating(true);
             setErrorMessage('');
-            const res: { access_token: string; refresh_token: string } = await post('/auth/signin', { email, password });
+            const res: { access_token: string; refresh_token: string } = await apiClient.post('/auth/signin', {
+                email,
+                password,
+            });
             localStorage.setItem('accessToken', res.access_token);
             localStorage.setItem('refreshToken', res.refresh_token);
             setAuthenticated(true);
@@ -67,8 +70,11 @@ export function AuthProvider({ children }: any) {
             const { email, password } = payload;
             setRegistering(true);
             setErrorMessage('');
-            const user: User = await post('/register', payload);
-            const res: { access_token: string; refresh_token: string } = await post('/auth/signin', { email, password });
+            const user: User = await apiClient.post('/register', payload);
+            const res: { access_token: string; refresh_token: string } = await apiClient.post('/auth/signin', {
+                email,
+                password,
+            });
             localStorage.setItem('accessToken', res.access_token);
             localStorage.setItem('refreshToken', res.refresh_token);
             setAuthenticated(true);

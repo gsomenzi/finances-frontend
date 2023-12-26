@@ -5,6 +5,7 @@ import { ArrowDownOutlined, ArrowUpOutlined, PlusOutlined } from '@ant-design/ic
 import dayjs from 'dayjs';
 import AddEditForm from './components/AddEditForm';
 import { Transaction } from '@/types/Transaction';
+import TransactionsList from './components/TransactionsList';
 const { Search } = Input;
 const { RangePicker } = DatePicker;
 
@@ -55,6 +56,7 @@ export default function TransactionsView(props: TransactionsViewProps) {
                 }}
             />
             <AddEditForm open={open} onClose={() => setOpen(false)} transaction={selectedTransaction} />
+            <TransactionsList loading={isLoading} transactions={transactions} />
             <Table
                 dataSource={transactions}
                 loading={isLoading}

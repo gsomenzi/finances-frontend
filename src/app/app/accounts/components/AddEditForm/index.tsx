@@ -4,16 +4,16 @@ import React, { useLayoutEffect, useMemo, useState } from 'react';
 import { Account } from '@/types/Account';
 import { AddEditFormProps } from './types';
 import { Button, Checkbox, Drawer, Flex, Form, Input, Select, Space } from 'antd';
-import { useApi } from '@/providers/ApiProvider';
 import { useMutation, useQueryClient } from 'react-query';
 import ErrorAlert from '@/components/ErrorAlert';
+import ApiClient from '@/lib/ApiClient';
 
 export default function AddEditForm(props: AddEditFormProps) {
     const { account, open, onClose } = props;
     const queryClient = useQueryClient();
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [form] = Form.useForm();
-    const { post, put } = useApi();
+    const apiClient = new ApiClient();
 
     const initialBalanceTransaction = useMemo(() => {
         if (account?.relatedTransactions?.length && account.relatedTransactions.length > 0) {
@@ -35,7 +35,7 @@ export default function AddEditForm(props: AddEditFormProps) {
     const addAccount = useMutation(
         (accountData) => {
             setErrorMessage(null);
-            return post('/accounts', accountData);
+            return apiClient.post('/accounts', accountData);
         },
         {
             onSuccess: () => {
@@ -52,7 +52,7 @@ export default function AddEditForm(props: AddEditFormProps) {
     const updateAccount = useMutation(
         (accountData: Account) => {
             setErrorMessage(null);
-            return put(`/accounts/${accountData.id}`, { ...accountData });
+            return apiClient.put(`/accounts/${accountData.id}`, { ...accountData });
         },
         {
             onSuccess: () => {

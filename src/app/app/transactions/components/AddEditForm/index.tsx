@@ -4,19 +4,19 @@ import React, { useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { AddEditFormProps } from './types';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { Button, Checkbox, DatePicker, Drawer, Flex, Form, Input, Radio, Select, Space } from 'antd';
-import { useApi } from '@/providers/ApiProvider';
 import { Transaction } from '@/types/Transaction';
 import dayjs from 'dayjs';
 import ErrorAlert from '@/components/ErrorAlert';
 import { useAccount } from '@/hooks/useAccount';
 import { useCategory } from '@/hooks/useCategory';
+import ApiClient from '@/lib/ApiClient';
 
 export default function AddEditForm(props: AddEditFormProps) {
+    const apiClient = new ApiClient();
     const { transaction, open, onClose } = props;
     const queryClient = useQueryClient();
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [form] = Form.useForm();
-    const { post, put } = useApi();
     const { getAccounts } = useAccount();
     const { getCategories } = useCategory();
     const [accountSearch, setAccountSearch] = useState<string>('');
@@ -60,7 +60,7 @@ export default function AddEditForm(props: AddEditFormProps) {
     const addTransaction = useMutation(
         (transactionData) => {
             setErrorMessage(null);
-            return post('/transactions', transactionData);
+            return apiClient.post('/transactions', transactionData);
         },
         {
             onSuccess: () => {
@@ -77,7 +77,7 @@ export default function AddEditForm(props: AddEditFormProps) {
     const updateTransaction = useMutation(
         (accountData: Transaction) => {
             setErrorMessage(null);
-            return put(`/transactions/${accountData.id}`, { ...accountData });
+            return apiClient.put(`/transactions/${accountData.id}`, { ...accountData });
         },
         {
             onSuccess: () => {
