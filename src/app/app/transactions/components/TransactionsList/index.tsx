@@ -8,7 +8,7 @@ import dayjs from 'dayjs';
 import { ArrowDownOutlined, ArrowUpOutlined } from '@ant-design/icons';
 
 export default function TransactionsList(props: TransactionsListProps) {
-    const { transactions, loading } = props;
+    const { transactions, loading, onSelect } = props;
 
     function getTransactionTypeIcon(type: string): ReactNode {
         switch (type) {
@@ -35,14 +35,14 @@ export default function TransactionsList(props: TransactionsListProps) {
                 loading={loading}
                 dataSource={transactions}
                 renderItem={(item) => (
-                    <List.Item>
-                        <List.Item.Meta title={item.description} description={dayjs(item.date).format('DD/MM/YYYY')} />
+                    <List.Item style={{ cursor: 'pointer' }} onClick={() => onSelect(item)}>
+                        <List.Item.Meta
+                            title={item.description}
+                            description={<Tooltip title="Conta">{item.relatedAccounts[0].account.name}</Tooltip>}
+                        />
                         <Space>
                             <Tooltip title="Categoria">
                                 <Tag>{item.category.name}</Tag>
-                            </Tooltip>
-                            <Tooltip title="Conta">
-                                <Tag>{item.relatedAccounts[0].account.name}</Tag>
                             </Tooltip>
                             <Space>
                                 <Tooltip title="Valor">

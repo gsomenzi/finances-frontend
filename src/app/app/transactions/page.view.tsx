@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { TransactionsViewProps } from './types';
-import { DatePicker, Flex, Typography, Input, FloatButton, Space, Popconfirm, Button, Table } from 'antd';
+import { DatePicker, Flex, Typography, Input, FloatButton, Space, Popconfirm, Button, Table, Card } from 'antd';
 import { ArrowDownOutlined, ArrowUpOutlined, PlusOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import AddEditForm from './components/AddEditForm';
 import { Transaction } from '@/types/Transaction';
 import TransactionsList from './components/TransactionsList';
+import TransactionDetails from './components/TransactionDetails';
 const { Search } = Input;
 const { RangePicker } = DatePicker;
 
@@ -17,6 +18,7 @@ export default function TransactionsView(props: TransactionsViewProps) {
         page,
         limit,
         total,
+        transactionDates,
         remove,
         onPageChange,
         onSizeChange,
@@ -25,6 +27,7 @@ export default function TransactionsView(props: TransactionsViewProps) {
         getTransactionTypeIcon,
     } = props;
     const [open, setOpen] = useState(false);
+    const [detailsOpen, setDetailsOpen] = useState(false);
     const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
     return (
         <div>
@@ -56,83 +59,27 @@ export default function TransactionsView(props: TransactionsViewProps) {
                 }}
             />
             <AddEditForm open={open} onClose={() => setOpen(false)} transaction={selectedTransaction} />
-            <TransactionsList loading={isLoading} transactions={transactions} />
-            <Table
-                dataSource={transactions}
-                loading={isLoading}
-                rowKey={(row) => row.id}
-                columns={[
-                    {
-                        title: 'Descrição',
-                        dataIndex: 'description',
-                        key: 'description',
-                        width: 400,
-                    },
-                    {
-                        title: 'Conta',
-                        dataIndex: 'account',
-                        key: 'account',
-                        render: (_, record) => record.relatedAccounts[0].account.name,
-                    },
-                    {
-                        title: 'Categoria',
-                        dataIndex: 'category',
-                        key: 'category',
-                        render: (_, record) => record.category?.name,
-                    },
-                    {
-                        title: 'Data',
-                        dataIndex: 'date',
-                        key: 'date',
-                        render: (_, record) => <span>{dayjs(record.date).format('DD/MM/YYYY')}</span>,
-                    },
-                    {
-                        title: 'Valor',
-                        dataIndex: 'value',
-                        key: 'value',
-                        render: (_, record) => (
-                            <Space>
-                                <span>{getTransactionTypeIcon(record.relatedAccounts[0].relation)}</span>
-                                <span>{record.value}</span>
-                            </Space>
-                        ),
-                    },
-                    {
-                        title: 'Ações',
-                        align: 'right',
-                        width: 1,
-                        render: (value, record) => (
-                            <Space>
-                                <Button
-                                    type="text"
-                                    onClick={() => {
-                                        setSelectedTransaction(record);
-                                        setOpen(true);
-                                    }}>
-                                    Editar
-                                </Button>
-                                <Popconfirm
-                                    title="Você tem certeza?"
-                                    description="Você tem certeza que deseja remover esta transação?"
-                                    onConfirm={() => remove(record.id)}
-                                    okButtonProps={{ loading: isRemoving }}>
-                                    <Button type="text" danger>
-                                        Remover
-                                    </Button>
-                                </Popconfirm>
-                            </Space>
-                        ),
-                    },
-                ]}
-                pagination={{
-                    defaultCurrent: page,
-                    defaultPageSize: limit,
-                    total: total,
-                    onChange: onPageChange,
-                    showSizeChanger: true,
-                    onShowSizeChange: (_, newSize) => onSizeChange(newSize),
-                }}
+            <TransactionDetails
+                open={detailsOpen}
+                onClose={() => setDetailsOpen(false)}
+                transaction={selectedTransaction}
             />
+            {transactionDates.map((date) => (
+                <Card
+                    title={dayjs(date).format('DD/MM/YYYY')}
+                    bordered={false}
+                    type="inner"
+                    style={{ marginBottom: '1rem' }}>
+                    <TransactionsList
+                        loading={isLoading}
+                        transactions={transactions.filter((t) => t.date === date)}
+                        onSelect={(transaction) => {
+                            setSelectedTransaction(transaction);
+                            setDetailsOpen(true);
+                        }}
+                    />
+                </Card>
+            ))}
         </div>
     );
 }

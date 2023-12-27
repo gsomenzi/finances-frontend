@@ -8,6 +8,7 @@ export type TransactionsViewProps = {
     page: number;
     limit: number;
     total: number;
+    transactionDates: string[];
     remove: UseMutateFunction<any, unknown, number, unknown>;
     onPageChange: (newPage: number) => void;
     onSizeChange: (newSize: number) => void;

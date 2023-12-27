@@ -1,15 +1,15 @@
-import React, { ReactNode, useEffect, useState } from 'react';
+import React, { ReactNode, useMemo, useState } from 'react';
 import { DateFilter, TransactionsViewProps } from './types';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
-import { useTransaction } from '@/hooks/useTransaction';
 import { ListResponseData } from '@/types/ListResponseData';
 import { Transaction } from '@/types/Transaction';
 import dayjs from 'dayjs';
 import { Tooltip } from 'antd';
 import { ArrowDownOutlined, ArrowUpOutlined } from '@ant-design/icons';
+import TransactionModel from '@/models/TransactionModel';
 
 export default function TransactionsViewModel(): TransactionsViewProps {
-    const { getTransactions, removeTransaction } = useTransaction();
+    const transactionModel = new TransactionModel();
     const queryClient = useQueryClient();
     const [page, setPage] = useState(1);
     const [limit, setLimit] = useState(20);
@@ -21,17 +21,31 @@ export default function TransactionsViewModel(): TransactionsViewProps {
 
     const { data: transactions, isLoading: gettingTransactions } = useQuery<ListResponseData<Transaction>>(
         ['transactions', { page, limit, search, startDate: dateFilter.startDate, endDate: dateFilter.endDate }],
-        () => getTransactions({ page, limit, search, startDate: dateFilter.startDate, endDate: dateFilter.endDate }),
+        () =>
+            transactionModel.findMany({
+                page,
+                limit,
+                search,
+                startDate: dateFilter.startDate,
+                endDate: dateFilter.endDate,
+            }),
         {
             refetchOnWindowFocus: false,
         },
     );
 
-    const { mutate: remove, isLoading: isRemoving } = useMutation((id: number) => removeTransaction(id), {
+    const { mutate: remove, isLoading: isRemoving } = useMutation((id: number) => transactionModel.delete(id), {
         onSuccess: () => {
             queryClient.invalidateQueries('transactions');
         },
     });
+
+    const transactionDates = useMemo(() => {
+        if (!transactions?.data) {
+            return [];
+        }
+        return [...new Set(transactions.data.map((t) => t.date))];
+    }, [transactions]);
 
     const isLoading = gettingTransactions;
 
@@ -77,6 +91,7 @@ export default function TransactionsViewModel(): TransactionsViewProps {
         page,
         limit,
         total: transactions?.total || 0,
+        transactionDates,
         remove,
         onPageChange,
         onSizeChange,

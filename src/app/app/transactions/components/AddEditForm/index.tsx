@@ -6,19 +6,19 @@ import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { Button, Checkbox, DatePicker, Drawer, Flex, Form, Input, Radio, Select, Space } from 'antd';
 import { Transaction } from '@/types/Transaction';
 import ErrorAlert from '@/components/ErrorAlert';
-import { useCategory } from '@/hooks/useCategory';
-import ApiClient from '@/lib/ApiClient';
 import AccountModel from '@/models/AccountModel';
 import dayjs from 'dayjs';
+import TransactionModel from '@/models/TransactionModel';
+import CategoryModel from '@/models/CategoryModel';
 
 export default function AddEditForm(props: AddEditFormProps) {
-    const apiClient = new ApiClient();
-    const accountModel = new AccountModel();
-    const { transaction, open, onClose } = props;
-    const queryClient = useQueryClient();
-    const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [form] = Form.useForm();
-    const { getCategories } = useCategory();
+    const queryClient = useQueryClient();
+    const accountModel = new AccountModel();
+    const categoryModel = new CategoryModel();
+    const transactionModel = new TransactionModel();
+    const { transaction, open, onClose } = props;
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [accountSearch, setAccountSearch] = useState<string>('');
     const [categorySearch, setCategorySearch] = useState<string>('');
     const [selectedType, setSelectedType] = useState<'income' | 'expense'>('income');
@@ -46,7 +46,7 @@ export default function AddEditForm(props: AddEditFormProps) {
 
     const { data: categories, isLoading: gettingCategories } = useQuery(
         ['categories', { page: 1, limit: 20, search: categorySearch, type: selectedType }],
-        () => getCategories({ page: 1, limit: 20, search: categorySearch, type: selectedType }),
+        () => categoryModel.findMany({ page: 1, limit: 20, search: categorySearch, type: selectedType }),
         {
             enabled: !!selectedType,
         },
@@ -60,7 +60,7 @@ export default function AddEditForm(props: AddEditFormProps) {
     const addTransaction = useMutation(
         (transactionData) => {
             setErrorMessage(null);
-            return apiClient.post('/transactions', transactionData);
+            return transactionModel.create(transactionData);
         },
         {
             onSuccess: () => {
@@ -77,7 +77,7 @@ export default function AddEditForm(props: AddEditFormProps) {
     const updateTransaction = useMutation(
         (accountData: Transaction) => {
             setErrorMessage(null);
-            return apiClient.put(`/transactions/${accountData.id}`, { ...accountData });
+            return transactionModel.update(accountData.id, { ...accountData });
         },
         {
             onSuccess: () => {
