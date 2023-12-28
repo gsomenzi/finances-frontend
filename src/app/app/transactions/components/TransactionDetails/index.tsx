@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Wrapper } from './styles';
 import { TransactionDetailsProps } from './types';
-import { Button, Drawer, Flex, Popconfirm, Space } from 'antd';
+import { Button, Descriptions, Drawer, Flex, Popconfirm, Space } from 'antd';
+import dayjs from 'dayjs';
+import { transactionTypeTranslator } from '@/lib/transactionTypeTranslator';
 
 export default function TransactionDetails(props: TransactionDetailsProps) {
     const { transaction, open, onClose } = props;
@@ -9,6 +11,22 @@ export default function TransactionDetails(props: TransactionDetailsProps) {
     function handleCancel() {
         onClose();
     }
+
+    const accountName = useMemo(() => {
+        if (transaction?.relatedAccounts && transaction.relatedAccounts.length > 0) {
+            return transaction?.relatedAccounts[0].account.name;
+        } else {
+            return '-';
+        }
+    }, [transaction]);
+
+    const accountRelation = useMemo(() => {
+        if (transaction?.relatedAccounts && transaction.relatedAccounts.length > 0) {
+            return transaction?.relatedAccounts[0].relation;
+        } else {
+            return '-';
+        }
+    }, [transaction]);
 
     return (
         <Drawer
@@ -37,6 +55,31 @@ export default function TransactionDetails(props: TransactionDetailsProps) {
                         </Button>
                     </Space>
                 </Flex>
-            }></Drawer>
+            }>
+            {transaction && (
+                <Descriptions layout="vertical" bordered>
+                    <Descriptions.Item span={3} label="Descricão">
+                        {transaction.description}
+                    </Descriptions.Item>
+                    <Descriptions.Item label="Tipo">{transactionTypeTranslator(accountRelation)}</Descriptions.Item>
+                    <Descriptions.Item label="Data">{dayjs(transaction.date).format('DD/MM/YYYY')}</Descriptions.Item>
+                    <Descriptions.Item label="Valor">
+                        {Intl.NumberFormat('pt-BR', {
+                            style: 'currency',
+                            currency: 'BRL',
+                        }).format(Number(transaction.value))}
+                    </Descriptions.Item>
+                    <Descriptions.Item label="Conta">{accountName}</Descriptions.Item>
+                    <Descriptions.Item span={2} label="Categoria">
+                        {transaction.category?.name}
+                    </Descriptions.Item>
+                    {transaction.notes && (
+                        <Descriptions.Item span={3} label="Observações">
+                            {transaction.notes}
+                        </Descriptions.Item>
+                    )}
+                </Descriptions>
+            )}
+        </Drawer>
     );
 }

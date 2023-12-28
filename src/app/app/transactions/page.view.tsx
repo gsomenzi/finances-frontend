@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { TransactionsViewProps } from './types';
-import { DatePicker, Flex, Typography, Input, FloatButton, Space, Popconfirm, Button, Table, Card } from 'antd';
-import { ArrowDownOutlined, ArrowUpOutlined, PlusOutlined } from '@ant-design/icons';
+import { DatePicker, Flex, Typography, Input, FloatButton, Space, Card, Empty, Tooltip } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import AddEditForm from './components/AddEditForm';
 import { Transaction } from '@/types/Transaction';
@@ -64,22 +64,36 @@ export default function TransactionsView(props: TransactionsViewProps) {
                 onClose={() => setDetailsOpen(false)}
                 transaction={selectedTransaction}
             />
-            {transactionDates.map((date) => (
-                <Card
-                    title={dayjs(date).format('DD/MM/YYYY')}
-                    bordered={false}
-                    type="inner"
-                    style={{ marginBottom: '1rem' }}>
-                    <TransactionsList
-                        loading={isLoading}
-                        transactions={transactions.filter((t) => t.date === date)}
-                        onSelect={(transaction) => {
-                            setSelectedTransaction(transaction);
-                            setDetailsOpen(true);
-                        }}
-                    />
-                </Card>
-            ))}
+            {transactionDates.length > 0 ? (
+                transactionDates.map((date) => (
+                    <Card
+                        key={date}
+                        title={
+                            <Tooltip title={`${dayjs(date).diff(dayjs(), 'day')} dias atrás`}>
+                                <Space>
+                                    <Typography>{dayjs(date).format('DD/MM/YYYY')}</Typography>
+                                    <Typography.Text type="secondary">{dayjs(date).format('dddd')}</Typography.Text>
+                                </Space>
+                            </Tooltip>
+                        }
+                        bordered={false}
+                        type="inner"
+                        style={{ marginBottom: '1rem' }}>
+                        <TransactionsList
+                            loading={isLoading}
+                            transactions={transactions.filter((t) => t.date === date)}
+                            onSelect={(transaction) => {
+                                setSelectedTransaction(transaction);
+                                setDetailsOpen(true);
+                            }}
+                        />
+                    </Card>
+                ))
+            ) : (
+                <Flex align="center" justify="center" style={{ marginTop: '2rem' }}>
+                    <Empty description="Nenhuma transação encontrada" />
+                </Flex>
+            )}
         </div>
     );
 }

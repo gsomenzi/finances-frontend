@@ -4,7 +4,6 @@ import React, { ReactNode } from 'react';
 import { Wrapper } from './styles';
 import { TransactionsListProps } from './types';
 import { List, Space, Tag, Tooltip } from 'antd';
-import dayjs from 'dayjs';
 import { ArrowDownOutlined, ArrowUpOutlined } from '@ant-design/icons';
 
 export default function TransactionsList(props: TransactionsListProps) {
@@ -35,7 +34,7 @@ export default function TransactionsList(props: TransactionsListProps) {
                 loading={loading}
                 dataSource={transactions}
                 renderItem={(item) => (
-                    <List.Item style={{ cursor: 'pointer' }} onClick={() => onSelect(item)}>
+                    <List.Item style={{ cursor: 'pointer', padding: 8 }} onClick={() => onSelect(item)}>
                         <List.Item.Meta
                             title={item.description}
                             description={<Tooltip title="Conta">{item.relatedAccounts[0].account.name}</Tooltip>}

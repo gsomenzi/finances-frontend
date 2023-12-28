@@ -3,13 +3,14 @@
 import React, { useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { AddEditFormProps } from './types';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
-import { Button, Checkbox, DatePicker, Drawer, Flex, Form, Input, Radio, Select, Space } from 'antd';
+import { Button, Checkbox, DatePicker, Divider, Drawer, Flex, Form, Input, Radio, Select, Space } from 'antd';
 import { Transaction } from '@/types/Transaction';
 import ErrorAlert from '@/components/ErrorAlert';
 import AccountModel from '@/models/AccountModel';
 import dayjs from 'dayjs';
 import TransactionModel from '@/models/TransactionModel';
 import CategoryModel from '@/models/CategoryModel';
+import AddCategoryForm from '../AddCategoryForm';
 
 export default function AddEditForm(props: AddEditFormProps) {
     const [form] = Form.useForm();
@@ -22,6 +23,7 @@ export default function AddEditForm(props: AddEditFormProps) {
     const [accountSearch, setAccountSearch] = useState<string>('');
     const [categorySearch, setCategorySearch] = useState<string>('');
     const [selectedType, setSelectedType] = useState<'income' | 'expense'>('income');
+    const [openCategoryForm, setOpenCategoryForm] = useState(false);
 
     const transactionType = useMemo(() => {
         if (transaction?.relatedAccounts && transaction.relatedAccounts.find((a) => a.relation === 'income')) {
@@ -45,8 +47,13 @@ export default function AddEditForm(props: AddEditFormProps) {
     }, [transactionType]);
 
     const { data: categories, isLoading: gettingCategories } = useQuery(
-        ['categories', { page: 1, limit: 20, search: categorySearch, type: selectedType }],
-        () => categoryModel.findMany({ page: 1, limit: 20, search: categorySearch, type: selectedType }),
+        ['categories', { page: 1, limit: 20, search: categorySearch, destination: selectedType }],
+        () =>
+            categoryModel.findManyByDestination(selectedType, {
+                page: 1,
+                limit: 20,
+                search: categorySearch,
+            }),
         {
             enabled: !!selectedType,
         },
@@ -132,6 +139,7 @@ export default function AddEditForm(props: AddEditFormProps) {
                     </Space>
                 </Flex>
             }>
+            <AddCategoryForm open={openCategoryForm} onClose={() => setOpenCategoryForm(false)} />
             <Form form={form} onFinish={handleSubmit} layout="vertical">
                 <Form.Item name="type" label="Tipo" rules={[{ required: true }]}>
                     <Radio.Group
@@ -173,6 +181,15 @@ export default function AddEditForm(props: AddEditFormProps) {
                             value: category.id,
                             name: category.name,
                         }))}
+                        dropdownRender={(menu) => (
+                            <>
+                                {menu}
+                                <Divider style={{ margin: '4px 0' }} />
+                                <Button type="text" block onClick={() => setOpenCategoryForm(true)}>
+                                    Criar categoria
+                                </Button>
+                            </>
+                        )}
                     />
                 </Form.Item>
                 <Form.Item name="description" label="Descrição" rules={[{ required: true }]}>
