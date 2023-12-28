@@ -38,7 +38,7 @@ export default function AddEditForm(props: AddEditFormProps) {
             description: transaction?.description || '',
             type: transactionType,
             value: transaction?.value || '',
-            date: transaction?.date || dayjs(),
+            date: transaction?.date ? dayjs(transaction.date) : dayjs(),
         });
     }, [transaction, transactionType]);
 
@@ -120,6 +120,13 @@ export default function AddEditForm(props: AddEditFormProps) {
         }
     }
 
+    useEffect(() => {
+        if (form && !transaction?.id && accounts?.data) {
+            const defaultAccount = accounts.data.find((a) => a.default);
+            form.setFieldValue('accountId', defaultAccount?.id);
+        }
+    }, [form, transaction, accounts]);
+
     return (
         <Drawer
             title={transaction ? 'Editar Transação' : 'Adicionar Transação'}
@@ -155,54 +162,58 @@ export default function AddEditForm(props: AddEditFormProps) {
                         }}
                     />
                 </Form.Item>
-                <Form.Item name="accountId" label="Conta" rules={[{ required: true }]}>
-                    <Select
-                        showSearch
-                        placeholder="Selecione uma conta"
-                        optionFilterProp="name"
-                        loading={gettingAccounts}
-                        onSearch={setAccountSearch}
-                        options={accounts?.data.map((account) => ({
-                            label: account.name,
-                            value: account.id,
-                            name: account.name,
-                        }))}
-                    />
-                </Form.Item>
-                <Form.Item name="categoryId" label="Categoria" rules={[{ required: true }]}>
-                    <Select
-                        showSearch
-                        placeholder="Selecione uma categoria"
-                        optionFilterProp="name"
-                        loading={gettingCategories}
-                        onSearch={setCategorySearch}
-                        options={categories?.data.map((category) => ({
-                            label: category.name,
-                            value: category.id,
-                            name: category.name,
-                        }))}
-                        dropdownRender={(menu) => (
-                            <>
-                                {menu}
-                                <Divider style={{ margin: '4px 0' }} />
-                                <Button type="text" block onClick={() => setOpenCategoryForm(true)}>
-                                    Criar categoria
-                                </Button>
-                            </>
-                        )}
-                    />
-                </Form.Item>
                 <Form.Item name="description" label="Descrição" rules={[{ required: true }]}>
                     <Input />
                 </Form.Item>
-                <Form.Item name="value" label="Valor" rules={[{ required: true }]}>
-                    <Input addonBefore="R$" type="number" min={0} />
-                </Form.Item>
-                <Form.Item name="date" label="Data" rules={[{ required: true }]}>
-                    <DatePicker format="DD/MM/YYYY" style={{ width: '100%' }} />
-                </Form.Item>
-                <Form.Item name="paid" valuePropName="checked" rules={[{ required: true }]}>
-                    <Checkbox>Pago</Checkbox>
+                <Flex gap={8}>
+                    <Form.Item name="value" label="Valor" rules={[{ required: true }]} style={{ flexGrow: 1 }}>
+                        <Input addonBefore="R$" type="number" min={0} />
+                    </Form.Item>
+                    <Form.Item name="date" label="Data" rules={[{ required: true }]} style={{ flexGrow: 1 }}>
+                        <DatePicker format="DD/MM/YYYY" style={{ width: '100%' }} />
+                    </Form.Item>
+                </Flex>
+                <Flex gap={8}>
+                    <Form.Item name="accountId" label="Conta" rules={[{ required: true }]} style={{ flexGrow: 1 }}>
+                        <Select
+                            showSearch
+                            placeholder="Selecione uma conta"
+                            optionFilterProp="name"
+                            loading={gettingAccounts}
+                            onSearch={setAccountSearch}
+                            options={accounts?.data.map((account) => ({
+                                label: account.name,
+                                value: account.id,
+                                name: account.name,
+                            }))}
+                        />
+                    </Form.Item>
+                    <Form.Item name="categoryId" label="Categoria" rules={[{ required: true }]} style={{ flexGrow: 1 }}>
+                        <Select
+                            showSearch
+                            placeholder="Selecione uma categoria"
+                            optionFilterProp="name"
+                            loading={gettingCategories}
+                            onSearch={setCategorySearch}
+                            options={categories?.data.map((category) => ({
+                                label: category.name,
+                                value: category.id,
+                                name: category.name,
+                            }))}
+                            dropdownRender={(menu) => (
+                                <>
+                                    {menu}
+                                    <Divider style={{ margin: '4px 0' }} />
+                                    <Button type="text" block onClick={() => setOpenCategoryForm(true)}>
+                                        Criar categoria
+                                    </Button>
+                                </>
+                            )}
+                        />
+                    </Form.Item>
+                </Flex>
+                <Form.Item name="paid" valuePropName="checked">
+                    <Checkbox>A conta já foi paga</Checkbox>
                 </Form.Item>
             </Form>
             <ErrorAlert show={!!errorMessage} title="Falha ao salvar a conta" description={errorMessage} />

@@ -1,12 +1,15 @@
 import React, { useMemo } from 'react';
-import { Wrapper } from './styles';
 import { TransactionDetailsProps } from './types';
 import { Button, Descriptions, Drawer, Flex, Popconfirm, Space } from 'antd';
-import dayjs from 'dayjs';
 import { transactionTypeTranslator } from '@/lib/transactionTypeTranslator';
+import dayjs from 'dayjs';
+import { useMutation, useQueryClient } from 'react-query';
+import TransactionModel from '@/models/TransactionModel';
 
 export default function TransactionDetails(props: TransactionDetailsProps) {
     const { transaction, open, onClose } = props;
+    const queryClient = useQueryClient();
+    const transactionModel = new TransactionModel();
 
     function handleCancel() {
         onClose();
@@ -28,6 +31,13 @@ export default function TransactionDetails(props: TransactionDetailsProps) {
         }
     }, [transaction]);
 
+    const { mutate: remove, isLoading: isRemoving } = useMutation((id: number) => transactionModel.delete(id), {
+        onSuccess: () => {
+            queryClient.invalidateQueries('transactions');
+            onClose();
+        },
+    });
+
     return (
         <Drawer
             title="Detalhes da transação"
@@ -35,26 +45,27 @@ export default function TransactionDetails(props: TransactionDetailsProps) {
             onClose={handleCancel}
             width={600}
             footer={
-                <Flex justify="end">
-                    <Space>
-                        <Popconfirm
-                            title="Você tem certeza?"
-                            description="Você tem certeza que deseja remover esta transação?"
-                            // onConfirm={() => remove(record.id)}
-                            // okButtonProps={{ loading: isRemoving }}>
-                        >
-                            <Button danger>Remover</Button>
-                        </Popconfirm>
-                        <Button
-                            type="primary"
-                            onClick={() => {
-                                // setSelectedTransaction(record);
-                                // setOpen(true);
-                            }}>
-                            Editar
-                        </Button>
-                    </Space>
-                </Flex>
+                transaction && (
+                    <Flex justify="end">
+                        <Space>
+                            <Popconfirm
+                                title="Você tem certeza?"
+                                description="Você tem certeza que deseja remover esta transação?"
+                                onConfirm={() => remove(transaction.id)}
+                                okButtonProps={{ loading: isRemoving }}>
+                                <Button danger>Remover</Button>
+                            </Popconfirm>
+                            <Button
+                                type="primary"
+                                onClick={() => {
+                                    // setSelectedTransaction(record);
+                                    // setOpen(true);
+                                }}>
+                                Editar
+                            </Button>
+                        </Space>
+                    </Flex>
+                )
             }>
             {transaction && (
                 <Descriptions layout="vertical" bordered>
