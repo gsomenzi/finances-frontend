@@ -36,7 +36,7 @@ export default function AddCategoryForm(props: AddCategoryFormProps) {
 
     return (
         <Drawer
-            title="Adicionar categoria"
+            title="Criar categoria"
             open={open}
             onClose={handleCancel}
             footer={

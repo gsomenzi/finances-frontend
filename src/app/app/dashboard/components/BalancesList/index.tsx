@@ -31,9 +31,9 @@ export default function BalancesList(props: BalancesListProps) {
                             <Typography.Text strong>Saldo geral</Typography.Text>
                             <Typography.Text type="secondary">Somatório do saldo de todas as contas</Typography.Text>
                         </Space>
-                        <Typography.Text strong>
+                        <Typography.Title level={5}>
                             {totalBalance.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-                        </Typography.Text>
+                        </Typography.Title>
                     </List.Item>
                 </List>
                 <Typography.Title level={5}>Minhas contas</Typography.Title>
@@ -41,7 +41,7 @@ export default function BalancesList(props: BalancesListProps) {
                     {balances?.map((balance) => (
                         <List.Item key={balance.accountId}>
                             <Typography.Text>{balance.accountName}:</Typography.Text>
-                            <Typography.Text strong>
+                            <Typography.Text strong type={balance.balance < 0 ? 'danger' : 'success'}>
                                 {balance.balance.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                             </Typography.Text>
                         </List.Item>

@@ -5,9 +5,11 @@ import { transactionTypeTranslator } from '@/lib/transactionTypeTranslator';
 import dayjs from 'dayjs';
 import { useMutation, useQueryClient } from 'react-query';
 import TransactionModel from '@/models/TransactionModel';
+import { useConfirm } from '@/providers/ConfirmProvider';
 
 export default function TransactionDetails(props: TransactionDetailsProps) {
     const { transaction, open, onClose } = props;
+    const { confirm } = useConfirm();
     const queryClient = useQueryClient();
     const transactionModel = new TransactionModel();
 
@@ -38,6 +40,19 @@ export default function TransactionDetails(props: TransactionDetailsProps) {
         },
     });
 
+    function handleRemove() {
+        confirm({
+            title: 'Voce tem certeza?',
+            description: 'Você tem certeza que deseja remover esta transação?',
+            onConfirm: () => {
+                if (transaction) {
+                    remove(transaction.id);
+                }
+            },
+            onCancel: () => {},
+        });
+    }
+
     return (
         <Drawer
             title="Detalhes da transação"
@@ -48,13 +63,9 @@ export default function TransactionDetails(props: TransactionDetailsProps) {
                 transaction && (
                     <Flex justify="end">
                         <Space>
-                            <Popconfirm
-                                title="Você tem certeza?"
-                                description="Você tem certeza que deseja remover esta transação?"
-                                onConfirm={() => remove(transaction.id)}
-                                okButtonProps={{ loading: isRemoving }}>
-                                <Button danger>Remover</Button>
-                            </Popconfirm>
+                            <Button loading={isRemoving} onClick={handleRemove} danger>
+                                Remover
+                            </Button>
                             <Button
                                 type="primary"
                                 onClick={() => {

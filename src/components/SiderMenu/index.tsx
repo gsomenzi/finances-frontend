@@ -18,7 +18,7 @@ export default function SiderMenu() {
         {
             key: '/app/transactions',
             icon: <UnorderedListOutlined />,
-            label: 'Lanamentos',
+            label: 'Lançamentos',
         },
         {
             key: '/app/accounts',
