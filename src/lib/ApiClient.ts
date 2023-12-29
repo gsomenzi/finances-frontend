@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-export type RequestQueryParams = { [key: string]: string | number | boolean };
+export type RequestQueryParams = { [key: string]: string | number | boolean | null };
 
 export default class ApiClient {
     public apiClient = axios.create({
@@ -22,6 +22,10 @@ export default class ApiClient {
     }
 
     public async get<T>(url: string, queryParams?: RequestQueryParams): Promise<T> {
+        // filter null and undefined values
+        if (queryParams) {
+            queryParams = Object.fromEntries(Object.entries(queryParams).filter(([, v]) => v != null));
+        }
         const res = await this.apiClient.get<T>(url, { params: queryParams });
         return res.data;
     }

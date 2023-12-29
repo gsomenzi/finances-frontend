@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { TransactionsViewProps } from './types';
-import { DatePicker, Flex, Typography, Input, FloatButton, Space, Card, Empty, Tooltip } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
+import { DatePicker, Flex, Typography, Input, FloatButton, Space, Card, Empty, Tooltip, Tag } from 'antd';
+import { BankOutlined, FolderOutlined, PlusOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import AddEditForm from './components/AddEditForm';
 import { Transaction } from '@/types/Transaction';
@@ -12,6 +12,8 @@ const { RangePicker } = DatePicker;
 
 export default function TransactionsView(props: TransactionsViewProps) {
     const {
+        account,
+        category,
         transactions,
         isLoading,
         isRemoving,
@@ -22,9 +24,10 @@ export default function TransactionsView(props: TransactionsViewProps) {
         remove,
         onPageChange,
         onSizeChange,
+        onAccountChange,
+        onCategoryChange,
         onSearch,
         onDateFilterChange,
-        getTransactionTypeIcon,
     } = props;
     const [open, setOpen] = useState(false);
     const [detailsOpen, setDetailsOpen] = useState(false);
@@ -32,8 +35,18 @@ export default function TransactionsView(props: TransactionsViewProps) {
     return (
         <div>
             <Flex justify="space-between" align="center">
-                <Typography.Title level={2}>Transações</Typography.Title>
+                <Typography.Title level={2}>Lançamentos</Typography.Title>
                 <Space>
+                    {account && (
+                        <Tag color="blue" icon={<BankOutlined />} closable onClose={() => onAccountChange(null)}>
+                            {account.name}
+                        </Tag>
+                    )}
+                    {category && (
+                        <Tag color="cyan" icon={<FolderOutlined />} closable onClose={() => onCategoryChange(null)}>
+                            {category.name}
+                        </Tag>
+                    )}
                     <Search placeholder="Pesquisa" onSearch={onSearch} style={{ width: 200 }} />
                     <RangePicker
                         format="DD/MM/YYYY"
@@ -86,6 +99,8 @@ export default function TransactionsView(props: TransactionsViewProps) {
                                 setSelectedTransaction(transaction);
                                 setDetailsOpen(true);
                             }}
+                            onSelectAccount={(account) => onAccountChange(account)}
+                            onSelectCategory={(category) => onCategoryChange(category)}
                         />
                     </Card>
                 ))

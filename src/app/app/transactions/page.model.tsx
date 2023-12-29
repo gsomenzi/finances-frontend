@@ -7,6 +7,8 @@ import dayjs from 'dayjs';
 import { Tooltip } from 'antd';
 import { ArrowDownOutlined, ArrowUpOutlined } from '@ant-design/icons';
 import TransactionModel from '@/models/TransactionModel';
+import { Account } from '@/types/Account';
+import { Category } from '@/types/Category';
 
 export default function TransactionsViewModel(): TransactionsViewProps {
     const transactionModel = new TransactionModel();
@@ -14,18 +16,33 @@ export default function TransactionsViewModel(): TransactionsViewProps {
     const [page, setPage] = useState(1);
     const [limit, setLimit] = useState(20);
     const [search, setSearch] = useState('');
+    const [account, setAccount] = useState<Pick<Account, 'id' | 'name'> | null>(null);
+    const [category, setCategory] = useState<Pick<Category, 'id' | 'name'> | null>(null);
     const [dateFilter, setDateFilter] = useState<DateFilter>({
         startDate: dayjs().startOf('month').format('YYYY-MM-DD'),
         endDate: dayjs().endOf('month').format('YYYY-MM-DD'),
     });
 
     const { data: transactions, isLoading: gettingTransactions } = useQuery<ListResponseData<Transaction>>(
-        ['transactions', { page, limit, search, startDate: dateFilter.startDate, endDate: dateFilter.endDate }],
+        [
+            'transactions',
+            {
+                page,
+                limit,
+                search,
+                accountId: account?.id || null,
+                categoryId: category?.id || null,
+                startDate: dateFilter.startDate,
+                endDate: dateFilter.endDate,
+            },
+        ],
         () =>
             transactionModel.findMany({
                 page,
                 limit,
                 search,
+                accountId: account?.id || null,
+                categoryId: category?.id || null,
                 startDate: dateFilter.startDate,
                 endDate: dateFilter.endDate,
             }),
@@ -65,6 +82,14 @@ export default function TransactionsViewModel(): TransactionsViewProps {
         setDateFilter(newDateFilter);
     }
 
+    function onAccountChange(newAccount: Pick<Account, 'id' | 'name'> | null) {
+        setAccount(newAccount);
+    }
+
+    function onCategoryChange(newCategory: Pick<Category, 'id' | 'name'> | null) {
+        setCategory(newCategory);
+    }
+
     function getTransactionTypeIcon(type: string): ReactNode {
         switch (type) {
             case 'income':
@@ -92,10 +117,14 @@ export default function TransactionsViewModel(): TransactionsViewProps {
         limit,
         total: transactions?.total || 0,
         transactionDates,
+        account,
+        category,
         remove,
         onPageChange,
         onSizeChange,
         onSearch,
+        onAccountChange,
+        onCategoryChange,
         onDateFilterChange,
         getTransactionTypeIcon,
     };

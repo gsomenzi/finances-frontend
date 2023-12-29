@@ -57,7 +57,7 @@ export default function AppHeader() {
             case 'dashboard':
                 return 'Home';
             case 'transactions':
-                return 'Transações';
+                return 'Lançamentos';
             case 'accounts':
                 return 'Contas';
             case 'credit-cards':

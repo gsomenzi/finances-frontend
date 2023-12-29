@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { TransactionDetailsProps } from './types';
-import { Button, Descriptions, Drawer, Flex, Popconfirm, Space } from 'antd';
+import { Button, Descriptions, Divider, Drawer, Flex, Popconfirm, Space, Tag, Typography } from 'antd';
 import { transactionTypeTranslator } from '@/lib/transactionTypeTranslator';
 import dayjs from 'dayjs';
 import { useMutation, useQueryClient } from 'react-query';
@@ -68,28 +68,42 @@ export default function TransactionDetails(props: TransactionDetailsProps) {
                 )
             }>
             {transaction && (
-                <Descriptions layout="vertical" bordered>
-                    <Descriptions.Item span={3} label="Descricão">
-                        {transaction.description}
-                    </Descriptions.Item>
-                    <Descriptions.Item label="Tipo">{transactionTypeTranslator(accountRelation)}</Descriptions.Item>
-                    <Descriptions.Item label="Data">{dayjs(transaction.date).format('DD/MM/YYYY')}</Descriptions.Item>
-                    <Descriptions.Item label="Valor">
-                        {Intl.NumberFormat('pt-BR', {
-                            style: 'currency',
-                            currency: 'BRL',
-                        }).format(Number(transaction.value))}
-                    </Descriptions.Item>
-                    <Descriptions.Item label="Conta">{accountName}</Descriptions.Item>
-                    <Descriptions.Item span={2} label="Categoria">
-                        {transaction.category?.name}
-                    </Descriptions.Item>
-                    {transaction.notes && (
-                        <Descriptions.Item span={3} label="Observações">
-                            {transaction.notes}
+                <>
+                    <Descriptions bordered style={{ marginBottom: '1rem' }} column={1}>
+                        <Descriptions.Item span={3} label="Descricão">
+                            {transaction.description}
                         </Descriptions.Item>
+                        <Descriptions.Item label="Tipo">{transactionTypeTranslator(accountRelation)}</Descriptions.Item>
+                        <Descriptions.Item label="Data">
+                            {dayjs(transaction.date).format('DD/MM/YYYY')}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Valor">
+                            {Intl.NumberFormat('pt-BR', {
+                                style: 'currency',
+                                currency: 'BRL',
+                            }).format(Number(transaction.value))}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Conta">{accountName}</Descriptions.Item>
+                        <Descriptions.Item span={2} label="Categoria">
+                            {transaction.category?.name}
+                        </Descriptions.Item>
+                        {transaction.notes && (
+                            <Descriptions.Item span={3} label="Observações">
+                                {transaction.notes}
+                            </Descriptions.Item>
+                        )}
+                    </Descriptions>
+                    {transaction.tags && transaction.tags.length > 0 && (
+                        <>
+                            <Space wrap>
+                                <Typography.Text>Tags:</Typography.Text>
+                                {transaction.tags.map((tag) => (
+                                    <Tag key={tag.id}>{tag.name}</Tag>
+                                ))}
+                            </Space>
+                        </>
                     )}
-                </Descriptions>
+                </>
             )}
         </Drawer>
     );

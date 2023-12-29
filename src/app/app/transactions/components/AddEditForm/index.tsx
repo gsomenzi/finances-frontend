@@ -3,7 +3,21 @@
 import React, { useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { AddEditFormProps } from './types';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
-import { Button, Checkbox, DatePicker, Divider, Drawer, Flex, Form, Input, Radio, Select, Space } from 'antd';
+import {
+    Button,
+    Checkbox,
+    Collapse,
+    CollapseProps,
+    DatePicker,
+    Divider,
+    Drawer,
+    Flex,
+    Form,
+    Input,
+    Radio,
+    Select,
+    Space,
+} from 'antd';
 import { Transaction } from '@/types/Transaction';
 import ErrorAlert from '@/components/ErrorAlert';
 import AccountModel from '@/models/AccountModel';
@@ -11,19 +25,25 @@ import dayjs from 'dayjs';
 import TransactionModel from '@/models/TransactionModel';
 import CategoryModel from '@/models/CategoryModel';
 import AddCategoryForm from '../AddCategoryForm';
+import AddTagForm from '../AddTagForm';
+import TagModel from '@/models/TagModel';
+const { TextArea } = Input;
 
 export default function AddEditForm(props: AddEditFormProps) {
     const [form] = Form.useForm();
     const queryClient = useQueryClient();
     const accountModel = new AccountModel();
     const categoryModel = new CategoryModel();
+    const tagModel = new TagModel();
     const transactionModel = new TransactionModel();
     const { transaction, open, onClose } = props;
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [accountSearch, setAccountSearch] = useState<string>('');
     const [categorySearch, setCategorySearch] = useState<string>('');
+    const [tagSearch, setTagSearch] = useState<string>('');
     const [selectedType, setSelectedType] = useState<'income' | 'expense'>('income');
     const [openCategoryForm, setOpenCategoryForm] = useState(false);
+    const [openTagForm, setOpenTagForm] = useState(false);
 
     const transactionType = useMemo(() => {
         if (transaction?.relatedAccounts && transaction.relatedAccounts.find((a) => a.relation === 'income')) {
@@ -62,6 +82,10 @@ export default function AddEditForm(props: AddEditFormProps) {
     const { data: accounts, isLoading: gettingAccounts } = useQuery(
         ['accounts', { page: 1, limit: 20, search: accountSearch }],
         () => accountModel.findMany({ page: 1, limit: 20, search: accountSearch }),
+    );
+
+    const { data: tags, isLoading: gettingTags } = useQuery(['tags', { page: 1, limit: 20, search: tagSearch }], () =>
+        tagModel.findMany({ page: 1, limit: 20, search: tagSearch }),
     );
 
     const addTransaction = useMutation(
@@ -127,6 +151,47 @@ export default function AddEditForm(props: AddEditFormProps) {
         }
     }, [form, transaction, accounts]);
 
+    const optionalFields: CollapseProps['items'] = useMemo(() => {
+        return [
+            {
+                key: '1',
+                label: 'Campos opcionais',
+                children: (
+                    <>
+                        <Form.Item name="tagsIds" label="Tags" style={{ flexGrow: 1 }}>
+                            <Select
+                                showSearch
+                                mode="multiple"
+                                allowClear
+                                placeholder="Selecione as tags"
+                                optionFilterProp="name"
+                                loading={gettingTags}
+                                onSearch={setTagSearch}
+                                options={tags?.data.map((tag) => ({
+                                    label: tag.name,
+                                    value: tag.id,
+                                    name: tag.name,
+                                }))}
+                                dropdownRender={(menu) => (
+                                    <>
+                                        {menu}
+                                        <Divider style={{ margin: '4px 0' }} />
+                                        <Button type="text" block onClick={() => setOpenTagForm(true)}>
+                                            Criar tag
+                                        </Button>
+                                    </>
+                                )}
+                            />
+                        </Form.Item>
+                        <Form.Item name="notes" label="Observações">
+                            <TextArea rows={4} />
+                        </Form.Item>
+                    </>
+                ),
+            },
+        ];
+    }, [tags, transaction]);
+
     return (
         <Drawer
             title={transaction ? 'Editar Transação' : 'Adicionar Transação'}
@@ -147,6 +212,7 @@ export default function AddEditForm(props: AddEditFormProps) {
                 </Flex>
             }>
             <AddCategoryForm open={openCategoryForm} onClose={() => setOpenCategoryForm(false)} />
+            <AddTagForm open={openTagForm} onClose={() => setOpenTagForm(false)} />
             <Form form={form} onFinish={handleSubmit} layout="vertical">
                 <Form.Item name="type" label="Tipo" rules={[{ required: true }]}>
                     <Radio.Group
@@ -215,6 +281,7 @@ export default function AddEditForm(props: AddEditFormProps) {
                 <Form.Item name="paid" valuePropName="checked">
                     <Checkbox>A conta já foi paga</Checkbox>
                 </Form.Item>
+                <Collapse bordered={false} items={optionalFields} />
             </Form>
             <ErrorAlert show={!!errorMessage} title="Falha ao salvar a conta" description={errorMessage} />
         </Drawer>
