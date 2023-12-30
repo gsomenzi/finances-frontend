@@ -14,7 +14,6 @@ export type TransactionsViewProps = {
     account: Pick<Account, 'id' | 'name'> | null;
     category: Pick<Category, 'id' | 'name'> | null;
     remove: UseMutateFunction<any, unknown, number, unknown>;
-    onDateFilterChange: (newDateFilter: DateFilter) => void;
     getTransactionTypeIcon: (type: string) => React.ReactNode;
 };
 

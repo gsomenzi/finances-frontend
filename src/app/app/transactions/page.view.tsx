@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { TransactionsViewProps } from './types';
 import { DatePicker, Flex, Typography, Input, FloatButton, Space, Card, Empty, Tooltip, Tag } from 'antd';
 import { BankOutlined, FolderOutlined, PlusOutlined } from '@ant-design/icons';
@@ -11,10 +11,8 @@ const { Search } = Input;
 const { RangePicker } = DatePicker;
 
 export default function TransactionsView(props: TransactionsViewProps) {
-    const { account, category, transactions, isLoading, transactionDates, onDateFilterChange } = props;
-    const { setAccount, setCategory, setSearch, setSelectedTransaction } = useTransaction();
-    const [open, setOpen] = useState(false);
-    const [detailsOpen, setDetailsOpen] = useState(false);
+    const { account, category, transactions, isLoading, transactionDates } = props;
+    const { setAccount, setCategory, setSearch, setSelectedTransaction, setDateFilter } = useTransaction();
     return (
         <div>
             <Flex justify="space-between" align="center">
@@ -37,7 +35,7 @@ export default function TransactionsView(props: TransactionsViewProps) {
                         defaultValue={[dayjs().startOf('month'), dayjs().endOf('month')]}
                         onChange={(range) => {
                             if (range) {
-                                onDateFilterChange({
+                                setDateFilter({
                                     startDate: dayjs(range[0]).format('YYYY-MM-DD'),
                                     endDate: dayjs(range[1]).format('YYYY-MM-DD'),
                                 });

@@ -1,5 +1,5 @@
 import React, { ReactNode, useMemo } from 'react';
-import { DateFilter, TransactionsViewProps } from './types';
+import { TransactionsViewProps } from './types';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { ListResponseData } from '@/types/ListResponseData';
 import { Transaction } from '@/types/Transaction';
@@ -10,7 +10,7 @@ import { useTransaction } from './providers/TransactionProvider';
 
 export default function TransactionsViewModel(): TransactionsViewProps {
     const transactionModel = new TransactionModel();
-    const { account, category, dateFilter, limit, page, search, setDateFilter } = useTransaction();
+    const { account, category, dateFilter, limit, page, search } = useTransaction();
     const queryClient = useQueryClient();
 
     const { data: transactions, isLoading: gettingTransactions } = useQuery<ListResponseData<Transaction>>(
@@ -56,10 +56,6 @@ export default function TransactionsViewModel(): TransactionsViewProps {
 
     const isLoading = gettingTransactions;
 
-    function onDateFilterChange(newDateFilter: DateFilter) {
-        setDateFilter(newDateFilter);
-    }
-
     function getTransactionTypeIcon(type: string): ReactNode {
         switch (type) {
             case 'income':
@@ -90,7 +86,6 @@ export default function TransactionsViewModel(): TransactionsViewProps {
         account,
         category,
         remove,
-        onDateFilterChange,
         getTransactionTypeIcon,
     };
 }
