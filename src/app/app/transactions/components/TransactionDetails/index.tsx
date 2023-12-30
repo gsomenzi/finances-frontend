@@ -6,15 +6,23 @@ import dayjs from 'dayjs';
 import { useMutation, useQueryClient } from 'react-query';
 import TransactionModel from '@/models/TransactionModel';
 import { useConfirm } from '@/providers/ConfirmProvider';
+import { useTransaction } from '../../providers/TransactionProvider';
 
 export default function TransactionDetails(props: TransactionDetailsProps) {
-    const { transaction, open, onClose } = props;
+    const {
+        selectedTransaction: { transaction, action },
+        setSelectedTransaction,
+    } = useTransaction();
+    const { onEdit } = props;
     const { confirm } = useConfirm();
     const queryClient = useQueryClient();
     const transactionModel = new TransactionModel();
 
-    function handleCancel() {
-        onClose();
+    function handleClose() {
+        setSelectedTransaction({
+            transaction: null,
+            action: null,
+        });
     }
 
     const accountName = useMemo(() => {
@@ -36,9 +44,15 @@ export default function TransactionDetails(props: TransactionDetailsProps) {
     const { mutate: remove, isLoading: isRemoving } = useMutation((id: number) => transactionModel.delete(id), {
         onSuccess: () => {
             queryClient.invalidateQueries('transactions');
-            onClose();
+            handleClose();
         },
     });
+
+    function handleEdit() {
+        if (transaction && onEdit) {
+            onEdit(transaction);
+        }
+    }
 
     function handleRemove() {
         confirm({
@@ -56,8 +70,8 @@ export default function TransactionDetails(props: TransactionDetailsProps) {
     return (
         <Drawer
             title="Detalhes da transação"
-            open={open}
-            onClose={handleCancel}
+            open={!!transaction && action === 'details'}
+            onClose={handleClose}
             width={600}
             footer={
                 transaction && (
@@ -66,12 +80,7 @@ export default function TransactionDetails(props: TransactionDetailsProps) {
                             <Button loading={isRemoving} onClick={handleRemove} danger>
                                 Remover
                             </Button>
-                            <Button
-                                type="primary"
-                                onClick={() => {
-                                    // setSelectedTransaction(record);
-                                    // setOpen(true);
-                                }}>
+                            <Button type="primary" onClick={handleEdit}>
                                 Editar
                             </Button>
                         </Space>

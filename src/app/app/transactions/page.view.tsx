@@ -4,50 +4,33 @@ import { DatePicker, Flex, Typography, Input, FloatButton, Space, Card, Empty, T
 import { BankOutlined, FolderOutlined, PlusOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import AddEditForm from './components/AddEditForm';
-import { Transaction } from '@/types/Transaction';
 import TransactionsList from './components/TransactionsList';
 import TransactionDetails from './components/TransactionDetails';
+import { useTransaction } from './providers/TransactionProvider';
 const { Search } = Input;
 const { RangePicker } = DatePicker;
 
 export default function TransactionsView(props: TransactionsViewProps) {
-    const {
-        account,
-        category,
-        transactions,
-        isLoading,
-        isRemoving,
-        page,
-        limit,
-        total,
-        transactionDates,
-        remove,
-        onPageChange,
-        onSizeChange,
-        onAccountChange,
-        onCategoryChange,
-        onSearch,
-        onDateFilterChange,
-    } = props;
+    const { account, category, transactions, isLoading, transactionDates, onDateFilterChange } = props;
+    const { setAccount, setCategory, setSearch, setSelectedTransaction } = useTransaction();
     const [open, setOpen] = useState(false);
     const [detailsOpen, setDetailsOpen] = useState(false);
-    const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
     return (
         <div>
             <Flex justify="space-between" align="center">
                 <Typography.Title level={2}>Lançamentos</Typography.Title>
                 <Space>
                     {account && (
-                        <Tag color="blue" icon={<BankOutlined />} closable onClose={() => onAccountChange(null)}>
+                        <Tag color="blue" icon={<BankOutlined />} closable onClose={() => setAccount(null)}>
                             {account.name}
                         </Tag>
                     )}
                     {category && (
-                        <Tag color="cyan" icon={<FolderOutlined />} closable onClose={() => onCategoryChange(null)}>
+                        <Tag color="cyan" icon={<FolderOutlined />} closable onClose={() => setCategory(null)}>
                             {category.name}
                         </Tag>
                     )}
-                    <Search placeholder="Pesquisa" onSearch={onSearch} style={{ width: 200 }} />
+                    <Search placeholder="Pesquisa" onSearch={setSearch} style={{ width: 200 }} />
                     <RangePicker
                         format="DD/MM/YYYY"
                         allowClear={false}
@@ -67,16 +50,14 @@ export default function TransactionsView(props: TransactionsViewProps) {
                 type="primary"
                 icon={<PlusOutlined />}
                 onClick={() => {
-                    setSelectedTransaction(null);
-                    setOpen(true);
+                    setSelectedTransaction({
+                        transaction: null,
+                        action: 'add',
+                    });
                 }}
             />
-            <AddEditForm open={open} onClose={() => setOpen(false)} transaction={selectedTransaction} />
-            <TransactionDetails
-                open={detailsOpen}
-                onClose={() => setDetailsOpen(false)}
-                transaction={selectedTransaction}
-            />
+            <AddEditForm />
+            <TransactionDetails />
             {transactionDates.length > 0 ? (
                 transactionDates.map((date) => (
                     <Card
@@ -95,12 +76,6 @@ export default function TransactionsView(props: TransactionsViewProps) {
                         <TransactionsList
                             loading={isLoading}
                             transactions={transactions.filter((t) => t.date === date)}
-                            onSelect={(transaction) => {
-                                setSelectedTransaction(transaction);
-                                setDetailsOpen(true);
-                            }}
-                            onSelectAccount={(account) => onAccountChange(account)}
-                            onSelectCategory={(category) => onCategoryChange(category)}
                         />
                     </Card>
                 ))

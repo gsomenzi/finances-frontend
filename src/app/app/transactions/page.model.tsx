@@ -1,27 +1,17 @@
-import React, { ReactNode, useMemo, useState } from 'react';
+import React, { ReactNode, useMemo } from 'react';
 import { DateFilter, TransactionsViewProps } from './types';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { ListResponseData } from '@/types/ListResponseData';
 import { Transaction } from '@/types/Transaction';
-import dayjs from 'dayjs';
 import { Tooltip } from 'antd';
 import { ArrowDownOutlined, ArrowUpOutlined } from '@ant-design/icons';
 import TransactionModel from '@/models/TransactionModel';
-import { Account } from '@/types/Account';
-import { Category } from '@/types/Category';
+import { useTransaction } from './providers/TransactionProvider';
 
 export default function TransactionsViewModel(): TransactionsViewProps {
     const transactionModel = new TransactionModel();
+    const { account, category, dateFilter, limit, page, search, setDateFilter } = useTransaction();
     const queryClient = useQueryClient();
-    const [page, setPage] = useState(1);
-    const [limit, setLimit] = useState(20);
-    const [search, setSearch] = useState('');
-    const [account, setAccount] = useState<Pick<Account, 'id' | 'name'> | null>(null);
-    const [category, setCategory] = useState<Pick<Category, 'id' | 'name'> | null>(null);
-    const [dateFilter, setDateFilter] = useState<DateFilter>({
-        startDate: dayjs().startOf('month').format('YYYY-MM-DD'),
-        endDate: dayjs().endOf('month').format('YYYY-MM-DD'),
-    });
 
     const { data: transactions, isLoading: gettingTransactions } = useQuery<ListResponseData<Transaction>>(
         [
@@ -66,28 +56,8 @@ export default function TransactionsViewModel(): TransactionsViewProps {
 
     const isLoading = gettingTransactions;
 
-    function onPageChange(newPage: number) {
-        setPage(newPage);
-    }
-
-    function onSizeChange(newSize: number) {
-        setLimit(newSize);
-    }
-
-    function onSearch(newSearch: string) {
-        setSearch(newSearch);
-    }
-
     function onDateFilterChange(newDateFilter: DateFilter) {
         setDateFilter(newDateFilter);
-    }
-
-    function onAccountChange(newAccount: Pick<Account, 'id' | 'name'> | null) {
-        setAccount(newAccount);
-    }
-
-    function onCategoryChange(newCategory: Pick<Category, 'id' | 'name'> | null) {
-        setCategory(newCategory);
     }
 
     function getTransactionTypeIcon(type: string): ReactNode {
@@ -120,11 +90,6 @@ export default function TransactionsViewModel(): TransactionsViewProps {
         account,
         category,
         remove,
-        onPageChange,
-        onSizeChange,
-        onSearch,
-        onAccountChange,
-        onCategoryChange,
         onDateFilterChange,
         getTransactionTypeIcon,
     };

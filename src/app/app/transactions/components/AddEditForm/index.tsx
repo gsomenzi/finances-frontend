@@ -27,16 +27,17 @@ import CategoryModel from '@/models/CategoryModel';
 import AddCategoryForm from '../AddCategoryForm';
 import AddTagForm from '../AddTagForm';
 import TagModel from '@/models/TagModel';
+import { useTransaction } from '../../providers/TransactionProvider';
 const { TextArea } = Input;
 
 export default function AddEditForm(props: AddEditFormProps) {
     const [form] = Form.useForm();
+    const { selectedTransaction, setSelectedTransaction } = useTransaction();
     const queryClient = useQueryClient();
     const accountModel = new AccountModel();
     const categoryModel = new CategoryModel();
     const tagModel = new TagModel();
     const transactionModel = new TransactionModel();
-    const { transaction, open, onClose } = props;
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [accountSearch, setAccountSearch] = useState<string>('');
     const [categorySearch, setCategorySearch] = useState<string>('');
@@ -44,6 +45,8 @@ export default function AddEditForm(props: AddEditFormProps) {
     const [selectedType, setSelectedType] = useState<'income' | 'expense'>('income');
     const [openCategoryForm, setOpenCategoryForm] = useState(false);
     const [openTagForm, setOpenTagForm] = useState(false);
+
+    const transaction = selectedTransaction?.transaction || null;
 
     const transactionType = useMemo(() => {
         if (transaction?.relatedAccounts && transaction.relatedAccounts.find((a) => a.relation === 'income')) {
@@ -97,7 +100,7 @@ export default function AddEditForm(props: AddEditFormProps) {
             onSuccess: () => {
                 queryClient.invalidateQueries('transactions');
                 queryClient.invalidateQueries('balances');
-                onClose();
+                handleClose();
             },
             onError: (e: any) => {
                 setErrorMessage(e?.response?.data?.message || 'Erro ao criar a transação');
@@ -114,7 +117,7 @@ export default function AddEditForm(props: AddEditFormProps) {
             onSuccess: () => {
                 queryClient.invalidateQueries('transactions');
                 queryClient.invalidateQueries('balances');
-                onClose();
+                handleClose();
             },
             onError: (e: any) => {
                 setErrorMessage(e?.response?.data?.message || 'Erro ao atualizar a transação');
@@ -122,9 +125,9 @@ export default function AddEditForm(props: AddEditFormProps) {
         },
     );
 
-    function handleCancel() {
+    function handleClose() {
         form.resetFields();
-        onClose();
+        setSelectedTransaction({ transaction: null, action: null });
     }
 
     function handleSubmit(values: any) {
@@ -195,13 +198,13 @@ export default function AddEditForm(props: AddEditFormProps) {
     return (
         <Drawer
             title={transaction ? 'Editar Transação' : 'Adicionar Transação'}
-            open={open}
-            onClose={handleCancel}
+            open={!!(selectedTransaction.action === 'add' || selectedTransaction.action === 'edit')}
+            onClose={handleClose}
             width={600}
             footer={
                 <Flex justify="end">
                     <Space>
-                        <Button onClick={handleCancel}>Cancelar</Button>
+                        <Button onClick={handleClose}>Cancelar</Button>
                         <Button
                             type="primary"
                             onClick={() => form.submit()}

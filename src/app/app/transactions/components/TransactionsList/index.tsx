@@ -7,9 +7,11 @@ import { List, Space, Tag, Tooltip, Typography } from 'antd';
 import { ArrowDownOutlined, ArrowUpOutlined, BankOutlined, FolderOutlined } from '@ant-design/icons';
 import { Account } from '@/types/Account';
 import { Category } from '@/types/Category';
+import { useTransaction } from '../../providers/TransactionProvider';
 
 export default function TransactionsList(props: TransactionsListProps) {
-    const { transactions, loading, onSelect, onSelectAccount, onSelectCategory } = props;
+    const { transactions, loading } = props;
+    const { setSelectedTransaction, setAccount, setCategory } = useTransaction();
 
     function getTransactionTypeIcon(type: string): ReactNode {
         switch (type) {
@@ -33,17 +35,13 @@ export default function TransactionsList(props: TransactionsListProps) {
     function handleSelectAccount(e: any, account: Pick<Account, 'id' | 'name'>) {
         e.preventDefault();
         e.stopPropagation();
-        if (onSelectAccount) {
-            onSelectAccount(account);
-        }
+        setAccount(account);
     }
 
     function handleSelectCategory(e: any, category: Pick<Category, 'id' | 'name'>) {
         e.preventDefault();
         e.stopPropagation();
-        if (onSelectCategory) {
-            onSelectCategory(category);
-        }
+        setCategory(category);
     }
 
     return (
@@ -52,7 +50,14 @@ export default function TransactionsList(props: TransactionsListProps) {
                 loading={loading}
                 dataSource={transactions}
                 renderItem={(item) => (
-                    <List.Item style={{ cursor: 'pointer' }} onClick={() => onSelect(item)}>
+                    <List.Item
+                        style={{ cursor: 'pointer' }}
+                        onClick={() =>
+                            setSelectedTransaction({
+                                transaction: item,
+                                action: 'details',
+                            })
+                        }>
                         <List.Item.Meta
                             title={item.description}
                             description={
