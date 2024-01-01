@@ -63,7 +63,6 @@ export default function TransactionDetails(props: TransactionDetailsProps) {
                     remove(transaction.id);
                 }
             },
-            onCancel: () => {},
         });
     }
 
