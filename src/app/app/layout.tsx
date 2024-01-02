@@ -23,15 +23,23 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
     return (
         <>
             {authenticated === true ? (
-                <Layout style={{ minHeight: '100vh' }}>
-                    <Sider collapsible>
+                <Layout hasSider>
+                    <Sider style={{ overflow: 'auto', height: '100vh', position: 'fixed', left: 0, top: 0, bottom: 0 }}>
                         <SiderMenu />
                     </Sider>
-                    <Layout>
-                        <Header style={{ paddingLeft: 24, paddingRight: 24, backgroundColor: '#fff' }}>
+                    <Layout style={{ marginLeft: 200 }}>
+                        <Header style={{ height: 64, paddingLeft: 24, paddingRight: 24, backgroundColor: '#fff' }}>
                             <AppHeader />
                         </Header>
-                        <Content style={{ paddingLeft: 24, paddingRight: 24 }}>{children}</Content>
+                        <Content
+                            style={{
+                                height: 'calc(100vh - 64px)',
+                                paddingLeft: 24,
+                                paddingRight: 24,
+                                overflow: 'auto',
+                            }}>
+                            {children}
+                        </Content>
                     </Layout>
                 </Layout>
             ) : (
