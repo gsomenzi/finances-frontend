@@ -6,30 +6,27 @@ export interface Transaction {
     value: string;
     date: string;
     paid: boolean;
-    paid_at: string | null;
-    notes: string | null;
-    category: Category;
-    relatedAccounts: RelatedAccount[];
-    tags: Tag[];
+    paid_at: any;
+    notes: any;
     createdAt: string;
     updatedAt: string;
     images?: any[];
-    transactionGroups?: TransactionGroup[];
+    category: Category;
+    relatedAccounts: AccountRelation[];
+    transactionGroups?: TransactionGroupRelation[];
+    tags?: Tag[];
 }
 
 interface Category {
     id: number;
     name: string;
-    description?: any;
-    destination?: string;
-    createdAt?: string;
-    updatedAt?: string;
+    description: any;
+    destination: string;
+    createdAt: string;
+    updatedAt: string;
 }
 
-interface RelatedAccount {
-    transactionToAccountId: number;
-    transactionId: number;
-    accountId: number;
+interface AccountRelation {
     relation: string;
     account: Account;
 }
@@ -37,38 +34,33 @@ interface RelatedAccount {
 interface Account {
     id: number;
     name: string;
-    description?: string;
-    type?: string;
-    default?: boolean;
-    currency?: string;
-    createdAt?: string;
-    updatedAt?: string;
+    description: string;
+    type: string;
+    default: boolean;
+    currency: string;
+    createdAt: string;
+    updatedAt: string;
+}
+
+interface TransactionGroupRelation {
+    transactionGroup: TransactionGroup;
 }
 
 interface TransactionGroup {
-    transactionToTransactionGroupId: number;
-    transactionId: number;
-    transactionGroupId: number;
-    transactionGroup: TransactionGroup2;
-}
-
-interface TransactionGroup2 {
     id: number;
     type: string;
+    transactionsCount: number;
     notes: any;
     createdAt: string;
     updatedAt: string;
-    transactions: RelatedTransaction[];
+    transactions: TransactionRelation[];
 }
 
-interface RelatedTransaction {
-    transactionToTransactionGroupId: number;
-    transactionId: number;
-    transactionGroupId: number;
-    transaction: RelatedTransaction2;
+interface TransactionRelation {
+    transaction: NestedTransaction;
 }
 
-interface RelatedTransaction2 {
+interface NestedTransaction {
     id: number;
     description: string;
     value: string;

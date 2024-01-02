@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { TransactionDetailsProps } from './types';
 import { Button, Descriptions, Divider, Drawer, Flex, Popconfirm, Space, Table, Tag, Typography } from 'antd';
 import { transactionTypeTranslator } from '@/lib/transactionTypeTranslator';
@@ -31,7 +31,7 @@ export default function TransactionDetails(props: TransactionDetailsProps) {
         );
         if (!installmentsGroup) return [1, []];
         return [
-            installmentsGroup?.transactionGroup.transactions.length,
+            installmentsGroup?.transactionGroup.transactionsCount,
             installmentsGroup?.transactionGroup.transactions
                 .map((t) => t.transaction)
                 .sort((a, b) => a.date.localeCompare(b.date)),
