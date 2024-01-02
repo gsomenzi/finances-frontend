@@ -1,9 +1,9 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { TransactionDetailsProps } from './types';
-import { Button, Descriptions, Divider, Drawer, Flex, Popconfirm, Space, Tag, Typography } from 'antd';
+import { Button, Descriptions, Divider, Drawer, Flex, Popconfirm, Space, Table, Tag, Typography } from 'antd';
 import { transactionTypeTranslator } from '@/lib/transactionTypeTranslator';
 import dayjs from 'dayjs';
-import { useMutation, useQueryClient } from 'react-query';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
 import TransactionModel from '@/models/TransactionModel';
 import { useConfirm } from '@/providers/ConfirmProvider';
 import { useTransaction } from '../../providers/TransactionProvider';
@@ -16,6 +16,27 @@ export default function TransactionDetails(props: TransactionDetailsProps) {
     const { confirm } = useConfirm();
     const queryClient = useQueryClient();
     const transactionModel = new TransactionModel();
+
+    const { data: transactionDetails, isLoading } = useQuery(
+        ['transactions', transaction?.id],
+        () => transactionModel.findOne(transaction?.id || 0),
+        {
+            enabled: !!transaction?.id,
+        },
+    );
+
+    const [installmentsNumber, installments] = useMemo(() => {
+        const installmentsGroup = transactionDetails?.transactionGroups?.find(
+            (g) => g.transactionGroup.type === 'installments',
+        );
+        if (!installmentsGroup) return [1, []];
+        return [
+            installmentsGroup?.transactionGroup.transactions.length,
+            installmentsGroup?.transactionGroup.transactions
+                .map((t) => t.transaction)
+                .sort((a, b) => a.date.localeCompare(b.date)),
+        ];
+    }, [transactionDetails]);
 
     function handleClose() {
         setSelectedTransaction({
@@ -90,7 +111,8 @@ export default function TransactionDetails(props: TransactionDetailsProps) {
             }>
             {transaction && (
                 <>
-                    <Descriptions bordered style={{ marginBottom: '1rem' }} column={1}>
+                    <Typography.Title level={5}>Detalhes:</Typography.Title>
+                    <Descriptions bordered column={1}>
                         <Descriptions.Item span={3} label="Descricão">
                             {transaction.description}
                         </Descriptions.Item>
@@ -113,16 +135,72 @@ export default function TransactionDetails(props: TransactionDetailsProps) {
                                 {transaction.notes}
                             </Descriptions.Item>
                         )}
+                        <Descriptions.Item label="Parcelas">{installmentsNumber}</Descriptions.Item>
                     </Descriptions>
                     {transaction.tags && transaction.tags.length > 0 && (
                         <>
+                            <Typography.Title level={5}>Tags:</Typography.Title>
                             <Space wrap>
-                                <Typography.Text>Tags:</Typography.Text>
                                 {transaction.tags.map((tag) => (
                                     <Tag key={tag.id}>{tag.name}</Tag>
                                 ))}
                             </Space>
                         </>
+                    )}
+                    {installments.length > 0 && (
+                        <Flex vertical gap={8}>
+                            <Typography.Title level={5}>Parcelas:</Typography.Title>
+                            <Table
+                                dataSource={installments}
+                                pagination={false}
+                                rowKey={(t) => t.id}
+                                columns={[
+                                    {
+                                        title: 'Parcela',
+                                        dataIndex: 'key',
+                                        width: 1,
+                                        render: (text, record, index) => (
+                                            <Typography.Text strong={record.id === transaction.id}>
+                                                {index + 1}
+                                            </Typography.Text>
+                                        ),
+                                    },
+                                    {
+                                        title: 'Data',
+                                        dataIndex: 'date',
+                                        key: 'date',
+                                        render: (value, record) => (
+                                            <Typography.Text strong={record.id === transaction.id}>
+                                                {dayjs(value).format('DD/MM/YYYY')}
+                                            </Typography.Text>
+                                        ),
+                                    },
+                                    {
+                                        title: 'Valor',
+                                        dataIndex: 'value',
+                                        key: 'value',
+                                        render: (value, record) => (
+                                            <Typography.Text strong={record.id === transaction.id}>
+                                                {Intl.NumberFormat('pt-BR', {
+                                                    style: 'currency',
+                                                    currency: 'BRL',
+                                                }).format(Number(value))}
+                                            </Typography.Text>
+                                        ),
+                                    },
+                                    {
+                                        title: 'Paga',
+                                        dataIndex: 'paid',
+                                        key: 'paid',
+                                        render: (value, record) => (
+                                            <Typography.Text strong={record.id === transaction.id}>
+                                                {value ? 'Sim' : 'Não'}
+                                            </Typography.Text>
+                                        ),
+                                    },
+                                ]}
+                            />
+                        </Flex>
                     )}
                 </>
             )}

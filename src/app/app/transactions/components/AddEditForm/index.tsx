@@ -17,6 +17,7 @@ import {
     Radio,
     Select,
     Space,
+    Switch,
 } from 'antd';
 import { Transaction } from '@/types/Transaction';
 import ErrorAlert from '@/components/ErrorAlert';
@@ -77,10 +78,52 @@ export default function AddEditForm(props: AddEditFormProps) {
         },
     );
 
+    const categoriesOptions = useMemo(() => {
+        if (!categories) {
+            return [];
+        }
+        let options = categories.data.map((category) => ({
+            label: category.name,
+            name: category.name,
+            value: category.id,
+        }));
+        if (transaction?.category?.id && !options.find((o) => o.value === transaction.category.id)) {
+            options = options.concat({
+                label: transaction.category.name,
+                name: transaction.category.name,
+                value: transaction.category.id,
+            });
+        }
+        return options;
+    }, [categories, transaction]);
+
     const { data: accounts, isLoading: gettingAccounts } = useQuery(
         ['accounts', { page: 1, limit: 20, search: accountSearch }],
         () => accountModel.findMany({ page: 1, limit: 20, search: accountSearch }),
     );
+
+    const accountsOptions = useMemo(() => {
+        if (!accounts) {
+            return [];
+        }
+        let options = accounts.data.map((account) => ({
+            label: account.name,
+            name: account.name,
+            value: account.id,
+        }));
+        if (transaction?.relatedAccounts && transaction.relatedAccounts.length > 0) {
+            options = options.concat(
+                transaction.relatedAccounts
+                    .map((account) => ({
+                        label: account.account.name,
+                        name: account.account.name,
+                        value: account.account.id,
+                    }))
+                    .filter((a) => !options.find((o) => o.value === a.value)),
+            );
+        }
+        return options;
+    }, [accounts, transaction]);
 
     const { data: tags, isLoading: gettingTags } = useQuery(['tags', { page: 1, limit: 20, search: tagSearch }], () =>
         tagModel.findMany({ page: 1, limit: 20, search: tagSearch }),
@@ -153,6 +196,7 @@ export default function AddEditForm(props: AddEditFormProps) {
             ...values,
             date: values.date.format('YYYY-MM-DD'),
             accountRelation: values.type,
+            installmentsCount: values.installmentsCount ? Number(values.installmentsCount) : 1,
         };
 
         if (transaction?.id) {
@@ -168,14 +212,14 @@ export default function AddEditForm(props: AddEditFormProps) {
     useLayoutEffect(() => {
         if (transaction) {
             form.setFieldsValue({
-                description: transaction?.description || '',
+                description: transaction?.description,
                 type: transactionType,
-                value: transaction?.value || '',
-                date: transaction?.date ? dayjs(transaction.date) : dayjs(),
-                categoryId: transaction?.category?.id || null,
-                paid: transaction?.paid || false,
-                accountId: transactionAccount?.id || null,
-                notes: transaction?.notes || '',
+                value: transaction?.value,
+                date: transaction?.date ? dayjs(transaction?.date) : null,
+                categoryId: transaction?.category?.id,
+                paid: transaction?.paid,
+                accountId: transactionAccount?.id,
+                notes: transaction?.notes,
             });
         }
     }, [transaction, transactionAccount, transactionType]);
@@ -198,6 +242,22 @@ export default function AddEditForm(props: AddEditFormProps) {
                 label: 'Campos opcionais',
                 children: (
                     <>
+                        {!transaction ? (
+                            <Flex gap={8}>
+                                <Form.Item name="installmentsCount" label="Parcelas" style={{ flexGrow: 1 }}>
+                                    <Input type="number" min={1} max={12} step={1} />
+                                </Form.Item>
+                                <Form.Item name="installmentsPeriod" label="Período" style={{ flexGrow: 1 }}>
+                                    <Select
+                                        options={[
+                                            { label: 'Semanas', value: 'week' },
+                                            { label: 'Meses', value: 'month' },
+                                            { label: 'Anos', value: 'year' },
+                                        ]}
+                                    />
+                                </Form.Item>
+                            </Flex>
+                        ) : null}
                         <Form.Item name="tagsIds" label="Tags" style={{ flexGrow: 1 }}>
                             <Select
                                 showSearch
@@ -250,9 +310,22 @@ export default function AddEditForm(props: AddEditFormProps) {
             }>
             <AddCategoryForm open={openCategoryForm} onClose={() => setOpenCategoryForm(false)} />
             <AddTagForm open={openTagForm} onClose={() => setOpenTagForm(false)} />
-            <Form form={form} onFinish={handleSubmit} layout="vertical">
+            <Form
+                initialValues={{
+                    type: 'expense',
+                    description: '',
+                    value: '',
+                    date: dayjs(),
+                    paid: false,
+                    installmentsCount: 1,
+                    installmentsPeriod: 'month',
+                }}
+                form={form}
+                onFinish={handleSubmit}
+                layout="vertical">
                 <Form.Item name="type" label="Tipo" rules={[{ required: true }]}>
                     <Radio.Group
+                        disabled={!!transaction}
                         options={[
                             { label: 'Receita', value: 'income' },
                             { label: 'Despesa', value: 'expense' },
@@ -284,11 +357,7 @@ export default function AddEditForm(props: AddEditFormProps) {
                             optionFilterProp="name"
                             loading={gettingAccounts}
                             onSearch={setAccountSearch}
-                            options={accounts?.data.map((account) => ({
-                                label: account.name,
-                                value: account.id,
-                                name: account.name,
-                            }))}
+                            options={accountsOptions}
                         />
                     </Form.Item>
                     <Form.Item name="categoryId" label="Categoria" rules={[{ required: true }]} style={{ flexGrow: 1 }}>
@@ -298,11 +367,7 @@ export default function AddEditForm(props: AddEditFormProps) {
                             optionFilterProp="name"
                             loading={gettingCategories}
                             onSearch={setCategorySearch}
-                            options={categories?.data.map((category) => ({
-                                label: category.name,
-                                value: category.id,
-                                name: category.name,
-                            }))}
+                            options={categoriesOptions}
                             dropdownRender={(menu) => (
                                 <>
                                     {menu}
