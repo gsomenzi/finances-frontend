@@ -8,10 +8,9 @@ import dayjs from 'dayjs';
 
 export default function BalancesList(props: BalancesListProps) {
     const accountModel = new AccountModel();
-    const date = dayjs().format('YYYY-MM-DD');
     const {} = props;
 
-    const { data: balances, isLoading } = useQuery(['balances', date], () => accountModel.getAllAccountsBalances(date));
+    const { data: balances, isLoading } = useQuery(['balances'], () => accountModel.getAllAccountsBalances());
 
     const totalBalance = useMemo(() => {
         if (!balances) {

@@ -13,12 +13,9 @@ export default class AccountModel extends _ApiModel<Account> {
         });
     }
 
-    public getAllAccountsBalances(date: string): Promise<AccountBalance[]> {
-        if (!date) {
-            date = dayjs().format('YYYY-MM-DD');
-        }
+    public getAllAccountsBalances(projectionDate?: string): Promise<AccountBalance[]> {
         return this.apiClient.get(`${this.url}/balances`, {
-            date,
+            projectionDate: projectionDate || null,
         });
     }
 

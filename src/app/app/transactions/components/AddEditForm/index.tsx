@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useLayoutEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { AddEditFormProps } from './types';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import {
@@ -48,6 +48,14 @@ export default function AddEditForm(props: AddEditFormProps) {
 
     const transaction = selectedTransaction?.transaction || null;
 
+    const transactionAccount = useMemo(() => {
+        if (transaction?.relatedAccounts && transaction.relatedAccounts.length > 0) {
+            return transaction?.relatedAccounts[0].account;
+        } else {
+            return null;
+        }
+    }, [transaction]);
+
     const transactionType = useMemo(() => {
         if (transaction?.relatedAccounts && transaction.relatedAccounts.find((a) => a.relation === 'income')) {
             return 'income';
@@ -77,6 +85,29 @@ export default function AddEditForm(props: AddEditFormProps) {
     const { data: tags, isLoading: gettingTags } = useQuery(['tags', { page: 1, limit: 20, search: tagSearch }], () =>
         tagModel.findMany({ page: 1, limit: 20, search: tagSearch }),
     );
+
+    const tagsOptions = useMemo(() => {
+        if (!tags) {
+            return [];
+        }
+        let options = tags.data.map((tag) => ({
+            label: tag.name,
+            name: tag.name,
+            value: tag.id,
+        }));
+        if (transaction?.tags && transaction.tags.length > 0) {
+            options = options.concat(
+                transaction.tags
+                    .map((tag) => ({
+                        label: tag.name,
+                        name: tag.name,
+                        value: tag.id,
+                    }))
+                    .filter((t) => !options.find((o) => o.value === t.value)),
+            );
+        }
+        return options;
+    }, [tags, transaction]);
 
     const addTransaction = useMutation(
         (transactionData) => {
@@ -135,21 +166,26 @@ export default function AddEditForm(props: AddEditFormProps) {
     }
 
     useLayoutEffect(() => {
-        form.setFieldsValue({
-            description: transaction?.description || '',
-            type: transactionType,
-            value: transaction?.value || '',
-            date: transaction?.date ? dayjs(transaction.date) : dayjs(),
-            categoryId: transaction?.category?.id || null,
-        });
-    }, [transaction, transactionType]);
+        if (transaction) {
+            form.setFieldsValue({
+                description: transaction?.description || '',
+                type: transactionType,
+                value: transaction?.value || '',
+                date: transaction?.date ? dayjs(transaction.date) : dayjs(),
+                categoryId: transaction?.category?.id || null,
+                paid: transaction?.paid || false,
+                accountId: transactionAccount?.id || null,
+                notes: transaction?.notes || '',
+            });
+        }
+    }, [transaction, transactionAccount, transactionType]);
 
     useEffect(() => {
-        if (form && !transaction?.id && accounts?.data) {
+        if (form && !transactionAccount?.id && accounts?.data) {
             const defaultAccount = accounts.data.find((a) => a.default);
             form.setFieldValue('accountId', defaultAccount?.id);
         }
-    }, [form, transaction, accounts]);
+    }, [accounts, form, transactionAccount]);
 
     useEffect(() => {
         setSelectedType(transactionType);
@@ -171,11 +207,8 @@ export default function AddEditForm(props: AddEditFormProps) {
                                 optionFilterProp="name"
                                 loading={gettingTags}
                                 onSearch={setTagSearch}
-                                options={tags?.data.map((tag) => ({
-                                    label: tag.name,
-                                    value: tag.id,
-                                    name: tag.name,
-                                }))}
+                                defaultValue={transaction?.tags?.map((tag) => tag.id) || []}
+                                options={tagsOptions}
                                 dropdownRender={(menu) => (
                                     <>
                                         {menu}
@@ -194,7 +227,7 @@ export default function AddEditForm(props: AddEditFormProps) {
                 ),
             },
         ];
-    }, [tags, transaction]);
+    }, [gettingTags, tagsOptions, transaction]);
 
     return (
         <Drawer
@@ -285,7 +318,7 @@ export default function AddEditForm(props: AddEditFormProps) {
                 <Form.Item name="paid" valuePropName="checked">
                     <Checkbox>A conta já foi paga</Checkbox>
                 </Form.Item>
-                <Collapse bordered={false} items={optionalFields} />
+                <Collapse defaultActiveKey={transaction ? ['1'] : []} bordered={false} items={optionalFields} />
             </Form>
             <ErrorAlert show={!!errorMessage} title="Falha ao salvar a conta" description={errorMessage} />
         </Drawer>

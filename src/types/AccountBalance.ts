@@ -1,7 +1,8 @@
 export type AccountBalance = {
     accountId: number;
     accountName: string;
-    date: string;
+    projected: boolean;
+    projectionDate: string | null;
     currency: string;
     balance: number;
 };
