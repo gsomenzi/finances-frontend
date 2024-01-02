@@ -56,19 +56,6 @@ export default function AddEditForm(props: AddEditFormProps) {
         }
     }, [transaction]);
 
-    useLayoutEffect(() => {
-        form.setFieldsValue({
-            description: transaction?.description || '',
-            type: transactionType,
-            value: transaction?.value || '',
-            date: transaction?.date ? dayjs(transaction.date) : dayjs(),
-        });
-    }, [transaction, transactionType]);
-
-    useEffect(() => {
-        setSelectedType(transactionType);
-    }, [transactionType]);
-
     const { data: categories, isLoading: gettingCategories } = useQuery(
         ['categories', { page: 1, limit: 20, search: categorySearch, destination: selectedType }],
         () =>
@@ -147,12 +134,26 @@ export default function AddEditForm(props: AddEditFormProps) {
         }
     }
 
+    useLayoutEffect(() => {
+        form.setFieldsValue({
+            description: transaction?.description || '',
+            type: transactionType,
+            value: transaction?.value || '',
+            date: transaction?.date ? dayjs(transaction.date) : dayjs(),
+            categoryId: transaction?.category?.id || null,
+        });
+    }, [transaction, transactionType]);
+
     useEffect(() => {
         if (form && !transaction?.id && accounts?.data) {
             const defaultAccount = accounts.data.find((a) => a.default);
             form.setFieldValue('accountId', defaultAccount?.id);
         }
     }, [form, transaction, accounts]);
+
+    useEffect(() => {
+        setSelectedType(transactionType);
+    }, [transactionType]);
 
     const optionalFields: CollapseProps['items'] = useMemo(() => {
         return [

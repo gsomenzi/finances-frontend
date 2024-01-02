@@ -13,7 +13,6 @@ export default function TransactionDetails(props: TransactionDetailsProps) {
         selectedTransaction: { transaction, action },
         setSelectedTransaction,
     } = useTransaction();
-    const { onEdit } = props;
     const { confirm } = useConfirm();
     const queryClient = useQueryClient();
     const transactionModel = new TransactionModel();
@@ -49,8 +48,11 @@ export default function TransactionDetails(props: TransactionDetailsProps) {
     });
 
     function handleEdit() {
-        if (transaction && onEdit) {
-            onEdit(transaction);
+        if (transaction) {
+            setSelectedTransaction({
+                transaction,
+                action: 'edit',
+            });
         }
     }
 
