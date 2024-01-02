@@ -11,7 +11,15 @@ const { Search } = Input;
 const { RangePicker } = DatePicker;
 
 export default function TransactionsView(props: TransactionsViewProps) {
-    const { account, category, transactions, isLoading, transactionDates } = props;
+    const {
+        account,
+        category,
+        generalBalanceOnStartDate,
+        generalBalanceOnEndDate,
+        transactions,
+        isLoading,
+        transactionDates,
+    } = props;
     const { setAccount, setCategory, setSearch, setSelectedTransaction, setDateFilter } = useTransaction();
     return (
         <div>
@@ -57,26 +65,42 @@ export default function TransactionsView(props: TransactionsViewProps) {
             <AddEditForm />
             <TransactionDetails />
             {transactionDates.length > 0 ? (
-                transactionDates.map((date) => (
-                    <Card
-                        key={date}
-                        title={
-                            <Tooltip title={`${dayjs(date).diff(dayjs(), 'day')} dias atrás`}>
-                                <Space>
-                                    <Typography>{dayjs(date).format('DD/MM/YYYY')}</Typography>
-                                    <Typography.Text type="secondary">{dayjs(date).format('dddd')}</Typography.Text>
-                                </Space>
-                            </Tooltip>
-                        }
-                        bordered={false}
-                        type="inner"
-                        style={{ marginBottom: '1rem' }}>
-                        <TransactionsList
-                            loading={isLoading}
-                            transactions={transactions.filter((t) => t.date === date)}
-                        />
-                    </Card>
-                ))
+                <>
+                    <Typography style={{ textAlign: 'right', marginBottom: '1rem' }}>
+                        <Typography.Text>
+                            {Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(
+                                generalBalanceOnStartDate || 0,
+                            )}
+                        </Typography.Text>
+                    </Typography>
+                    {transactionDates.map((date) => (
+                        <Card
+                            key={date}
+                            title={
+                                <Tooltip title={`${dayjs(date).diff(dayjs(), 'day')} dias atrás`}>
+                                    <Space>
+                                        <Typography>{dayjs(date).format('DD/MM/YYYY')}</Typography>
+                                        <Typography.Text type="secondary">{dayjs(date).format('dddd')}</Typography.Text>
+                                    </Space>
+                                </Tooltip>
+                            }
+                            bordered={false}
+                            type="inner"
+                            style={{ marginBottom: '1rem' }}>
+                            <TransactionsList
+                                loading={isLoading}
+                                transactions={transactions.filter((t) => t.date === date)}
+                            />
+                        </Card>
+                    ))}
+                    <Typography style={{ textAlign: 'right' }}>
+                        <Typography.Text>
+                            {Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(
+                                generalBalanceOnEndDate || 0,
+                            )}
+                        </Typography.Text>
+                    </Typography>
+                </>
             ) : (
                 <Flex align="center" justify="center" style={{ marginTop: '2rem' }}>
                     <Empty description="Nenhuma transação encontrada" />
