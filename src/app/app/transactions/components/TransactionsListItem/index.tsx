@@ -3,7 +3,13 @@ import { TransactionsListItemProps } from './types';
 import { List, Space, Tag, Tooltip, Typography } from 'antd';
 import { useTransaction } from '../../providers/TransactionProvider';
 import { Account } from '@/types/Account';
-import { ArrowDownOutlined, ArrowUpOutlined, BankOutlined, FolderOutlined } from '@ant-design/icons';
+import {
+    ArrowDownOutlined,
+    ArrowUpOutlined,
+    BankOutlined,
+    FolderOutlined,
+    UnorderedListOutlined,
+} from '@ant-design/icons';
 import { Category } from '@/types/Category';
 
 export default function TransactionsListItem(props: TransactionsListItemProps) {
@@ -21,7 +27,10 @@ export default function TransactionsListItem(props: TransactionsListItemProps) {
         setCategory(category);
     }
 
-    function getTransactionTypeIcon(type: string): ReactNode {
+    function getTransactionTypeIcon(type: string | null): ReactNode {
+        if (!type) {
+            return null;
+        }
         switch (type) {
             case 'income':
                 return (
@@ -40,21 +49,18 @@ export default function TransactionsListItem(props: TransactionsListItemProps) {
         }
     }
 
-    const account: Pick<Account, 'id' | 'name'> | null = useMemo(() => {
-        if (item?.relatedAccounts?.length <= 0) {
-            return null;
-        }
-        return item.relatedAccounts[0].account;
+    const [account, category, type] = useMemo(() => {
+        const mainAccount = item?.relatedAccounts?.find((ra) =>
+            ['income', 'expense', 'transfer_out'].includes(ra.relation),
+        );
+        return [mainAccount?.account || null, item.category || null, mainAccount?.relation || null];
     }, [item]);
 
-    const category: Pick<Category, 'id' | 'name'> | null = useMemo(() => {
-        if (!item?.category) {
-            return null;
-        }
-        return item.category;
+    const installmentsNumber = useMemo(() => {
+        const installmentsGroup = item?.transactionGroups.find((g) => g.type === 'installments');
+        if (!installmentsGroup) return 1;
+        return installmentsGroup.transactionsCount;
     }, [item]);
-
-    const type = item?.relatedAccounts?.[0]?.relation;
 
     return (
         <List.Item
@@ -81,30 +87,34 @@ export default function TransactionsListItem(props: TransactionsListItemProps) {
                                 <span>{category?.name}</span>
                             </Space>
                         </Tooltip>
+                        {installmentsNumber > 1 ? (
+                            <Tooltip title="Lançamento parcelado">
+                                <Space size="small">
+                                    <UnorderedListOutlined />
+                                    <span>Parcelado</span>
+                                </Space>
+                            </Tooltip>
+                        ) : null}
                     </Space>
                 }
             />
             <Space size="middle">
                 {item.tags && item.tags.length > 0 ? (
-                    <Tooltip title="Tags">
-                        <Space size="small">
-                            {item.tags.map((tag) => (
-                                <Tag bordered={false} key={tag.id}>
-                                    {tag.name}
-                                </Tag>
-                            ))}
-                        </Space>
-                    </Tooltip>
+                    <Space size="small">
+                        {item.tags.map((tag) => (
+                            <Tag bordered={false} key={tag.id}>
+                                {tag.name}
+                            </Tag>
+                        ))}
+                    </Space>
                 ) : null}
                 <Space size="small">
-                    <Tooltip title="Valor">
-                        <Typography>
-                            {Intl.NumberFormat('pt-BR', {
-                                style: 'currency',
-                                currency: 'BRL',
-                            }).format(Number(item.value))}
-                        </Typography>
-                    </Tooltip>
+                    <Typography>
+                        {Intl.NumberFormat('pt-BR', {
+                            style: 'currency',
+                            currency: 'BRL',
+                        }).format(Number(item.value))}
+                    </Typography>
                     {getTransactionTypeIcon(type)}
                 </Space>
             </Space>

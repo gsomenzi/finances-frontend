@@ -30,7 +30,7 @@ export default function TransactionDetails(props: TransactionDetailsProps) {
         if (!installmentsGroup) return [1, []];
         return [
             installmentsGroup.transactionsCount,
-            installmentsGroup.transactions.sort((a, b) => a.date.localeCompare(b.date)),
+            installmentsGroup.transactions?.sort((a, b) => a.date.localeCompare(b.date)) || [],
         ];
     }, [transactionDetails]);
 

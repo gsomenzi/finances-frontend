@@ -27,5 +27,5 @@ interface TransactionGroup {
     type: string;
     transactionsCount: number;
     notes: string | null;
-    transactions: Pick<Transaction, 'id' | 'description' | 'value' | 'date' | 'paid' | 'paid_at' | 'notes'>[];
+    transactions?: Pick<Transaction, 'id' | 'description' | 'value' | 'date' | 'paid' | 'paid_at' | 'notes'>[];
 }
