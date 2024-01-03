@@ -26,15 +26,11 @@ export default function TransactionDetails(props: TransactionDetailsProps) {
     );
 
     const [installmentsNumber, installments] = useMemo(() => {
-        const installmentsGroup = transactionDetails?.transactionGroups?.find(
-            (g) => g.transactionGroup.type === 'installments',
-        );
+        const installmentsGroup = transactionDetails?.transactionGroups.find((g) => g.type === 'installments');
         if (!installmentsGroup) return [1, []];
         return [
-            installmentsGroup?.transactionGroup.transactionsCount,
-            installmentsGroup?.transactionGroup.transactions
-                .map((t) => t.transaction)
-                .sort((a, b) => a.date.localeCompare(b.date)),
+            installmentsGroup.transactionsCount,
+            installmentsGroup.transactions.sort((a, b) => a.date.localeCompare(b.date)),
         ];
     }, [transactionDetails]);
 
@@ -45,20 +41,14 @@ export default function TransactionDetails(props: TransactionDetailsProps) {
         });
     }
 
-    const accountName = useMemo(() => {
-        if (transaction?.relatedAccounts && transaction.relatedAccounts.length > 0) {
-            return transaction?.relatedAccounts[0].account.name;
-        } else {
-            return '-';
+    const [accountName, accountRelation] = useMemo(() => {
+        const mainAccount = transaction?.relatedAccounts?.find((ra) =>
+            ['income', 'expense', 'transfer_out'].includes(ra.relation),
+        );
+        if (!mainAccount) {
+            return ['-', '-'];
         }
-    }, [transaction]);
-
-    const accountRelation = useMemo(() => {
-        if (transaction?.relatedAccounts && transaction.relatedAccounts.length > 0) {
-            return transaction?.relatedAccounts[0].relation;
-        } else {
-            return '-';
-        }
+        return [mainAccount.account.name, mainAccount.relation];
     }, [transaction]);
 
     const { mutate: remove, isLoading: isRemoving } = useMutation((id: number) => transactionModel.delete(id), {
@@ -147,7 +137,7 @@ export default function TransactionDetails(props: TransactionDetailsProps) {
                             </Space>
                         </>
                     )}
-                    {installments.length > 0 && (
+                    {installmentsNumber > 1 && (
                         <Flex vertical gap={8}>
                             <Typography.Title level={5}>Parcelas:</Typography.Title>
                             <Table
@@ -159,7 +149,7 @@ export default function TransactionDetails(props: TransactionDetailsProps) {
                                         title: 'Parcela',
                                         dataIndex: 'key',
                                         width: 1,
-                                        render: (text, record, index) => (
+                                        render: (_, record, index) => (
                                             <Typography.Text strong={record.id === transaction.id}>
                                                 {index + 1}
                                             </Typography.Text>
