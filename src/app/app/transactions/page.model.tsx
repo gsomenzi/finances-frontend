@@ -43,6 +43,30 @@ export default function TransactionsViewModel(): TransactionsViewProps {
         },
     );
 
+    const [transactionDates, generalIncomeOnPeriod, generalExpenseOnPeriod] = useMemo(() => {
+        if (!transactions?.data) {
+            return [[], 0, 0];
+        }
+        const dates = [...new Set(transactions.data.map((t) => t.date))];
+        const totalIncome = transactions.data.reduce((acc, cur) => {
+            const mainAccount = cur.relatedAccounts.find((a) => ['income', 'expense'].includes(a.relation));
+            if (mainAccount?.relation === 'income') {
+                return acc + Number(cur.value);
+            }
+            return acc;
+        }, 0);
+        const totalExpense = transactions.data.reduce((acc, cur) => {
+            const mainAccount = cur.relatedAccounts.find((a) => ['income', 'expense'].includes(a.relation));
+            if (mainAccount?.relation === 'expense') {
+                return acc + Number(cur.value);
+            }
+            return acc;
+        }, 0);
+        return [dates, totalIncome, totalExpense];
+    }, [transactions]);
+
+    const isLoading = gettingTransactions;
+
     const { mutate: remove, isLoading: isRemoving } = useMutation((id: number) => transactionModel.delete(id), {
         onSuccess: () => {
             queryClient.invalidateQueries('transactions');
@@ -75,15 +99,6 @@ export default function TransactionsViewModel(): TransactionsViewProps {
         },
     );
 
-    const transactionDates = useMemo(() => {
-        if (!transactions?.data) {
-            return [];
-        }
-        return [...new Set(transactions.data.map((t) => t.date))];
-    }, [transactions]);
-
-    const isLoading = gettingTransactions;
-
     function getTransactionTypeIcon(type: string): ReactNode {
         switch (type) {
             case 'income':
@@ -115,6 +130,8 @@ export default function TransactionsViewModel(): TransactionsViewProps {
         category,
         generalBalanceOnStartDate,
         generalBalanceOnEndDate,
+        generalIncomeOnPeriod,
+        generalExpenseOnPeriod,
         remove,
         getTransactionTypeIcon,
     };

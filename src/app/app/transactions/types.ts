@@ -15,6 +15,8 @@ export type TransactionsViewProps = {
     category: Pick<Category, 'id' | 'name'> | null;
     generalBalanceOnStartDate: number | undefined;
     generalBalanceOnEndDate: number | undefined;
+    generalIncomeOnPeriod: number;
+    generalExpenseOnPeriod: number;
     remove: UseMutateFunction<any, unknown, number, unknown>;
     getTransactionTypeIcon: (type: string) => React.ReactNode;
 };

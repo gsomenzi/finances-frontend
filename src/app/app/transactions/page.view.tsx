@@ -1,6 +1,6 @@
 import React from 'react';
 import { TransactionsViewProps } from './types';
-import { DatePicker, Flex, Typography, Input, FloatButton, Space, Card, Empty, Tooltip, Tag } from 'antd';
+import { DatePicker, Flex, Typography, Input, FloatButton, Space, Card, Empty, Tag, List, Row, Col } from 'antd';
 import { BankOutlined, FolderOutlined, PlusOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import AddEditForm from './components/AddEditForm';
@@ -16,11 +16,13 @@ export default function TransactionsView(props: TransactionsViewProps) {
         category,
         generalBalanceOnStartDate,
         generalBalanceOnEndDate,
+        generalIncomeOnPeriod,
+        generalExpenseOnPeriod,
         transactions,
         isLoading,
         transactionDates,
     } = props;
-    const { setAccount, setCategory, setSearch, setSelectedTransaction, setDateFilter } = useTransaction();
+    const { dateFilter, setAccount, setCategory, setSearch, setSelectedTransaction, setDateFilter } = useTransaction();
     return (
         <div>
             <Flex justify="space-between" align="center">
@@ -66,23 +68,14 @@ export default function TransactionsView(props: TransactionsViewProps) {
             <TransactionDetails />
             {transactionDates.length > 0 ? (
                 <>
-                    <Typography style={{ textAlign: 'right', marginBottom: '1rem' }}>
-                        <Typography.Text>
-                            {Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(
-                                generalBalanceOnStartDate || 0,
-                            )}
-                        </Typography.Text>
-                    </Typography>
                     {transactionDates.map((date) => (
                         <Card
                             key={date}
                             title={
-                                <Tooltip title={`${dayjs(date).diff(dayjs(), 'day')} dias atrás`}>
-                                    <Space>
-                                        <Typography>{dayjs(date).format('DD/MM/YYYY')}</Typography>
-                                        <Typography.Text type="secondary">{dayjs(date).format('dddd')}</Typography.Text>
-                                    </Space>
-                                </Tooltip>
+                                <Space>
+                                    <Typography>{dayjs(date).format('DD/MM/YYYY')}</Typography>
+                                    <Typography.Text type="secondary">{dayjs(date).format('dddd')}</Typography.Text>
+                                </Space>
                             }
                             bordered={false}
                             type="inner"
@@ -93,13 +86,56 @@ export default function TransactionsView(props: TransactionsViewProps) {
                             />
                         </Card>
                     ))}
-                    <Typography style={{ textAlign: 'right' }}>
-                        <Typography.Text>
-                            {Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(
-                                generalBalanceOnEndDate || 0,
-                            )}
-                        </Typography.Text>
-                    </Typography>
+                    <Row>
+                        <Col span={12}></Col>
+                        <Col span={12}>
+                            <Card
+                                title={
+                                    <Flex justify="space-between">
+                                        <Typography>Projeção do saldo</Typography>
+                                        <Typography.Text type="secondary">
+                                            {dayjs(dateFilter.startDate).format('DD/MM/YYYY')} até{' '}
+                                            {dayjs(dateFilter.endDate).format('DD/MM/YYYY')}
+                                        </Typography.Text>
+                                    </Flex>
+                                }>
+                                <List size="small">
+                                    <List.Item style={{ paddingLeft: 0, paddingRight: 0 }}>
+                                        <Typography>Saldo inicial</Typography>
+                                        <Typography>
+                                            {Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(
+                                                generalBalanceOnStartDate || 0,
+                                            )}
+                                        </Typography>
+                                    </List.Item>
+                                    <List.Item style={{ paddingLeft: 0, paddingRight: 0 }}>
+                                        <Typography>Entradas</Typography>
+                                        <Typography.Text type="success">
+                                            {Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(
+                                                generalIncomeOnPeriod || 0,
+                                            )}
+                                        </Typography.Text>
+                                    </List.Item>
+                                    <List.Item style={{ paddingLeft: 0, paddingRight: 0 }}>
+                                        <Typography>Saídas</Typography>
+                                        <Typography.Text type="danger">
+                                            {Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(
+                                                generalExpenseOnPeriod || 0,
+                                            )}
+                                        </Typography.Text>
+                                    </List.Item>
+                                    <List.Item style={{ paddingLeft: 0, paddingRight: 0 }}>
+                                        <Typography>Saldo projetado</Typography>
+                                        <Typography.Text strong>
+                                            {Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(
+                                                generalBalanceOnEndDate || 0,
+                                            )}
+                                        </Typography.Text>
+                                    </List.Item>
+                                </List>
+                            </Card>
+                        </Col>
+                    </Row>
                 </>
             ) : (
                 <Flex align="center" justify="center" style={{ marginTop: '2rem' }}>
