@@ -4,7 +4,7 @@ import dayjs from 'dayjs';
 import { AccountBalance } from '@/types/AccountBalance';
 import { AccountActivity } from '@/types/AccountActivity';
 
-export default class AccountModel extends _ApiModel<Account> {
+export default class AccountModel extends _ApiModel<Account, Partial<Account>> {
     protected url = '/accounts';
 
     public getAccountsBalances(accountIds: number[]): Promise<AccountBalance[]> {

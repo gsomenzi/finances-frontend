@@ -3,7 +3,7 @@ import _ApiModel from './_ApiModel';
 import { RequestQueryParams } from '@/lib/ApiClient';
 import { ListResponseData } from '@/types/ListResponseData';
 
-export default class CategoryModel extends _ApiModel<Category> {
+export default class CategoryModel extends _ApiModel<Category, Partial<Category>> {
     protected url = '/categories';
 
     public findManyByDestination(
