@@ -33,7 +33,7 @@ export default function AddEditForm(props: AddEditFormProps) {
     }, [account, initialBalanceTransaction]);
 
     const addAccount = useMutation(
-        (accountData) => {
+        (accountData: any) => {
             setErrorMessage(null);
             return accountModel.create(accountData);
         },

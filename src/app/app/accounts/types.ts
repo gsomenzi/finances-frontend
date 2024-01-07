@@ -3,7 +3,12 @@ import { UseMutateFunction } from 'react-query';
 
 export type AccountsViewProps = {
     accounts: Account[];
-    balances: any[];
+    balances: {
+        id: number;
+        name: string;
+        currency: string;
+        balance: number;
+    }[];
     isLoading: boolean;
     isRemoving: boolean;
     page: number;

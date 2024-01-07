@@ -9,9 +9,7 @@ import dayjs from 'dayjs';
 const Area = dynamic(() => import('@ant-design/plots').then((mod) => mod.Area), { ssr: false });
 
 export default function LineChart(props: LineChartProps) {
-    const { data, loading, title, valueToPercent } = props;
-
-    const totalValue = data.reduce((acc, curr) => acc + curr.value, 0);
+    const { data, loading, title } = props;
 
     const config: any = useMemo(() => {
         return {
@@ -35,7 +33,7 @@ export default function LineChart(props: LineChartProps) {
     return (
         <Wrapper>
             <Card loading={!!loading} title={title}>
-                {config.data.length > 0 ? <Area {...config} /> : <Empty />}
+                {config.data.length > 0 && config.data.some((d: any) => d.value > 0) ? <Area {...config} /> : <Empty />}
             </Card>
         </Wrapper>
     );

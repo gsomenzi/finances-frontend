@@ -7,13 +7,20 @@ import { Account } from '@/types/Account';
 import { AccountBalance } from '@/types/AccountBalance';
 import { ListResponseData } from '@/types/ListResponseData';
 import AccountModel from '@/models/AccountModel';
+import AnalyticModel from '@/models/AnalyticModel';
 
 export default function AccountsViewModel(): AccountsViewProps {
     const accountModel = new AccountModel();
+    const analyticModel = new AnalyticModel();
     const queryClient = useQueryClient();
     const [page, setPage] = useState(1);
     const [limit, setLimit] = useState(20);
     const [search, setSearch] = useState('');
+
+    const getAccountsBalances = async (accountIds: number[]) => {
+        const balances = await Promise.all(accountIds.map(async (id) => await analyticModel.getAccountBalance(id)));
+        return balances;
+    };
 
     const { data: accounts, isLoading: gettingAccounts } = useQuery<ListResponseData<Account>>(
         ['accounts', { page, limit, search }],
@@ -25,11 +32,11 @@ export default function AccountsViewModel(): AccountsViewProps {
 
     const accountIds: number[] = (accounts?.data || []).map((a: any) => a.id) || [];
 
-    const { data: balanceData, isLoading: gettingBalances } = useQuery<AccountBalance[], Error>(
+    const { data: balanceData, isLoading: gettingBalances } = useQuery(
         ['balances', { accountIds }],
         ({ queryKey }) => {
             const { accountIds } = queryKey[1] as any;
-            return accountModel.getAccountsBalances(accountIds as number[]);
+            return getAccountsBalances(accountIds as number[]);
         },
         {
             enabled: accountIds.length > 0,

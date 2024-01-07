@@ -8,9 +8,11 @@ import { ArrowDownOutlined, ArrowUpOutlined } from '@ant-design/icons';
 import TransactionModel from '@/models/TransactionModel';
 import { useTransaction } from './providers/TransactionProvider';
 import AccountModel from '@/models/AccountModel';
+import AnalyticModel from '@/models/AnalyticModel';
 
 export default function TransactionsViewModel(): TransactionsViewProps {
     const accountModel = new AccountModel();
+    const analyticModel = new AnalyticModel();
     const transactionModel = new TransactionModel();
     const { account, category, dateFilter, limit, page, search } = useTransaction();
     const queryClient = useQueryClient();
@@ -74,27 +76,27 @@ export default function TransactionsViewModel(): TransactionsViewProps {
     });
 
     const { data: generalBalanceOnStartDate } = useQuery(
-        ['balances', { projectionDate: dateFilter.startDate }],
+        ['balances', { date: dateFilter.startDate }],
         () => {
-            return accountModel.getAllAccountsBalances(dateFilter.startDate);
+            return analyticModel.getGeneralBalanceProjection(dateFilter.startDate);
         },
         {
             enabled: !!dateFilter.startDate,
             select: (data): number => {
-                return data.reduce((acc, curr) => acc + curr.balance, 0);
+                return data.balance;
             },
         },
     );
 
     const { data: generalBalanceOnEndDate } = useQuery(
-        ['balances', { projectionDate: dateFilter.endDate }],
+        ['balances', { date: dateFilter.endDate }],
         () => {
-            return accountModel.getAllAccountsBalances(dateFilter.endDate);
+            return analyticModel.getGeneralBalanceProjection(dateFilter.endDate);
         },
         {
             enabled: !!dateFilter.endDate,
             select: (data): number => {
-                return data.reduce((acc, curr) => acc + curr.balance, 0);
+                return data.balance;
             },
         },
     );

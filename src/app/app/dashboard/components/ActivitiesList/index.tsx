@@ -1,20 +1,19 @@
 import React, { useMemo } from 'react';
-import { Wrapper } from './styles';
 import { ActivitiesListProps } from './types';
-import AccountModel from '@/models/AccountModel';
 import dayjs from 'dayjs';
 import { useQuery } from 'react-query';
 import { Card, List, Space, Typography } from 'antd';
 import { ArrowDownOutlined, ArrowUpOutlined } from '@ant-design/icons';
+import AnalyticModel from '@/models/AnalyticModel';
 
 export default function ActivitiesList(props: ActivitiesListProps) {
-    const accountModel = new AccountModel();
+    const analyticModel = new AnalyticModel();
     const startDate = dayjs().startOf('month').format('YYYY-MM-DD');
     const endDate = dayjs().endOf('month').format('YYYY-MM-DD');
     const {} = props;
 
     const { data: activities, isLoading } = useQuery(['activities', startDate, endDate], () =>
-        accountModel.getAllAccountsActivities(startDate, endDate),
+        analyticModel.getAllAccountsActivities(startDate, endDate),
     );
 
     const totalIncome = useMemo(() => {
@@ -66,8 +65,8 @@ export default function ActivitiesList(props: ActivitiesListProps) {
             <Typography.Title level={5}>Movimentação das contas</Typography.Title>
             <List bordered={false} style={{ padding: 0 }}>
                 {activities?.map((activity) => (
-                    <List.Item key={activity.accountId}>
-                        <Typography.Text>{activity.accountName}:</Typography.Text>
+                    <List.Item key={activity.id}>
+                        <Typography.Text>{activity.name}:</Typography.Text>
                         <Space size="large">
                             <Space size="small">
                                 <Typography.Text>

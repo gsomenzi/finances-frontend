@@ -153,7 +153,7 @@ export default function AddEditForm(props: AddEditFormProps) {
     }, [tags, transaction]);
 
     const addTransaction = useMutation(
-        (transactionData) => {
+        (transactionData: any) => {
             setErrorMessage(null);
             return transactionModel.create(transactionData);
         },

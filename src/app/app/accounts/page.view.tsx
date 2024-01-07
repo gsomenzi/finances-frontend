@@ -92,7 +92,7 @@ export default function AccountsView(props: AccountsViewProps) {
                     {
                         title: 'Saldo',
                         render: (value, record) =>
-                            `${currencyFormatter(balances.find((b) => b.accountId === record.id)?.balance ?? 0)}`,
+                            `${currencyFormatter(balances.find((b) => b.id === record.id)?.balance ?? 0)}`,
                     },
                     {
                         title: 'Ações',

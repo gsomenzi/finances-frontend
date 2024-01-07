@@ -4,6 +4,6 @@ export type AccountActivity = {
     currency: string;
     income: number;
     expense: number;
-    accountId: number;
-    accountName: string;
+    id: number;
+    name: string;
 };
