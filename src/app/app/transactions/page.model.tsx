@@ -72,6 +72,7 @@ export default function TransactionsViewModel(): TransactionsViewProps {
     const { mutate: remove, isLoading: isRemoving } = useMutation((id: number) => transactionModel.delete(id), {
         onSuccess: () => {
             queryClient.invalidateQueries('transactions');
+            queryClient.invalidateQueries('balances');
         },
     });
 
