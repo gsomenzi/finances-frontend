@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { AddEditFormProps } from './types';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import {
@@ -17,10 +17,8 @@ import {
     Radio,
     Select,
     Space,
-    Switch,
 } from 'antd';
 import { Transaction } from '@/types/Transaction';
-import ErrorAlert from '@/components/ErrorAlert';
 import AccountModel from '@/models/AccountModel';
 import dayjs from 'dayjs';
 import TransactionModel from '@/models/TransactionModel';
@@ -29,6 +27,7 @@ import AddCategoryForm from '../AddCategoryForm';
 import AddTagForm from '../AddTagForm';
 import TagModel from '@/models/TagModel';
 import { useTransaction } from '../../providers/TransactionProvider';
+import { useFeedback } from '@/providers/FeedbackProvider';
 const { TextArea } = Input;
 
 export default function AddEditForm(props: AddEditFormProps) {
@@ -39,7 +38,7 @@ export default function AddEditForm(props: AddEditFormProps) {
     const categoryModel = new CategoryModel();
     const tagModel = new TagModel();
     const transactionModel = new TransactionModel();
-    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const { showMessage, showNotification } = useFeedback();
     const [accountSearch, setAccountSearch] = useState<string>('');
     const [categorySearch, setCategorySearch] = useState<string>('');
     const [tagSearch, setTagSearch] = useState<string>('');
@@ -100,6 +99,13 @@ export default function AddEditForm(props: AddEditFormProps) {
     const { data: accounts, isLoading: gettingAccounts } = useQuery(
         ['accounts', { page: 1, limit: 20, search: accountSearch }],
         () => accountModel.findMany({ page: 1, limit: 20, search: accountSearch }),
+        {
+            onError: (e: any) => {
+                showNotification('Erro', e?.response?.data?.message || 'Erro ao buscar contas', {
+                    type: 'error',
+                });
+            },
+        },
     );
 
     const accountsOptions = useMemo(() => {
@@ -125,8 +131,16 @@ export default function AddEditForm(props: AddEditFormProps) {
         return options;
     }, [accounts, transaction]);
 
-    const { data: tags, isLoading: gettingTags } = useQuery(['tags', { page: 1, limit: 20, search: tagSearch }], () =>
-        tagModel.findMany({ page: 1, limit: 20, search: tagSearch }),
+    const { data: tags, isLoading: gettingTags } = useQuery(
+        ['tags', { page: 1, limit: 20, search: tagSearch }],
+        () => tagModel.findMany({ page: 1, limit: 20, search: tagSearch }),
+        {
+            onError: (e: any) => {
+                showNotification('Erro', e?.response?.data?.message || 'Erro ao buscar tags', {
+                    type: 'error',
+                });
+            },
+        },
     );
 
     const tagsOptions = useMemo(() => {
@@ -154,7 +168,6 @@ export default function AddEditForm(props: AddEditFormProps) {
 
     const addTransaction = useMutation(
         (transactionData: any) => {
-            setErrorMessage(null);
             return transactionModel.create(transactionData);
         },
         {
@@ -162,26 +175,31 @@ export default function AddEditForm(props: AddEditFormProps) {
                 queryClient.invalidateQueries('transactions');
                 queryClient.invalidateQueries('balances');
                 handleClose();
+                showMessage('success', 'Transação criada com sucesso!');
             },
             onError: (e: any) => {
-                setErrorMessage(e?.response?.data?.message || 'Erro ao criar a transação');
+                showNotification('Erro', e?.response?.data?.message || 'Erro ao criar transação', {
+                    type: 'error',
+                });
             },
         },
     );
 
     const updateTransaction = useMutation(
-        (accountData: Transaction) => {
-            setErrorMessage(null);
-            return transactionModel.update(accountData.id, { ...accountData });
+        (transactionData: Transaction) => {
+            return transactionModel.update(transactionData.id, { ...transactionData });
         },
         {
             onSuccess: () => {
                 queryClient.invalidateQueries('transactions');
                 queryClient.invalidateQueries('balances');
                 handleClose();
+                showMessage('success', 'Transação atualizada com sucesso!');
             },
             onError: (e: any) => {
-                setErrorMessage(e?.response?.data?.message || 'Erro ao atualizar a transação');
+                showNotification('Erro', e?.response?.data?.message || 'Erro ao atualizar a transação', {
+                    type: 'error',
+                });
             },
         },
     );
@@ -221,6 +239,8 @@ export default function AddEditForm(props: AddEditFormProps) {
                 accountId: transactionAccount?.id,
                 notes: transaction?.notes,
             });
+        } else {
+            form.resetFields();
         }
     }, [transaction, transactionAccount, transactionType]);
 
@@ -385,7 +405,6 @@ export default function AddEditForm(props: AddEditFormProps) {
                 </Form.Item>
                 <Collapse defaultActiveKey={transaction ? ['1'] : []} bordered={false} items={optionalFields} />
             </Form>
-            <ErrorAlert show={!!errorMessage} title="Falha ao salvar a conta" description={errorMessage} />
         </Drawer>
     );
 }

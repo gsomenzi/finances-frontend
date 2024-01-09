@@ -11,6 +11,7 @@ import theme from '../theme/themeConfig';
 import ptBR from 'antd/lib/locale/pt_BR';
 import dayjs from 'dayjs';
 import 'dayjs/locale/pt-br';
+import { FeedbackProvider } from '@/providers/FeedbackProvider';
 
 dayjs.locale('pt-br');
 
@@ -22,9 +23,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <StyledComponentsRegistry>
                     <ConfigProvider locale={ptBR} theme={theme}>
                         <ConfirmProvider>
-                            <AuthProvider>
-                                <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-                            </AuthProvider>
+                            <FeedbackProvider>
+                                <AuthProvider>
+                                    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+                                </AuthProvider>
+                            </FeedbackProvider>
                         </ConfirmProvider>
                     </ConfigProvider>
                 </StyledComponentsRegistry>

@@ -1,18 +1,25 @@
 import React, { ReactNode, useMemo } from 'react';
 import { TransactionsListItemProps } from './types';
-import { List, Space, Tag, Tooltip, Typography } from 'antd';
+import { Button, List, Space, Tag, Tooltip, Typography } from 'antd';
 import { useTransaction } from '../../providers/TransactionProvider';
 import { Account } from '@/types/Account';
 import {
     ArrowDownOutlined,
     ArrowUpOutlined,
     BankOutlined,
+    CheckCircleOutlined,
     FolderOutlined,
     UnorderedListOutlined,
 } from '@ant-design/icons';
 import { Category } from '@/types/Category';
+import { useMutation, useQueryClient } from 'react-query';
+import TransactionModel from '@/models/TransactionModel';
+import { useFeedback } from '@/providers/FeedbackProvider';
 
 export default function TransactionsListItem(props: TransactionsListItemProps) {
+    const transactionModel = new TransactionModel();
+    const queryClient = useQueryClient();
+    const { showMessage, showNotification } = useFeedback();
     const { setAccount, setCategory, setSelectedTransaction } = useTransaction();
     const { item } = props;
     function handleSelectAccount(e: any, account: Pick<Account, 'id' | 'name'> | null) {
@@ -47,6 +54,31 @@ export default function TransactionsListItem(props: TransactionsListItemProps) {
             default:
                 return null;
         }
+    }
+
+    const payTransaction = useMutation(
+        (transactionId: number) => {
+            return transactionModel.togglePaid(transactionId);
+        },
+        {
+            onSuccess: () => {
+                queryClient.invalidateQueries('transactions');
+                queryClient.invalidateQueries('balances');
+                showMessage('success', 'Transação efetivada com sucesso!');
+            },
+            onError: (e: any) => {
+                console.log(e);
+                showNotification('Erro', e?.response?.data?.message || 'Erro ao efetivar a transação', {
+                    type: 'error',
+                });
+            },
+        },
+    );
+
+    function handlePayTransaction(e: any) {
+        e.preventDefault();
+        e.stopPropagation();
+        payTransaction.mutate(item.id);
     }
 
     const [account, category, type] = useMemo(() => {
@@ -117,6 +149,11 @@ export default function TransactionsListItem(props: TransactionsListItemProps) {
                     </Typography>
                     {getTransactionTypeIcon(type)}
                 </Space>
+                {!item.paid ? (
+                    <Tooltip title="Efetivar">
+                        <Button onClick={handlePayTransaction} type="text" icon={<CheckCircleOutlined />} />
+                    </Tooltip>
+                ) : null}
             </Space>
         </List.Item>
     );
