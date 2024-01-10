@@ -14,7 +14,7 @@ export default function TransactionsListItem(props: TransactionsListItemProps) {
         switch (type) {
             case 'income':
                 return (
-                    <Tooltip title="Receita">
+                    <Tooltip title="Pagamento">
                         <ArrowUpOutlined style={{ color: 'green' }} />
                     </Tooltip>
                 );
