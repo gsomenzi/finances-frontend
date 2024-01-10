@@ -4,6 +4,7 @@ import { CreditCard } from '@/types/CreditCard';
 import { Flex, Typography, Input, FloatButton, Table, Space, Button, Popconfirm } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import AddEditForm from './components/AddEditForm';
+import Link from 'next/link';
 const { Search } = Input;
 
 export default function CreditCardsView(props: CreditCardsViewProps) {
@@ -15,7 +16,7 @@ export default function CreditCardsView(props: CreditCardsViewProps) {
     return (
         <div>
             <Flex justify="space-between" align="center">
-                <Typography.Title level={2}>Contas</Typography.Title>
+                <Typography.Title level={2}>Cartões de Crédito</Typography.Title>
                 <Search placeholder="Pesquisa" onSearch={onSearch} style={{ width: 200 }} />
             </Flex>
             <FloatButton
@@ -36,6 +37,11 @@ export default function CreditCardsView(props: CreditCardsViewProps) {
                         title: 'Nome',
                         dataIndex: 'name',
                         key: 'name',
+                        render: (name, record) => (
+                            <Typography.Text strong>
+                                <Link href={`/app/credit-cards/${record.id}`}>{name}</Link>
+                            </Typography.Text>
+                        ),
                     },
                     {
                         title: 'Limite',

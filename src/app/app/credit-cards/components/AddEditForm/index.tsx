@@ -1,17 +1,17 @@
 'use client';
 
-import React, { useLayoutEffect, useMemo, useState } from 'react';
-import { Account } from '@/types/Account';
+import React, { useLayoutEffect } from 'react';
 import { AddEditFormProps } from './types';
-import { Button, Checkbox, Drawer, Flex, Form, Input, Select, Space } from 'antd';
+import { Button, Drawer, Flex, Form, Input, Select, Space } from 'antd';
 import { useMutation, useQueryClient } from 'react-query';
-import ErrorAlert from '@/components/ErrorAlert';
 import CreditCardModel from '@/models/CreditCardModel';
+import { useFeedback } from '@/providers/FeedbackProvider';
+import { CreditCard } from '@/types/CreditCard';
 
 export default function AddEditForm(props: AddEditFormProps) {
     const { creditCard, open, onClose } = props;
     const queryClient = useQueryClient();
-    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const { showError } = useFeedback();
     const [form] = Form.useForm();
     const creditCardModel = new CreditCardModel();
 
@@ -25,9 +25,11 @@ export default function AddEditForm(props: AddEditFormProps) {
     }, [creditCard]);
 
     const addCreditCard = useMutation(
-        (creditCardData: any) => {
-            setErrorMessage(null);
-            return creditCardModel.create(creditCardData);
+        (creditCardData: Partial<CreditCard>) => {
+            return creditCardModel.create({
+                ...creditCardData,
+                currency: 'BRL',
+            });
         },
         {
             onSuccess: () => {
@@ -35,14 +37,13 @@ export default function AddEditForm(props: AddEditFormProps) {
                 onClose();
             },
             onError: (e: any) => {
-                setErrorMessage(e?.response?.data?.message || 'Erro ao criar o cartão');
+                showError('Erro ao atualizar o cartão', e);
             },
         },
     );
 
     const updateCreditCard = useMutation(
-        (creditCardData: Account) => {
-            setErrorMessage(null);
+        (creditCardData: Partial<CreditCard> & { id: number }) => {
             return creditCardModel.update(creditCardData.id, { ...creditCardData });
         },
         {
@@ -51,7 +52,7 @@ export default function AddEditForm(props: AddEditFormProps) {
                 onClose();
             },
             onError: (e: any) => {
-                setErrorMessage(e?.response?.data?.message || 'Erro ao atualizar o cartão');
+                showError('Erro ao atualizar o cartão', e);
             },
         },
     );
@@ -124,7 +125,6 @@ export default function AddEditForm(props: AddEditFormProps) {
                         />
                     </Form.Item>
                 </Flex>
-                <ErrorAlert show={!!errorMessage} title="Falha ao salvar o cartão" description={errorMessage} />
             </Form>
         </Drawer>
     );
