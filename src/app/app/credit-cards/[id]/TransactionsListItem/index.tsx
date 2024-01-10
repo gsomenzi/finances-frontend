@@ -45,14 +45,12 @@ export default function TransactionsListItem(props: TransactionsListItemProps) {
                             <Typography.Text type="secondary">{dayjs(item.date).format('DD/MM/YYYY')}</Typography.Text>
                         </Space>
                         <Space size="middle">
-                            {installmentsNumber > 1 ? (
-                                <Tooltip title="Lançamento parcelado">
-                                    <Space size="small">
-                                        <UnorderedListOutlined />
-                                        <span>Parcelado</span>
-                                    </Space>
-                                </Tooltip>
-                            ) : null}
+                            <Tooltip title="Número de parcelas">
+                                <Space size="small">
+                                    <UnorderedListOutlined />
+                                    <span>{installmentsNumber}x</span>
+                                </Space>
+                            </Tooltip>
                         </Space>
                     </Space>
                 }
