@@ -1,3 +1,5 @@
+import { Tag } from './Tag';
+
 export interface CreditCardTransaction {
     id: number;
     description: string;
@@ -6,6 +8,7 @@ export interface CreditCardTransaction {
     type: string;
     notes: any;
     group: Group;
+    tags?: Pick<Tag, 'id' | 'name'>[];
 }
 
 interface Group {

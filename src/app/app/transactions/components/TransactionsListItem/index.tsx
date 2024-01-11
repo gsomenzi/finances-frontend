@@ -1,4 +1,6 @@
-import React, { ReactNode, useMemo } from 'react';
+'use client';
+
+import React, { ReactNode, useMemo, useState } from 'react';
 import { TransactionsListItemProps } from './types';
 import { Button, List, Space, Tag, Tooltip, Typography } from 'antd';
 import { useTransaction } from '../../providers/TransactionProvider';
@@ -8,6 +10,8 @@ import {
     ArrowUpOutlined,
     BankOutlined,
     CheckCircleOutlined,
+    CheckCircleTwoTone,
+    DeleteOutlined,
     FolderOutlined,
     UnorderedListOutlined,
 } from '@ant-design/icons';
@@ -15,10 +19,17 @@ import { Category } from '@/types/Category';
 import { useMutation, useQueryClient } from 'react-query';
 import TransactionModel from '@/models/TransactionModel';
 import { useFeedback } from '@/providers/FeedbackProvider';
+import { motion } from 'framer-motion';
+
+const contextMenuVariants = {
+    hidden: { opacity: 0, scale: 0, width: 0 },
+    visible: { opacity: 1, scale: 1, width: 'auto' },
+};
 
 export default function TransactionsListItem(props: TransactionsListItemProps) {
     const transactionModel = new TransactionModel();
     const queryClient = useQueryClient();
+    const [showContext, setShowContext] = useState(false);
     const { showMessage, showNotification } = useFeedback();
     const { setAccount, setCategory, setSelectedTransaction } = useTransaction();
     const { item } = props;
@@ -64,11 +75,11 @@ export default function TransactionsListItem(props: TransactionsListItemProps) {
             onSuccess: () => {
                 queryClient.invalidateQueries('transactions');
                 queryClient.invalidateQueries('balances');
-                showMessage('success', 'Transação efetivada com sucesso!');
+                showMessage('success', 'Transação alterada com sucesso!');
             },
             onError: (e: any) => {
                 console.log(e);
-                showNotification('Erro', e?.response?.data?.message || 'Erro ao efetivar a transação', {
+                showNotification('Erro', e?.response?.data?.message || 'Erro ao alterar a transação', {
                     type: 'error',
                 });
             },
@@ -80,6 +91,12 @@ export default function TransactionsListItem(props: TransactionsListItemProps) {
         e.stopPropagation();
         payTransaction.mutate(item.id);
     }
+
+    const { mutate: remove } = useMutation((id: number) => transactionModel.delete(id), {
+        onSuccess: () => {
+            queryClient.invalidateQueries('transactions');
+        },
+    });
 
     const [account, category, type] = useMemo(() => {
         const mainAccount = item?.relatedAccounts?.find((ra) =>
@@ -96,6 +113,8 @@ export default function TransactionsListItem(props: TransactionsListItemProps) {
 
     return (
         <List.Item
+            onMouseEnter={() => setShowContext(true)}
+            onMouseLeave={() => setShowContext(false)}
             style={{ cursor: 'pointer' }}
             onClick={() =>
                 setSelectedTransaction({
@@ -104,6 +123,7 @@ export default function TransactionsListItem(props: TransactionsListItemProps) {
                 })
             }>
             <List.Item.Meta
+                style={{ position: 'relative' }}
                 title={item.description}
                 description={
                     <Space size="middle">
@@ -149,11 +169,45 @@ export default function TransactionsListItem(props: TransactionsListItemProps) {
                     </Typography>
                     {getTransactionTypeIcon(type)}
                 </Space>
-                {!item.paid ? (
-                    <Tooltip title="Efetivar">
-                        <Button onClick={handlePayTransaction} type="text" icon={<CheckCircleOutlined />} />
-                    </Tooltip>
-                ) : null}
+                <motion.div
+                    layout
+                    variants={contextMenuVariants}
+                    initial="hidden"
+                    animate={showContext ? 'visible' : 'hidden'}
+                    exit="hidden">
+                    <Space>
+                        {!item.paid ? (
+                            <Tooltip title="Desfazer">
+                                <Button
+                                    color="green"
+                                    onClick={handlePayTransaction}
+                                    type="text"
+                                    icon={<CheckCircleOutlined />}
+                                />
+                            </Tooltip>
+                        ) : (
+                            <Tooltip title="Efetivar">
+                                <Button
+                                    onClick={handlePayTransaction}
+                                    type="text"
+                                    icon={<CheckCircleTwoTone twoToneColor="#52c41a" />}
+                                />
+                            </Tooltip>
+                        )}
+                        <Tooltip title="Remover">
+                            <Button
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    remove(item.id);
+                                }}
+                                danger
+                                type="text"
+                                icon={<DeleteOutlined />}
+                            />
+                        </Tooltip>
+                    </Space>
+                </motion.div>
             </Space>
         </List.Item>
     );

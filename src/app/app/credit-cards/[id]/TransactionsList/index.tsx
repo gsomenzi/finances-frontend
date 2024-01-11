@@ -12,12 +12,13 @@ export default function TransactionsList(props: TransactionsListProps) {
         <Wrapper>
             {transactions && transactions.length > 0 ? (
                 <List
+                    rowKey="id"
                     loading={loading}
                     dataSource={transactions}
                     renderItem={(item) => <TransactionsListItem item={item} />}
                 />
             ) : (
-                <Empty />
+                <Empty description="Nenhuma transação encontrada" />
             )}
             {loading ? (
                 <Flex align="center" justify="center">

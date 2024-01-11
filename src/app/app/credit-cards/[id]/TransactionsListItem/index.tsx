@@ -1,11 +1,22 @@
-import React, { ReactNode, useMemo } from 'react';
+import React, { ReactNode, useMemo, useState } from 'react';
 import { TransactionsListItemProps } from './types';
-import { List, Space, Tooltip, Typography } from 'antd';
-import { ArrowDownOutlined, ArrowUpOutlined, UnorderedListOutlined } from '@ant-design/icons';
+import { Button, List, Space, Tag, Tooltip, Typography } from 'antd';
+import { ArrowDownOutlined, ArrowUpOutlined, DeleteOutlined, UnorderedListOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
+import { motion } from 'framer-motion';
+import { useMutation, useQueryClient } from 'react-query';
+import CreditCardTransactionModel from '@/models/CreditCardTransactionModel';
+
+const contextMenuVariants = {
+    hidden: { opacity: 0, scale: 0, width: 0 },
+    visible: { opacity: 1, scale: 1, width: 'auto' },
+};
 
 export default function TransactionsListItem(props: TransactionsListItemProps) {
     const { item } = props;
+    const [showContext, setShowContext] = useState(false);
+    const creditCardTransactionModel = new CreditCardTransactionModel();
+    const queryClient = useQueryClient();
 
     function getTransactionTypeIcon(type: string | null): ReactNode {
         if (!type) {
@@ -35,8 +46,21 @@ export default function TransactionsListItem(props: TransactionsListItemProps) {
         return item?.group?.transactions?.length || 1;
     }, [item]);
 
+    const { mutate: remove, isLoading: isRemoving } = useMutation(
+        (id: number) => creditCardTransactionModel.delete(id),
+        {
+            onSuccess: () => {
+                queryClient.invalidateQueries('statements');
+            },
+        },
+    );
+
     return (
-        <List.Item style={{ cursor: 'pointer' }} onClick={() => {}}>
+        <List.Item
+            onMouseEnter={() => setShowContext(true)}
+            onMouseLeave={() => setShowContext(false)}
+            style={{ cursor: 'pointer' }}
+            onClick={() => {}}>
             <List.Item.Meta
                 description={
                     <Space direction="vertical">
@@ -56,7 +80,7 @@ export default function TransactionsListItem(props: TransactionsListItemProps) {
                 }
             />
             <Space size="middle">
-                {/* {item.tags && item.tags.length > 0 ? (
+                {item.tags && item.tags.length > 0 ? (
                     <Space size="small">
                         {item.tags.map((tag) => (
                             <Tag bordered={false} key={tag.id}>
@@ -64,7 +88,7 @@ export default function TransactionsListItem(props: TransactionsListItemProps) {
                             </Tag>
                         ))}
                     </Space>
-                ) : null} */}
+                ) : null}
                 <Space size="small">
                     <Typography>
                         {Intl.NumberFormat('pt-BR', {
@@ -74,6 +98,18 @@ export default function TransactionsListItem(props: TransactionsListItemProps) {
                     </Typography>
                     {getTransactionTypeIcon(item.type)}
                 </Space>
+                <motion.div
+                    layout
+                    variants={contextMenuVariants}
+                    initial="hidden"
+                    animate={showContext ? 'visible' : 'hidden'}
+                    exit="hidden">
+                    <Space>
+                        <Tooltip title="Remover">
+                            <Button onClick={() => remove(item.id)} danger type="text" icon={<DeleteOutlined />} />
+                        </Tooltip>
+                    </Space>
+                </motion.div>
             </Space>
         </List.Item>
     );

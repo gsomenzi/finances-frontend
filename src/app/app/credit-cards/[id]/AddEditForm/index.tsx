@@ -9,6 +9,7 @@ import {
     Collapse,
     CollapseProps,
     DatePicker,
+    Divider,
     Drawer,
     Flex,
     Form,
@@ -21,14 +22,52 @@ import dayjs from 'dayjs';
 import { useFeedback } from '@/providers/FeedbackProvider';
 import CreditCardTransactionModel from '@/models/CreditCardTransactionModel';
 import { CreditCardTransaction } from '@/types/CreditCardTransaction';
+import TagModel from '@/models/TagModel';
 const { TextArea } = Input;
 
 export default function AddEditForm(props: AddEditFormProps) {
     const [form] = Form.useForm();
     const transactionModel = new CreditCardTransactionModel();
+    const tagModel = new TagModel();
     const { statement, transaction, open, onClose } = props;
     const queryClient = useQueryClient();
+    const [tagSearch, setTagSearch] = useState<string>('');
     const { showMessage, showNotification } = useFeedback();
+
+    const { data: tags, isLoading: gettingTags } = useQuery(
+        ['tags', { page: 1, limit: 20, search: tagSearch }],
+        () => tagModel.findMany({ page: 1, limit: 20, search: tagSearch }),
+        {
+            onError: (e: any) => {
+                showNotification('Erro', e?.response?.data?.message || 'Erro ao buscar tags', {
+                    type: 'error',
+                });
+            },
+        },
+    );
+
+    const tagsOptions = useMemo(() => {
+        if (!tags) {
+            return [];
+        }
+        let options = tags.data.map((tag) => ({
+            label: tag.name,
+            name: tag.name,
+            value: tag.id,
+        }));
+        if (transaction?.tags && transaction.tags.length > 0) {
+            options = options.concat(
+                transaction.tags
+                    .map((tag) => ({
+                        label: tag.name,
+                        name: tag.name,
+                        value: tag.id,
+                    }))
+                    .filter((t) => !options.find((o) => o.value === t.value)),
+            );
+        }
+        return options;
+    }, [tags, transaction]);
 
     const addTransaction = useMutation(
         (transactionData: Partial<CreditCardTransaction>) => {
@@ -111,6 +150,19 @@ export default function AddEditForm(props: AddEditFormProps) {
                 label: 'Campos opcionais',
                 children: (
                     <>
+                        <Form.Item name="tagsIds" label="Tags" style={{ flexGrow: 1 }}>
+                            <Select
+                                showSearch
+                                mode="multiple"
+                                allowClear
+                                placeholder="Selecione as tags"
+                                optionFilterProp="name"
+                                loading={gettingTags}
+                                onSearch={setTagSearch}
+                                defaultValue={transaction?.tags?.map((tag) => tag.id) || []}
+                                options={tagsOptions}
+                            />
+                        </Form.Item>
                         <Form.Item name="notes" label="Observações">
                             <TextArea rows={4} />
                         </Form.Item>
