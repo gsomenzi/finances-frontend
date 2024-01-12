@@ -5,6 +5,7 @@ import { Wrapper } from './styles';
 import { TransactionsListProps } from './types';
 import { List } from 'antd';
 import TransactionsListItem from '../TransactionsListItem';
+import TransactionDetailsProvider from '../TransactionsListItem/providers/TransactionDetailsProvider';
 
 export default function TransactionsList(props: TransactionsListProps) {
     const { transactions, loading } = props;
@@ -13,7 +14,11 @@ export default function TransactionsList(props: TransactionsListProps) {
             <List
                 loading={loading}
                 dataSource={transactions}
-                renderItem={(item) => <TransactionsListItem item={item} />}
+                renderItem={(item) => (
+                    <TransactionDetailsProvider transaction={item}>
+                        <TransactionsListItem />
+                    </TransactionDetailsProvider>
+                )}
             />
         </Wrapper>
     );

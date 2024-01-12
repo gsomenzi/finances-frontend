@@ -3,10 +3,12 @@ import { TransactionListItemDescriptionProps } from './types';
 import { Space, Tooltip } from 'antd';
 import { BankOutlined, FolderOutlined, GroupOutlined, UnorderedListOutlined } from '@ant-design/icons';
 import { useTransaction } from '../../providers/TransactionProvider';
+import { useTransactionDetails } from '../TransactionsListItem/providers/TransactionDetailsProvider';
 
 export default function TransactionListItemDescription(props: TransactionListItemDescriptionProps) {
     const { setAccount, setCategory } = useTransaction();
-    const { account, category, isGrouped, installmentsNumber, group } = props;
+    const { account, category, isGrouped, installmentsNumber } = useTransactionDetails();
+    const { handleShowGroupItems } = props;
 
     function handleSelectAccount(e: any) {
         e.preventDefault();
@@ -38,12 +40,12 @@ export default function TransactionListItemDescription(props: TransactionListIte
                     </Tooltip>
                 )}
                 {isGrouped ? (
-                    <Tooltip title="Grupo de lançamentos">
+                    <a href="/" onClick={handleShowGroupItems}>
                         <Space size="small">
                             <GroupOutlined />
-                            <span>{group?.transactions?.length} lançamentos</span>
+                            <span>Mostrar agrupados</span>
                         </Space>
-                    </Tooltip>
+                    </a>
                 ) : null}
                 {installmentsNumber > 1 ? (
                     <Tooltip title="Lançamento parcelado">

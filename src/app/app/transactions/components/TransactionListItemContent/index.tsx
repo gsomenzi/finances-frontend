@@ -1,18 +1,13 @@
-import React, { ReactNode, useEffect } from 'react';
+import React from 'react';
 import { TransactionListItemContentProps } from './types';
 import { Button, Space, Tag, Tooltip, Typography } from 'antd';
-import {
-    ArrowDownOutlined,
-    ArrowUpOutlined,
-    CheckCircleOutlined,
-    CheckCircleTwoTone,
-    DeleteOutlined,
-} from '@ant-design/icons';
+import { CheckCircleOutlined, CheckCircleTwoTone, DeleteOutlined } from '@ant-design/icons';
 import { motion } from 'framer-motion';
 import { useMutation, useQueryClient } from 'react-query';
 import TransactionModel from '@/models/TransactionModel';
 import { useTransaction } from '../../providers/TransactionProvider';
 import { useFeedback } from '@/providers/FeedbackProvider';
+import { useTransactionDetails } from '../TransactionsListItem/providers/TransactionDetailsProvider';
 
 const contextMenuVariants = {
     hidden: { opacity: 0, scale: 0, width: 0 },
@@ -21,32 +16,10 @@ const contextMenuVariants = {
 
 export default function TransactionListItemContent(props: TransactionListItemContentProps) {
     const transactionModel = new TransactionModel();
-    const { isGrouped, group, showContext, transaction, type } = props;
     const { showMessage, showNotification } = useFeedback();
     const { selectedTransactions } = useTransaction();
+    const { isGrouped, group, transaction, transactionTypeIcon, showContext } = useTransactionDetails();
     const queryClient = useQueryClient();
-
-    function getTransactionTypeIcon(type: string | null): ReactNode {
-        if (!type) {
-            return null;
-        }
-        switch (type) {
-            case 'income':
-                return (
-                    <Tooltip title="Receita">
-                        <ArrowUpOutlined style={{ color: 'green' }} />
-                    </Tooltip>
-                );
-            case 'expense':
-                return (
-                    <Tooltip title="Despesa">
-                        <ArrowDownOutlined style={{ color: 'red' }} />
-                    </Tooltip>
-                );
-            default:
-                return null;
-        }
-    }
 
     const { mutate: remove } = useMutation((id: number) => transactionModel.delete(id), {
         onSuccess: () => {
@@ -103,11 +76,15 @@ export default function TransactionListItemContent(props: TransactionListItemCon
                         currency: 'BRL',
                     }).format(
                         isGrouped
-                            ? Number(group?.transactions?.reduce((acc, t) => acc + Number(t.value), 0))
+                            ? Number(
+                                  group?.transactions?.reduce((acc, t) => {
+                                      return acc + Number(t.value);
+                                  }, 0),
+                              )
                             : Number(transaction.value),
                     )}
                 </Typography>
-                {getTransactionTypeIcon(type)}
+                {transactionTypeIcon}
             </Space>
             <motion.div
                 layout

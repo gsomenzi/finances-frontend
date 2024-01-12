@@ -1,13 +1,14 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import { TransactionsListItemProps } from './types';
-import { Checkbox, List } from 'antd';
+import { Checkbox, List, Typography } from 'antd';
 import { useTransaction } from '../../providers/TransactionProvider';
 
 import { motion } from 'framer-motion';
 import TransactionListItemDescription from '../TransactionListItemDescription';
 import TransactionListItemContent from '../TransactionListItemContent';
+import TransactionDetailsProvider, { useTransactionDetails } from './providers/TransactionDetailsProvider';
 
 const contextMenuVariants = {
     hidden: { opacity: 0, scale: 0, width: 0 },
@@ -15,90 +16,79 @@ const contextMenuVariants = {
 };
 
 export default function TransactionsListItem(props: TransactionsListItemProps) {
-    const [showContext, setShowContext] = useState(false);
+    const [showGroupItems, setShowGroupItems] = useState(false);
     const { selectedTransactions, setSelectedTransaction, setSelectedTransactions } = useTransaction();
-    const { item } = props;
-
-    const [account, category, type] = useMemo(() => {
-        const mainAccount = item?.relatedAccounts?.find((ra) =>
-            ['income', 'expense', 'transfer_out'].includes(ra.relation),
-        );
-        return [mainAccount?.account || null, item.category || null, mainAccount?.relation || null];
-    }, [item]);
-
-    const installmentsNumber = useMemo(() => {
-        const installmentsGroup = item?.transactionGroups.find((g) => g.type === 'installments');
-        if (!installmentsGroup) return 1;
-        return installmentsGroup.transactionsCount;
-    }, [item]);
-
-    const isGrouped = item.transactionGroups.some((g) => g.type === 'group');
-
-    const group = useMemo(() => {
-        const itemGroup = item?.transactionGroups.find((g) => g.type === 'group');
-        if (!itemGroup) return null;
-        console.log(itemGroup);
-        return itemGroup;
-    }, [item]);
+    const { isGrouped, group, transaction, showContext, setShowContext } = useTransactionDetails();
 
     function handleItemSelection(e: any, checked: boolean) {
         e.preventDefault();
         e.stopPropagation();
         if (checked) {
-            setSelectedTransactions([...selectedTransactions.filter((t) => t.id !== item.id), item]);
+            setSelectedTransactions([...selectedTransactions.filter((t) => t.id !== transaction.id), transaction]);
         } else {
-            setSelectedTransactions(selectedTransactions.filter((t) => t.id !== item.id));
+            setSelectedTransactions(selectedTransactions.filter((t) => t.id !== transaction.id));
         }
     }
 
+    function handleShowGroupItems(e: any) {
+        e.preventDefault();
+        e.stopPropagation();
+        setShowGroupItems(!showGroupItems);
+    }
+
     return (
-        <List.Item
-            onMouseEnter={() => setShowContext(true)}
-            onMouseLeave={() => setShowContext(false)}
-            style={{ cursor: 'pointer' }}
-            onClick={() =>
-                setSelectedTransaction({
-                    transaction: item,
-                    action: 'details',
-                })
-            }>
-            {!isGrouped && (
-                <motion.div
-                    layout
-                    variants={contextMenuVariants}
-                    initial="hidden"
-                    animate={showContext || selectedTransactions.includes(item) ? 'visible' : 'hidden'}
-                    exit="hidden">
-                    <Checkbox
-                        style={{ marginRight: '1rem' }}
-                        onChange={(e) => handleItemSelection(e, e.target.checked)}
-                        onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                        }}
+        <>
+            <TransactionDetailsProvider transaction={transaction}>
+                <List.Item
+                    onMouseEnter={() => setShowContext(true)}
+                    onMouseLeave={() => setShowContext(false)}
+                    style={{ cursor: 'pointer' }}
+                    onClick={() =>
+                        setSelectedTransaction({
+                            transaction: transaction,
+                            action: 'details',
+                        })
+                    }>
+                    {!isGrouped && (
+                        <motion.div
+                            layout
+                            variants={contextMenuVariants}
+                            initial="hidden"
+                            animate={showContext || selectedTransactions.includes(transaction) ? 'visible' : 'hidden'}
+                            exit="hidden">
+                            <Checkbox
+                                style={{ marginRight: '1rem' }}
+                                onChange={(e) => handleItemSelection(e, e.target.checked)}
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                }}
+                            />
+                        </motion.div>
+                    )}
+                    <List.Item.Meta
+                        style={{ position: 'relative' }}
+                        title={isGrouped ? group?.name : transaction.description}
+                        description={<TransactionListItemDescription handleShowGroupItems={handleShowGroupItems} />}
                     />
-                </motion.div>
-            )}
-            <List.Item.Meta
-                style={{ position: 'relative' }}
-                title={isGrouped ? group?.name : item.description}
-                description={
-                    <TransactionListItemDescription
-                        account={account}
-                        category={category}
-                        isGrouped={isGrouped}
-                        group={group}
-                        installmentsNumber={installmentsNumber}
-                    />
-                }
-            />
-            <TransactionListItemContent
-                isGrouped={isGrouped}
-                group={group}
-                showContext={showContext}
-                transaction={item}
-                type={type}
-            />
-        </List.Item>
+                    <TransactionListItemContent />
+                </List.Item>
+                {isGrouped && showGroupItems && (
+                    <List>
+                        {group?.transactions?.map((t) => (
+                            <List.Item key={t.id}>
+                                <List.Item.Meta description={t.description} />
+                                <Typography.Text type="secondary">
+                                    {Intl.NumberFormat('pt-BR', {
+                                        style: 'currency',
+                                        currency: 'BRL',
+                                    }).format(Number(t.value))}
+                                </Typography.Text>
+                            </List.Item>
+                        ))}
+                    </List>
+                )}
+            </TransactionDetailsProvider>
+        </>
     );
 }
