@@ -5,9 +5,9 @@ import { CheckCircleOutlined, CheckCircleTwoTone, DeleteOutlined } from '@ant-de
 import { motion } from 'framer-motion';
 import { useMutation, useQueryClient } from 'react-query';
 import TransactionModel from '@/models/TransactionModel';
-import { useTransaction } from '../../providers/TransactionProvider';
+import { useTransaction } from '../../../../providers/TransactionProvider';
 import { useFeedback } from '@/providers/FeedbackProvider';
-import { useTransactionDetails } from '../TransactionsListItem/providers/TransactionDetailsProvider';
+import { useTransactionDetails } from '../../providers/TransactionDetailsProvider';
 
 const contextMenuVariants = {
     hidden: { opacity: 0, scale: 0, width: 0 },

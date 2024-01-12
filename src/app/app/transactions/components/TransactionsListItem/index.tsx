@@ -6,8 +6,8 @@ import { Checkbox, List, Typography } from 'antd';
 import { useTransaction } from '../../providers/TransactionProvider';
 
 import { motion } from 'framer-motion';
-import TransactionListItemDescription from '../TransactionListItemDescription';
-import TransactionListItemContent from '../TransactionListItemContent';
+import TransactionListItemDescription from './components/TransactionListItemDescription';
+import TransactionListItemContent from './components/TransactionListItemContent';
 import TransactionDetailsProvider, { useTransactionDetails } from './providers/TransactionDetailsProvider';
 
 const contextMenuVariants = {

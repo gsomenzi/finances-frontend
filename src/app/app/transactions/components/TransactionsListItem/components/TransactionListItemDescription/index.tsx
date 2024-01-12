@@ -2,8 +2,8 @@ import React from 'react';
 import { TransactionListItemDescriptionProps } from './types';
 import { Space, Tooltip } from 'antd';
 import { BankOutlined, FolderOutlined, GroupOutlined, UnorderedListOutlined } from '@ant-design/icons';
-import { useTransaction } from '../../providers/TransactionProvider';
-import { useTransactionDetails } from '../TransactionsListItem/providers/TransactionDetailsProvider';
+import { useTransaction } from '../../../../providers/TransactionProvider';
+import { useTransactionDetails } from '../../providers/TransactionDetailsProvider';
 
 export default function TransactionListItemDescription(props: TransactionListItemDescriptionProps) {
     const { setAccount, setCategory } = useTransaction();
