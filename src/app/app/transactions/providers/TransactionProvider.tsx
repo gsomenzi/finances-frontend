@@ -18,6 +18,7 @@ const ContextProps: {
     page: number;
     search: string;
     selectedTransaction: TransactionSelection;
+    selectedTransactions: Transaction[];
     setAccount: (value: Pick<Account, 'id' | 'name'> | null) => void;
     setCategory: (value: Pick<Category, 'id' | 'name'> | null) => void;
     setDateFilter: (value: DateFilter) => void;
@@ -25,6 +26,7 @@ const ContextProps: {
     setPage: (value: number) => void;
     setSearch: (value: string) => void;
     setSelectedTransaction: (value: TransactionSelection) => void;
+    setSelectedTransactions: (value: Transaction[]) => void;
 } = {
     account: null,
     category: null,
@@ -39,6 +41,7 @@ const ContextProps: {
         transaction: null,
         action: null,
     },
+    selectedTransactions: [],
     setAccount: () => {},
     setCategory: () => {},
     setDateFilter: () => {},
@@ -46,6 +49,7 @@ const ContextProps: {
     setPage: () => {},
     setSearch: () => {},
     setSelectedTransaction: () => {},
+    setSelectedTransactions: () => {},
 };
 
 const TransactionContext = createContext(ContextProps);
@@ -64,6 +68,7 @@ export default function TransactionProvider({ children }: { children: ReactNode 
         transaction: null,
         action: null,
     });
+    const [selectedTransactions, setSelectedTransactions] = useState<Transaction[]>([]);
     const [dateFilter, setDateFilter] = useState<DateFilter>({
         startDate: dayjs().startOf('month').format('YYYY-MM-DD'),
         endDate: dayjs().endOf('month').format('YYYY-MM-DD'),
@@ -78,6 +83,7 @@ export default function TransactionProvider({ children }: { children: ReactNode 
                 page,
                 search,
                 selectedTransaction,
+                selectedTransactions,
                 setAccount,
                 setCategory,
                 setDateFilter,
@@ -85,6 +91,7 @@ export default function TransactionProvider({ children }: { children: ReactNode 
                 setPage,
                 setSearch,
                 setSelectedTransaction,
+                setSelectedTransactions,
             }}>
             {children}
         </TransactionContext.Provider>

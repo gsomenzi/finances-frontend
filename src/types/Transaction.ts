@@ -1,6 +1,7 @@
 import { Account } from './Account';
 import { Category } from './Category';
 import { Tag } from './Tag';
+import { TransactionGroup } from './TransactionGroup';
 
 export interface Transaction {
     id: number;
@@ -20,12 +21,4 @@ export interface Transaction {
 interface AccountRelation {
     relation: string;
     account: Pick<Account, 'id' | 'name' | 'description' | 'type' | 'default' | 'currency'>;
-}
-
-interface TransactionGroup {
-    id: number;
-    type: string;
-    transactionsCount: number;
-    notes: string | null;
-    transactions?: Pick<Transaction, 'id' | 'description' | 'value' | 'date' | 'paid' | 'paid_at' | 'notes'>[];
 }

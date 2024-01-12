@@ -1,12 +1,27 @@
 import React from 'react';
 import { TransactionsViewProps } from './types';
-import { DatePicker, Flex, Typography, Input, FloatButton, Space, Card, Empty, Tag, List, Row, Col } from 'antd';
+import {
+    DatePicker,
+    Flex,
+    Typography,
+    Input,
+    FloatButton,
+    Space,
+    Card,
+    Empty,
+    Tag,
+    List,
+    Row,
+    Col,
+    Button,
+} from 'antd';
 import { BankOutlined, FolderOutlined, PlusOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import AddEditForm from './components/AddEditForm';
 import TransactionsList from './components/TransactionsList';
 import TransactionDetails from './components/TransactionDetails';
 import { useTransaction } from './providers/TransactionProvider';
+import { motion } from 'framer-motion';
 const { Search } = Input;
 const { RangePicker } = DatePicker;
 
@@ -21,8 +36,17 @@ export default function TransactionsView(props: TransactionsViewProps) {
         transactions,
         isLoading,
         transactionDates,
+        handleGroupTransactions,
     } = props;
-    const { dateFilter, setAccount, setCategory, setSearch, setSelectedTransaction, setDateFilter } = useTransaction();
+    const {
+        dateFilter,
+        selectedTransactions,
+        setAccount,
+        setCategory,
+        setSearch,
+        setSelectedTransaction,
+        setDateFilter,
+    } = useTransaction();
     return (
         <div>
             <Flex justify="space-between" align="center">
@@ -66,6 +90,20 @@ export default function TransactionsView(props: TransactionsViewProps) {
             />
             <AddEditForm />
             <TransactionDetails />
+            <motion.div layout>
+                {selectedTransactions.length > 1 && (
+                    <Flex justify="flex-end">
+                        <Space style={{ marginBottom: '1rem' }}>
+                            <Typography.Text>{selectedTransactions.length} selecionados</Typography.Text>
+                            <Button type="primary" onClick={handleGroupTransactions}>
+                                Agrupar
+                            </Button>
+                            <Button>Efetivar</Button>
+                            <Button danger>Remover</Button>
+                        </Space>
+                    </Flex>
+                )}
+            </motion.div>
             {transactionDates.length > 0 ? (
                 <>
                     {transactionDates.map((date) => (

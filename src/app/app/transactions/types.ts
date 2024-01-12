@@ -5,6 +5,7 @@ import { UseMutateFunction } from 'react-query';
 
 export type TransactionsViewProps = {
     transactions: Transaction[];
+    isGrouping: boolean;
     isLoading: boolean;
     isRemoving: boolean;
     page: number;
@@ -18,6 +19,7 @@ export type TransactionsViewProps = {
     generalIncomeOnPeriod: number;
     generalExpenseOnPeriod: number;
     remove: UseMutateFunction<any, unknown, number, unknown>;
+    handleGroupTransactions: () => void;
     getTransactionTypeIcon: (type: string) => React.ReactNode;
 };
 
