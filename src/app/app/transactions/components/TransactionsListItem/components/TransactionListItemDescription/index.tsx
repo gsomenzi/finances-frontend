@@ -1,9 +1,10 @@
 import React from 'react';
 import { TransactionListItemDescriptionProps } from './types';
-import { Space, Tooltip } from 'antd';
+import { Button, Space, Tooltip } from 'antd';
 import { BankOutlined, FolderOutlined, GroupOutlined, UnorderedListOutlined } from '@ant-design/icons';
 import { useTransaction } from '../../../../providers/TransactionProvider';
 import { useTransactionDetails } from '../../providers/TransactionDetailsProvider';
+import Show from '@/components/Show';
 
 export default function TransactionListItemDescription(props: TransactionListItemDescriptionProps) {
     const { setAccount, setCategory } = useTransaction();
@@ -31,22 +32,19 @@ export default function TransactionListItemDescription(props: TransactionListIte
                         <span>{account?.name}</span>
                     </Space>
                 </Tooltip>
-                {!isGrouped && (
+                <Show when={!isGrouped}>
                     <Tooltip title="Categoria">
                         <Space size="small" onClick={(e) => handleSelectCategory(e)}>
                             <FolderOutlined />
                             <span>{category?.name}</span>
                         </Space>
                     </Tooltip>
-                )}
-                {isGrouped ? (
-                    <a href="/" onClick={handleShowGroupItems}>
-                        <Space size="small">
-                            <GroupOutlined />
-                            <span>Mostrar agrupados</span>
-                        </Space>
-                    </a>
-                ) : null}
+                </Show>
+                <Show when={isGrouped}>
+                    <Button type="text" color="secondary" icon={<GroupOutlined />} onClick={handleShowGroupItems}>
+                        <span>Mostrar agrupados</span>
+                    </Button>
+                </Show>
                 {installmentsNumber > 1 ? (
                     <Tooltip title="Lançamento parcelado">
                         <Space size="small">

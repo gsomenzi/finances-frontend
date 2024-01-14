@@ -1,13 +1,15 @@
 import React from 'react';
 import { TransactionListItemContentProps } from './types';
 import { Button, Space, Tag, Tooltip, Typography } from 'antd';
-import { CheckCircleOutlined, CheckCircleTwoTone, DeleteOutlined } from '@ant-design/icons';
+import { CheckCircleOutlined, CheckCircleTwoTone, DeleteOutlined, UngroupOutlined } from '@ant-design/icons';
 import { motion } from 'framer-motion';
 import { useMutation, useQueryClient } from 'react-query';
 import TransactionModel from '@/models/TransactionModel';
 import { useTransaction } from '../../../../providers/TransactionProvider';
 import { useFeedback } from '@/providers/FeedbackProvider';
 import { useTransactionDetails } from '../../providers/TransactionDetailsProvider';
+import Show from '@/components/Show';
+import TransactionGroupModel from '@/models/TransactionGroupModel';
 
 const contextMenuVariants = {
     hidden: { opacity: 0, scale: 0, width: 0 },
@@ -16,6 +18,7 @@ const contextMenuVariants = {
 
 export default function TransactionListItemContent(props: TransactionListItemContentProps) {
     const transactionModel = new TransactionModel();
+    const transactionGroupModel = new TransactionGroupModel();
     const { showMessage, showNotification } = useFeedback();
     const { selectedTransactions } = useTransaction();
     const { isGrouped, group, transaction, transactionTypeIcon, showContext } = useTransactionDetails();
@@ -28,6 +31,18 @@ export default function TransactionListItemContent(props: TransactionListItemCon
         onError: (e: any) => {
             console.log(e);
             showNotification('Erro', e?.response?.data?.message || 'Erro ao remover a transação', {
+                type: 'error',
+            });
+        },
+    });
+
+    const { mutate: ungroup } = useMutation((id: number) => transactionGroupModel.delete(id), {
+        onSuccess: () => {
+            queryClient.invalidateQueries('transactions');
+        },
+        onError: (e: any) => {
+            console.log(e);
+            showNotification('Erro', e?.response?.data?.message || 'Erro ao desagrupar as transações', {
                 type: 'error',
             });
         },
@@ -93,7 +108,17 @@ export default function TransactionListItemContent(props: TransactionListItemCon
                 animate={showContext || selectedTransactions.includes(transaction) ? 'visible' : 'hidden'}
                 exit="hidden">
                 <Space>
-                    {!transaction.paid ? (
+                    <Show when={isGrouped}>
+                        <Tooltip title="Desagrupar">
+                            <Button
+                                onClick={() => ungroup(group?.id || 0)}
+                                type="text"
+                                icon={<UngroupOutlined />}
+                                disabled={selectedTransactions.length > 0}
+                            />
+                        </Tooltip>
+                    </Show>
+                    <Show when={transaction.paid}>
                         <Tooltip title="Desfazer">
                             <Button
                                 color="green"
@@ -103,7 +128,8 @@ export default function TransactionListItemContent(props: TransactionListItemCon
                                 disabled={selectedTransactions.length > 0}
                             />
                         </Tooltip>
-                    ) : (
+                    </Show>
+                    <Show when={!transaction.paid}>
                         <Tooltip title="Efetivar">
                             <Button
                                 onClick={handlePayTransaction}
@@ -112,7 +138,7 @@ export default function TransactionListItemContent(props: TransactionListItemCon
                                 disabled={selectedTransactions.length > 0}
                             />
                         </Tooltip>
-                    )}
+                    </Show>
                     <Tooltip title="Remover">
                         <Button
                             onClick={(e) => {

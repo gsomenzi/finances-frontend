@@ -7,6 +7,7 @@ import { useMutation, useQuery, useQueryClient } from 'react-query';
 import TransactionModel from '@/models/TransactionModel';
 import { useConfirm } from '@/providers/ConfirmProvider';
 import { useTransaction } from '../../providers/TransactionProvider';
+import Show from '@/components/Show';
 
 export default function TransactionDetails(props: TransactionDetailsProps) {
     const {
@@ -86,7 +87,7 @@ export default function TransactionDetails(props: TransactionDetailsProps) {
             onClose={handleClose}
             width={600}
             footer={
-                transaction && (
+                <Show when={!!transaction}>
                     <Flex justify="end">
                         <Space>
                             <Button loading={isRemoving} onClick={handleRemove} danger>
@@ -97,103 +98,97 @@ export default function TransactionDetails(props: TransactionDetailsProps) {
                             </Button>
                         </Space>
                     </Flex>
-                )
+                </Show>
             }>
-            {transaction && (
-                <>
-                    <Typography.Title level={5}>Detalhes:</Typography.Title>
-                    <Descriptions bordered column={1}>
-                        <Descriptions.Item span={3} label="Descricão">
-                            {transaction.description}
+            <Show when={!!transaction}>
+                <Typography.Title level={5}>Detalhes:</Typography.Title>
+                <Descriptions bordered column={1}>
+                    <Descriptions.Item span={3} label="Descricão">
+                        {transaction?.description}
+                    </Descriptions.Item>
+                    <Descriptions.Item label="Tipo">{transactionTypeTranslator(accountRelation)}</Descriptions.Item>
+                    <Descriptions.Item label="Data">{dayjs(transaction?.date).format('DD/MM/YYYY')}</Descriptions.Item>
+                    <Descriptions.Item label="Valor">
+                        {Intl.NumberFormat('pt-BR', {
+                            style: 'currency',
+                            currency: 'BRL',
+                        }).format(Number(transaction?.value))}
+                    </Descriptions.Item>
+                    <Descriptions.Item label="Conta">{accountName}</Descriptions.Item>
+                    <Descriptions.Item span={2} label="Categoria">
+                        {transaction?.category?.name}
+                    </Descriptions.Item>
+                    <Show when={!!transaction?.notes}>
+                        <Descriptions.Item span={3} label="Observações">
+                            {transaction?.notes}
                         </Descriptions.Item>
-                        <Descriptions.Item label="Tipo">{transactionTypeTranslator(accountRelation)}</Descriptions.Item>
-                        <Descriptions.Item label="Data">
-                            {dayjs(transaction.date).format('DD/MM/YYYY')}
-                        </Descriptions.Item>
-                        <Descriptions.Item label="Valor">
-                            {Intl.NumberFormat('pt-BR', {
-                                style: 'currency',
-                                currency: 'BRL',
-                            }).format(Number(transaction.value))}
-                        </Descriptions.Item>
-                        <Descriptions.Item label="Conta">{accountName}</Descriptions.Item>
-                        <Descriptions.Item span={2} label="Categoria">
-                            {transaction.category?.name}
-                        </Descriptions.Item>
-                        {transaction.notes && (
-                            <Descriptions.Item span={3} label="Observações">
-                                {transaction.notes}
-                            </Descriptions.Item>
-                        )}
-                        <Descriptions.Item label="Parcelas">{installmentsNumber}</Descriptions.Item>
-                    </Descriptions>
-                    {transaction.tags && transaction.tags.length > 0 && (
-                        <>
-                            <Typography.Title level={5}>Tags:</Typography.Title>
-                            <Space wrap>
-                                {transaction.tags.map((tag) => (
-                                    <Tag key={tag.id}>{tag.name}</Tag>
-                                ))}
-                            </Space>
-                        </>
-                    )}
-                    {installmentsNumber > 1 && (
-                        <Flex vertical gap={8}>
-                            <Typography.Title level={5}>Parcelas:</Typography.Title>
-                            <Table
-                                dataSource={installments}
-                                pagination={false}
-                                rowKey={(t) => t.id}
-                                columns={[
-                                    {
-                                        title: 'Parcela',
-                                        dataIndex: 'key',
-                                        width: 1,
-                                        render: (_, record, index) => (
-                                            <Typography.Text strong={record.id === transaction.id}>
-                                                {index + 1}
-                                            </Typography.Text>
-                                        ),
-                                    },
-                                    {
-                                        title: 'Data',
-                                        dataIndex: 'date',
-                                        key: 'date',
-                                        render: (value, record) => (
-                                            <Typography.Text strong={record.id === transaction.id}>
-                                                {dayjs(value).format('DD/MM/YYYY')}
-                                            </Typography.Text>
-                                        ),
-                                    },
-                                    {
-                                        title: 'Valor',
-                                        dataIndex: 'value',
-                                        key: 'value',
-                                        render: (value, record) => (
-                                            <Typography.Text strong={record.id === transaction.id}>
-                                                {Intl.NumberFormat('pt-BR', {
-                                                    style: 'currency',
-                                                    currency: 'BRL',
-                                                }).format(Number(value))}
-                                            </Typography.Text>
-                                        ),
-                                    },
-                                    {
-                                        title: 'Paga',
-                                        dataIndex: 'paid',
-                                        key: 'paid',
-                                        render: (value, record) => (
-                                            <Typography.Text strong={record.id === transaction.id}>
-                                                {value ? 'Sim' : 'Não'}
-                                            </Typography.Text>
-                                        ),
-                                    },
-                                ]}
-                            />
-                        </Flex>
-                    )}
-                </>
-            )}
+                    </Show>
+                    <Descriptions.Item label="Parcelas">{installmentsNumber}</Descriptions.Item>
+                </Descriptions>
+                <Show when={!!(transaction?.tags && transaction?.tags.length)}>
+                    <Typography.Title level={5}>Tags:</Typography.Title>
+                    <Space wrap>
+                        {transaction?.tags.map((tag) => (
+                            <Tag key={tag.id}>{tag.name}</Tag>
+                        ))}
+                    </Space>
+                </Show>
+                <Show when={installmentsNumber > 1}>
+                    <Flex vertical gap={8}>
+                        <Typography.Title level={5}>Parcelas:</Typography.Title>
+                        <Table
+                            dataSource={installments}
+                            pagination={false}
+                            rowKey={(t) => t.id}
+                            columns={[
+                                {
+                                    title: 'Parcela',
+                                    dataIndex: 'key',
+                                    width: 1,
+                                    render: (_, record, index) => (
+                                        <Typography.Text strong={record.id === transaction?.id}>
+                                            {index + 1}
+                                        </Typography.Text>
+                                    ),
+                                },
+                                {
+                                    title: 'Data',
+                                    dataIndex: 'date',
+                                    key: 'date',
+                                    render: (value, record) => (
+                                        <Typography.Text strong={record.id === transaction?.id}>
+                                            {dayjs(value).format('DD/MM/YYYY')}
+                                        </Typography.Text>
+                                    ),
+                                },
+                                {
+                                    title: 'Valor',
+                                    dataIndex: 'value',
+                                    key: 'value',
+                                    render: (value, record) => (
+                                        <Typography.Text strong={record.id === transaction?.id}>
+                                            {Intl.NumberFormat('pt-BR', {
+                                                style: 'currency',
+                                                currency: 'BRL',
+                                            }).format(Number(value))}
+                                        </Typography.Text>
+                                    ),
+                                },
+                                {
+                                    title: 'Paga',
+                                    dataIndex: 'paid',
+                                    key: 'paid',
+                                    render: (value, record) => (
+                                        <Typography.Text strong={record.id === transaction?.id}>
+                                            {value ? 'Sim' : 'Não'}
+                                        </Typography.Text>
+                                    ),
+                                },
+                            ]}
+                        />
+                    </Flex>
+                </Show>
+            </Show>
         </Drawer>
     );
 }
