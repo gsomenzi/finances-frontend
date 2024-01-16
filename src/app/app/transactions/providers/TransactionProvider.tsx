@@ -19,6 +19,7 @@ const ContextProps: {
     search: string;
     selectedTransaction: TransactionSelection;
     selectedTransactions: Transaction[];
+    selectedForGroup: Transaction[];
     setAccount: (value: Pick<Account, 'id' | 'name'> | null) => void;
     setCategory: (value: Pick<Category, 'id' | 'name'> | null) => void;
     setDateFilter: (value: DateFilter) => void;
@@ -27,6 +28,7 @@ const ContextProps: {
     setSearch: (value: string) => void;
     setSelectedTransaction: (value: TransactionSelection) => void;
     setSelectedTransactions: (value: Transaction[]) => void;
+    setSelectedForGroup: (value: Transaction[]) => void;
 } = {
     account: null,
     category: null,
@@ -42,6 +44,7 @@ const ContextProps: {
         action: null,
     },
     selectedTransactions: [],
+    selectedForGroup: [],
     setAccount: () => {},
     setCategory: () => {},
     setDateFilter: () => {},
@@ -50,6 +53,7 @@ const ContextProps: {
     setSearch: () => {},
     setSelectedTransaction: () => {},
     setSelectedTransactions: () => {},
+    setSelectedForGroup: () => {},
 };
 
 const TransactionContext = createContext(ContextProps);
@@ -69,6 +73,7 @@ export default function TransactionProvider({ children }: { children: ReactNode 
         action: null,
     });
     const [selectedTransactions, setSelectedTransactions] = useState<Transaction[]>([]);
+    const [selectedForGroup, setSelectedForGroup] = useState<Transaction[]>([]);
     const [dateFilter, setDateFilter] = useState<DateFilter>({
         startDate: dayjs().startOf('month').format('YYYY-MM-DD'),
         endDate: dayjs().endOf('month').format('YYYY-MM-DD'),
@@ -84,6 +89,7 @@ export default function TransactionProvider({ children }: { children: ReactNode 
                 search,
                 selectedTransaction,
                 selectedTransactions,
+                selectedForGroup,
                 setAccount,
                 setCategory,
                 setDateFilter,
@@ -92,6 +98,7 @@ export default function TransactionProvider({ children }: { children: ReactNode 
                 setSearch,
                 setSelectedTransaction,
                 setSelectedTransactions,
+                setSelectedForGroup,
             }}>
             {children}
         </TransactionContext.Provider>

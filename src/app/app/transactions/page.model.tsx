@@ -15,8 +15,17 @@ export default function TransactionsViewModel(): TransactionsViewProps {
     const analyticModel = new AnalyticModel();
     const transactionModel = new TransactionModel();
     const transactionGroupModel = new TransactionGroupModel();
-    const { account, category, dateFilter, limit, page, search, selectedTransactions, setSelectedTransactions } =
-        useTransaction();
+    const {
+        account,
+        category,
+        dateFilter,
+        limit,
+        page,
+        search,
+        selectedTransactions,
+        setSelectedForGroup,
+        setSelectedTransactions,
+    } = useTransaction();
     const { showMessage, showNotification } = useFeedback();
     const queryClient = useQueryClient();
 
@@ -176,10 +185,8 @@ export default function TransactionsViewModel(): TransactionsViewProps {
         if (selectedTransactions.length <= 1) {
             return;
         }
-        groupTransactions({
-            name: `${selectedTransactions[0].description} + ${selectedTransactions.length - 1} transações`,
-            transactionIds: selectedTransactions.map((t) => t.id),
-        });
+        setSelectedForGroup([...selectedTransactions]);
+        setSelectedTransactions([]);
     }
 
     return {

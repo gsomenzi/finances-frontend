@@ -22,6 +22,7 @@ import TransactionsList from './components/TransactionsList';
 import TransactionDetails from './components/TransactionDetails';
 import { useTransaction } from './providers/TransactionProvider';
 import { motion } from 'framer-motion';
+import AddGroupForm from './components/AddGroupForm';
 const { Search } = Input;
 const { RangePicker } = DatePicker;
 
@@ -89,6 +90,7 @@ export default function TransactionsView(props: TransactionsViewProps) {
                 }}
             />
             <AddEditForm />
+            <AddGroupForm />
             <TransactionDetails />
             <motion.div layout>
                 {selectedTransactions.length > 1 && (

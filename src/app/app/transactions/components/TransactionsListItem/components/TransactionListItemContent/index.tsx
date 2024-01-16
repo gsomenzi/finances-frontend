@@ -10,6 +10,7 @@ import { useFeedback } from '@/providers/FeedbackProvider';
 import { useTransactionDetails } from '../../providers/TransactionDetailsProvider';
 import Show from '@/components/Show';
 import TransactionGroupModel from '@/models/TransactionGroupModel';
+import { useConfirm } from '@/providers/ConfirmProvider';
 
 const contextMenuVariants = {
     hidden: { opacity: 0, scale: 0, width: 0 },
@@ -20,6 +21,7 @@ export default function TransactionListItemContent(props: TransactionListItemCon
     const transactionModel = new TransactionModel();
     const transactionGroupModel = new TransactionGroupModel();
     const { showMessage, showNotification } = useFeedback();
+    const { confirm } = useConfirm();
     const { selectedTransactions } = useTransaction();
     const { isGrouped, group, transaction, transactionTypeIcon, showContext } = useTransactionDetails();
     const queryClient = useQueryClient();
@@ -48,7 +50,7 @@ export default function TransactionListItemContent(props: TransactionListItemCon
         },
     });
 
-    const payTransaction = useMutation(
+    const { mutate: payTransaction } = useMutation(
         (transactionId: number) => {
             return transactionModel.togglePaid(transactionId);
         },
@@ -70,7 +72,19 @@ export default function TransactionListItemContent(props: TransactionListItemCon
     function handlePayTransaction(e: any) {
         e.preventDefault();
         e.stopPropagation();
-        payTransaction.mutate(transaction.id);
+        payTransaction(transaction.id);
+    }
+
+    function handleUngroupTransactions(e: any) {
+        e.preventDefault();
+        e.stopPropagation();
+        confirm({
+            title: 'Desagrupar?',
+            description: 'Tem certeza que deseja desagrupar as transações?',
+            onConfirm: () => {
+                ungroup(group?.id || 0);
+            },
+        });
     }
 
     return (
@@ -111,7 +125,7 @@ export default function TransactionListItemContent(props: TransactionListItemCon
                     <Show when={isGrouped}>
                         <Tooltip title="Desagrupar">
                             <Button
-                                onClick={() => ungroup(group?.id || 0)}
+                                onClick={handleUngroupTransactions}
                                 type="text"
                                 icon={<UngroupOutlined />}
                                 disabled={selectedTransactions.length > 0}

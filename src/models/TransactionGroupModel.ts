@@ -1,7 +1,8 @@
 import { TransactionGroup } from '@/types/TransactionGroup';
 import _ApiModel from './_ApiModel';
 
-type CreateTransactionGroupPayload = Pick<TransactionGroup, 'name' | 'type' | 'notes'> & {
+export type CreateTransactionGroupPayload = Pick<TransactionGroup, 'name' | 'type' | 'notes'> & {
+    date: string;
     transactionIds: number[];
 };
 
