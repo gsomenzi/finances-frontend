@@ -36,6 +36,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
                                 height: 'calc(100vh - 64px)',
                                 paddingLeft: 24,
                                 paddingRight: 24,
+                                paddingBottom: 24,
                                 overflow: 'auto',
                             }}>
                             {children}
