@@ -156,25 +156,10 @@ export default function TransactionsViewModel(): TransactionsViewProps {
     }
 
     const filteredTransactions: Transaction[] = useMemo(() => {
-        let tmpTransactions: Transaction[] = [];
         if (!transactions || !transactions.data) {
             return [];
         }
-        tmpTransactions = [
-            ...transactions.data.filter((t) => !t.transactionGroups || t.transactionGroups.length === 0),
-        ];
-        for (const t of transactions.data) {
-            if (t.transactionGroups && t.transactionGroups.length > 0) {
-                if (
-                    !tmpTransactions
-                        .flatMap((t) => t.transactionGroups)
-                        .some((g) => t.transactionGroups.some((tg) => tg.id === g.id))
-                ) {
-                    tmpTransactions.push(t);
-                }
-            }
-        }
-        return tmpTransactions;
+        return transactions.data;
     }, [transactions]);
 
     const [transactionDates, generalIncomeOnPeriod, generalExpenseOnPeriod] = useMemo(() => {
@@ -208,6 +193,7 @@ export default function TransactionsViewModel(): TransactionsViewProps {
     }
 
     return {
+        groups: groups?.data && groups.data.length > 0 ? groups.data : [],
         transactions: filteredTransactions,
         isGrouping,
         isRemoving,

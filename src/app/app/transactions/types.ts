@@ -1,9 +1,11 @@
 import { Account } from '@/types/Account';
 import { Category } from '@/types/Category';
 import { Transaction } from '@/types/Transaction';
+import { TransactionGroup } from '@/types/TransactionGroup';
 import { UseMutateFunction } from 'react-query';
 
 export type TransactionsViewProps = {
+    groups: TransactionGroup[];
     transactions: Transaction[];
     getting: boolean;
     isGrouping: boolean;

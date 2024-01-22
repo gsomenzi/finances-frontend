@@ -23,6 +23,7 @@ import TransactionDetails from './components/TransactionDetails';
 import { useTransaction } from './providers/TransactionProvider';
 import { motion } from 'framer-motion';
 import AddGroupForm from './components/AddGroupForm';
+import TransactionGroupsList from './components/TransactionGroupsList';
 const { Search } = Input;
 const { RangePicker } = DatePicker;
 
@@ -34,6 +35,7 @@ export default function TransactionsView(props: TransactionsViewProps) {
         generalBalanceOnEndDate,
         generalIncomeOnPeriod,
         generalExpenseOnPeriod,
+        groups,
         transactions,
         getting,
         transactionDates,
@@ -52,32 +54,6 @@ export default function TransactionsView(props: TransactionsViewProps) {
         <div>
             <Flex justify="space-between" align="center">
                 <Typography.Title level={2}>Lançamentos</Typography.Title>
-                <Space>
-                    {account && (
-                        <Tag color="blue" icon={<BankOutlined />} closable onClose={() => setAccount(null)}>
-                            {account.name}
-                        </Tag>
-                    )}
-                    {category && (
-                        <Tag color="cyan" icon={<FolderOutlined />} closable onClose={() => setCategory(null)}>
-                            {category.name}
-                        </Tag>
-                    )}
-                    <Search placeholder="Pesquisa" onSearch={setSearch} style={{ width: 200 }} />
-                    <RangePicker
-                        format="DD/MM/YYYY"
-                        allowClear={false}
-                        defaultValue={[dayjs().startOf('month'), dayjs().endOf('month')]}
-                        onChange={(range) => {
-                            if (range) {
-                                setDateFilter({
-                                    startDate: dayjs(range[0]).format('YYYY-MM-DD'),
-                                    endDate: dayjs(range[1]).format('YYYY-MM-DD'),
-                                });
-                            }
-                        }}
-                    />
-                </Space>
             </Flex>
             <FloatButton
                 type="primary"
@@ -108,34 +84,80 @@ export default function TransactionsView(props: TransactionsViewProps) {
             </motion.div>
             {transactionDates.length > 0 ? (
                 <>
-                    {transactionDates.map((date) => (
-                        <Card
-                            key={date}
-                            title={
-                                <Space>
-                                    <Typography>{dayjs(date).format('DD/MM/YYYY')}</Typography>
-                                    <Typography.Text type="secondary">{dayjs(date).format('dddd')}</Typography.Text>
-                                </Space>
-                            }
-                            bordered={false}
-                            type="inner"
-                            style={{ marginBottom: '1rem' }}>
-                            <TransactionsList
-                                loading={getting}
-                                transactions={transactions.filter((t) => t.date === date)}
-                            />
-                        </Card>
-                    ))}
-                    <Row>
-                        <Col span={12}></Col>
-                        <Col span={12}>
+                    <Row gutter={8}>
+                        <Col span={16}>
+                            <Space style={{ width: '100%' }} direction="vertical">
+                                <Flex gap={16}>
+                                    <Search placeholder="Pesquisa" onSearch={setSearch} style={{ flexGrow: 1 }} />
+                                    {account && (
+                                        <Tag
+                                            color="blue"
+                                            icon={<BankOutlined />}
+                                            closable
+                                            onClose={() => setAccount(null)}>
+                                            {account.name}
+                                        </Tag>
+                                    )}
+                                    {category && (
+                                        <Tag
+                                            color="cyan"
+                                            icon={<FolderOutlined />}
+                                            closable
+                                            onClose={() => setCategory(null)}>
+                                            {category.name}
+                                        </Tag>
+                                    )}
+                                    <RangePicker
+                                        style={{ width: '300px' }}
+                                        format="DD/MM/YYYY"
+                                        allowClear={false}
+                                        defaultValue={[dayjs().startOf('month'), dayjs().endOf('month')]}
+                                        onChange={(range) => {
+                                            if (range) {
+                                                setDateFilter({
+                                                    startDate: dayjs(range[0]).format('YYYY-MM-DD'),
+                                                    endDate: dayjs(range[1]).format('YYYY-MM-DD'),
+                                                });
+                                            }
+                                        }}
+                                    />
+                                </Flex>
+                                {transactionDates.map((date) => (
+                                    <Card
+                                        key={date}
+                                        title={
+                                            <Space>
+                                                <Typography>{dayjs(date).format('DD/MM/YYYY')}</Typography>
+                                                <Typography.Text type="secondary">
+                                                    {dayjs(date).format('dddd')}
+                                                </Typography.Text>
+                                            </Space>
+                                        }
+                                        bordered={false}
+                                        type="inner"
+                                        style={{ marginBottom: '1rem' }}>
+                                        <TransactionsList
+                                            loading={getting}
+                                            transactions={transactions.filter((t) => t.date === date)}
+                                        />
+                                        <TransactionGroupsList
+                                            loading={getting}
+                                            groups={groups.filter(
+                                                (g) => g.transactions && g.transactions[0].date === date,
+                                            )}
+                                        />
+                                    </Card>
+                                ))}
+                            </Space>
+                        </Col>
+                        <Col span={8}>
                             <Card
                                 title={
                                     <Flex justify="space-between">
                                         <Typography>Projeção do saldo</Typography>
                                         <Typography.Text type="secondary">
-                                            {dayjs(dateFilter.startDate).format('DD/MM/YYYY')} até{' '}
-                                            {dayjs(dateFilter.endDate).format('DD/MM/YYYY')}
+                                            {dayjs(dateFilter.startDate).format('DD/MM/YY')} até{' '}
+                                            {dayjs(dateFilter.endDate).format('DD/MM/YY')}
                                         </Typography.Text>
                                     </Flex>
                                 }>

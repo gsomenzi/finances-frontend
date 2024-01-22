@@ -12,6 +12,7 @@ export default function TransactionsList(props: TransactionsListProps) {
     return (
         <Wrapper>
             <List
+                header="Lançamentos"
                 loading={loading}
                 dataSource={transactions}
                 renderItem={(item) => (
