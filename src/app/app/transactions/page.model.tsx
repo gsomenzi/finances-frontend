@@ -10,6 +10,7 @@ import { useTransaction } from './providers/TransactionProvider';
 import AnalyticModel from '@/models/AnalyticModel';
 import TransactionGroupModel from '@/models/TransactionGroupModel';
 import { useFeedback } from '@/providers/FeedbackProvider';
+import { TransactionGroup } from '@/types/TransactionGroup';
 
 export default function TransactionsViewModel(): TransactionsViewProps {
     const analyticModel = new AnalyticModel();
@@ -19,7 +20,6 @@ export default function TransactionsViewModel(): TransactionsViewProps {
         account,
         category,
         dateFilter,
-        limit,
         page,
         search,
         selectedTransactions,
@@ -33,8 +33,6 @@ export default function TransactionsViewModel(): TransactionsViewProps {
         [
             'transactions',
             {
-                page,
-                limit,
                 search,
                 accountId: account?.id || null,
                 categoryId: category?.id || null,
@@ -44,8 +42,6 @@ export default function TransactionsViewModel(): TransactionsViewProps {
         ],
         () =>
             transactionModel.findMany({
-                page,
-                limit,
                 search,
                 accountId: account?.id || null,
                 categoryId: category?.id || null,
@@ -57,7 +53,29 @@ export default function TransactionsViewModel(): TransactionsViewProps {
         },
     );
 
-    const isLoading = gettingTransactions;
+    const { data: groups, isLoading: gettingGroups } = useQuery<ListResponseData<TransactionGroup>>(
+        [
+            'transaction-groups',
+            {
+                search,
+                accountId: account?.id || null,
+                categoryId: category?.id || null,
+                startDate: dateFilter.startDate,
+                endDate: dateFilter.endDate,
+            },
+        ],
+        () =>
+            transactionGroupModel.findMany({
+                search,
+                accountId: account?.id || null,
+                categoryId: category?.id || null,
+                startDate: dateFilter.startDate,
+                endDate: dateFilter.endDate,
+            }),
+        {
+            refetchOnWindowFocus: false,
+        },
+    );
 
     const { mutate: groupTransactions, isLoading: isGrouping } = useMutation(
         (transactionData: any) => {
@@ -192,10 +210,8 @@ export default function TransactionsViewModel(): TransactionsViewProps {
     return {
         transactions: filteredTransactions,
         isGrouping,
-        isLoading,
         isRemoving,
-        page,
-        limit,
+        getting: gettingTransactions || gettingGroups,
         total: transactions?.total || 0,
         transactionDates,
         account,

@@ -18,7 +18,7 @@ const contextMenuVariants = {
 export default function TransactionsListItem(props: TransactionsListItemProps) {
     const [showGroupItems, setShowGroupItems] = useState(false);
     const { selectedTransactions, setSelectedTransaction, setSelectedTransactions } = useTransaction();
-    const { isGrouped, group, transaction, showContext, setShowContext } = useTransactionDetails();
+    const { transaction, showContext, setShowContext } = useTransactionDetails();
 
     function handleItemSelection(e: any, checked: boolean) {
         e.preventDefault();
@@ -48,45 +48,28 @@ export default function TransactionsListItem(props: TransactionsListItemProps) {
                         action: 'details',
                     })
                 }>
-                {!isGrouped && (
-                    <motion.div
-                        layout
-                        variants={contextMenuVariants}
-                        initial="hidden"
-                        animate={showContext || selectedTransactions.includes(transaction) ? 'visible' : 'hidden'}
-                        exit="hidden">
-                        <Checkbox
-                            style={{ marginRight: '1rem' }}
-                            onChange={(e) => handleItemSelection(e, e.target.checked)}
-                            onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                            }}
-                        />
-                    </motion.div>
-                )}
+                <motion.div
+                    layout
+                    variants={contextMenuVariants}
+                    initial="hidden"
+                    animate={showContext || selectedTransactions.includes(transaction) ? 'visible' : 'hidden'}
+                    exit="hidden">
+                    <Checkbox
+                        style={{ marginRight: '1rem' }}
+                        onChange={(e) => handleItemSelection(e, e.target.checked)}
+                        onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                        }}
+                    />
+                </motion.div>
                 <List.Item.Meta
                     style={{ position: 'relative' }}
-                    title={isGrouped ? group?.name : transaction.description}
+                    title={transaction.description}
                     description={<TransactionListItemDescription handleShowGroupItems={handleShowGroupItems} />}
                 />
                 <TransactionListItemContent />
             </List.Item>
-            {isGrouped && showGroupItems && (
-                <List>
-                    {group?.transactions?.map((t) => (
-                        <List.Item key={t.id}>
-                            <List.Item.Meta description={t.description} />
-                            <Typography.Text type="secondary">
-                                {Intl.NumberFormat('pt-BR', {
-                                    style: 'currency',
-                                    currency: 'BRL',
-                                }).format(Number(t.value))}
-                            </Typography.Text>
-                        </List.Item>
-                    ))}
-                </List>
-            )}
         </>
     );
 }

@@ -35,7 +35,7 @@ export default function TransactionsView(props: TransactionsViewProps) {
         generalIncomeOnPeriod,
         generalExpenseOnPeriod,
         transactions,
-        isLoading,
+        getting,
         transactionDates,
         handleGroupTransactions,
     } = props;
@@ -121,7 +121,7 @@ export default function TransactionsView(props: TransactionsViewProps) {
                             type="inner"
                             style={{ marginBottom: '1rem' }}>
                             <TransactionsList
-                                loading={isLoading}
+                                loading={getting}
                                 transactions={transactions.filter((t) => t.date === date)}
                             />
                         </Card>

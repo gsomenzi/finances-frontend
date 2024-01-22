@@ -23,7 +23,7 @@ export default function TransactionListItemContent(props: TransactionListItemCon
     const { showMessage, showNotification } = useFeedback();
     const { confirm } = useConfirm();
     const { selectedTransactions } = useTransaction();
-    const { isGrouped, group, transaction, transactionTypeIcon, showContext } = useTransactionDetails();
+    const { transaction, transactionTypeIcon, showContext } = useTransactionDetails();
     const queryClient = useQueryClient();
 
     const { mutate: remove } = useMutation((id: number) => transactionModel.delete(id), {
@@ -75,18 +75,6 @@ export default function TransactionListItemContent(props: TransactionListItemCon
         payTransaction(transaction.id);
     }
 
-    function handleUngroupTransactions(e: any) {
-        e.preventDefault();
-        e.stopPropagation();
-        confirm({
-            title: 'Desagrupar?',
-            description: 'Tem certeza que deseja desagrupar as transações?',
-            onConfirm: () => {
-                ungroup(group?.id || 0);
-            },
-        });
-    }
-
     return (
         <Space size="middle">
             {transaction.tags && transaction.tags.length > 0 ? (
@@ -103,15 +91,7 @@ export default function TransactionListItemContent(props: TransactionListItemCon
                     {Intl.NumberFormat('pt-BR', {
                         style: 'currency',
                         currency: 'BRL',
-                    }).format(
-                        isGrouped
-                            ? Number(
-                                  group?.transactions?.reduce((acc, t) => {
-                                      return acc + Number(t.value);
-                                  }, 0),
-                              )
-                            : Number(transaction.value),
-                    )}
+                    }).format(Number(transaction.value))}
                 </Typography>
                 {transactionTypeIcon}
             </Space>
@@ -122,16 +102,6 @@ export default function TransactionListItemContent(props: TransactionListItemCon
                 animate={showContext || selectedTransactions.includes(transaction) ? 'visible' : 'hidden'}
                 exit="hidden">
                 <Space>
-                    <Show when={isGrouped}>
-                        <Tooltip title="Desagrupar">
-                            <Button
-                                onClick={handleUngroupTransactions}
-                                type="text"
-                                icon={<UngroupOutlined />}
-                                disabled={selectedTransactions.length > 0}
-                            />
-                        </Tooltip>
-                    </Show>
                     <Show when={transaction.paid}>
                         <Tooltip title="Desfazer">
                             <Button

@@ -1,7 +1,6 @@
 import React, { createContext, ReactNode, useMemo, useState } from 'react';
 import { Transaction } from '@/types/Transaction';
 import { Account } from '@/types/Account';
-import { TransactionGroup } from '@/types/TransactionGroup';
 import { Category } from '@/types/Category';
 import { Tooltip } from 'antd';
 import { ArrowDownOutlined, ArrowUpOutlined } from '@ant-design/icons';
@@ -11,8 +10,6 @@ const ContextProps: {
     category: Pick<Category, 'id' | 'name'> | null;
     type: string | null;
     installmentsNumber: number;
-    isGrouped: boolean;
-    group: TransactionGroup | null;
     transaction: Transaction;
     transactionTypeIcon: React.ReactNode;
     showContext: boolean;
@@ -22,8 +19,6 @@ const ContextProps: {
     category: null,
     type: null,
     installmentsNumber: 1,
-    isGrouped: false,
-    group: null,
     transaction: {} as Transaction,
     transactionTypeIcon: null,
     showContext: false,
@@ -58,12 +53,6 @@ export default function TransactionDetailsProvider({
         return installmentsGroup.transactionsCount;
     }, [transaction]);
 
-    const [isGrouped, group] = useMemo(() => {
-        const itemGroup = transaction?.transactionGroups.find((g) => g.type === 'group');
-        if (!itemGroup) return [false, null];
-        return [true, itemGroup];
-    }, [transaction]);
-
     const transactionTypeIcon = useMemo(() => {
         if (!type) {
             return null;
@@ -91,9 +80,7 @@ export default function TransactionDetailsProvider({
             value={{
                 account,
                 category,
-                group,
                 installmentsNumber,
-                isGrouped,
                 transaction,
                 type,
                 transactionTypeIcon,

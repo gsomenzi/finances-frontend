@@ -8,7 +8,7 @@ import Show from '@/components/Show';
 
 export default function TransactionListItemDescription(props: TransactionListItemDescriptionProps) {
     const { setAccount, setCategory } = useTransaction();
-    const { account, category, isGrouped, installmentsNumber } = useTransactionDetails();
+    const { account, category, installmentsNumber } = useTransactionDetails();
     const { handleShowGroupItems } = props;
 
     function handleSelectAccount(e: any) {
@@ -32,19 +32,12 @@ export default function TransactionListItemDescription(props: TransactionListIte
                         <span>{account?.name}</span>
                     </Space>
                 </Tooltip>
-                <Show when={!isGrouped}>
-                    <Tooltip title="Categoria">
-                        <Space size="small" onClick={(e) => handleSelectCategory(e)}>
-                            <FolderOutlined />
-                            <span>{category?.name}</span>
-                        </Space>
-                    </Tooltip>
-                </Show>
-                <Show when={isGrouped}>
-                    <Button type="text" color="secondary" icon={<GroupOutlined />} onClick={handleShowGroupItems}>
-                        <span>Mostrar agrupados</span>
-                    </Button>
-                </Show>
+                <Tooltip title="Categoria">
+                    <Space size="small" onClick={(e) => handleSelectCategory(e)}>
+                        <FolderOutlined />
+                        <span>{category?.name}</span>
+                    </Space>
+                </Tooltip>
                 {installmentsNumber > 1 ? (
                     <Tooltip title="Lançamento parcelado">
                         <Space size="small">

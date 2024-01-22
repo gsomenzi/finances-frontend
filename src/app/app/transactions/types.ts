@@ -5,11 +5,9 @@ import { UseMutateFunction } from 'react-query';
 
 export type TransactionsViewProps = {
     transactions: Transaction[];
+    getting: boolean;
     isGrouping: boolean;
-    isLoading: boolean;
     isRemoving: boolean;
-    page: number;
-    limit: number;
     total: number;
     transactionDates: string[];
     account: Pick<Account, 'id' | 'name'> | null;

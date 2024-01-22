@@ -65,7 +65,7 @@ export const useTransaction = () => {
 export default function TransactionProvider({ children }: { children: ReactNode }) {
     const [account, setAccount] = useState<Pick<Account, 'id' | 'name'> | null>(null);
     const [category, setCategory] = useState<Pick<Category, 'id' | 'name'> | null>(null);
-    const [limit, setLimit] = useState(20);
+    const [limit, setLimit] = useState(200);
     const [page, setPage] = useState(1);
     const [search, setSearch] = useState('');
     const [selectedTransaction, setSelectedTransaction] = useState<TransactionSelection>({
