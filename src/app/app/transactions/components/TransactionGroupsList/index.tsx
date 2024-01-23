@@ -1,24 +1,24 @@
 'use client';
 
 import React from 'react';
-import { Wrapper } from './styles';
 import { TransactionGroupsListProps } from './types';
 import { List } from 'antd';
-import TransactionsListItem from '../TransactionsList/TransactionListItem';
-import TransactionDetailsProvider from '../TransactionsList/TransactionListItem/providers/TransactionDetailsProvider';
+import TransactionGroupDetailsProvider from './TransactionGroupListItem/providers/TransactionGroupDetailsProvider';
+import TransactionGroupListItem from './TransactionGroupListItem';
 
 export default function TransactionGroupsList(props: TransactionGroupsListProps) {
     const { groups, loading } = props;
     return (
-        <Wrapper>
-            <List
-                header="Grupos de lançamentos"
-                loading={loading}
-                dataSource={groups}
-                renderItem={(item) => {
-                    return <span key={item.id}>{item.name}</span>;
-                }}
-            />
-        </Wrapper>
+        <List
+            style={{ marginTop: '20px' }}
+            header="Lançamentos agrupados"
+            loading={loading}
+            dataSource={groups}
+            renderItem={(item) => (
+                <TransactionGroupDetailsProvider transactionGroup={item}>
+                    <TransactionGroupListItem />
+                </TransactionGroupDetailsProvider>
+            )}
+        />
     );
 }

@@ -3,7 +3,7 @@ import { Category } from './Category';
 import { Tag } from './Tag';
 import { TransactionGroup } from './TransactionGroup';
 
-export interface Transaction {
+export type Transaction = {
     id: number;
     description: string;
     value: string;
@@ -16,7 +16,7 @@ export interface Transaction {
     relatedAccounts: AccountRelation[];
     transactionGroups: TransactionGroup[];
     tags: Pick<Tag, 'id' | 'name'>[];
-}
+};
 
 interface AccountRelation {
     relation: string;
