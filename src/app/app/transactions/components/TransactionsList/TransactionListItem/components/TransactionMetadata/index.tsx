@@ -1,15 +1,12 @@
 import React from 'react';
-import { TransactionListItemDescriptionProps } from './types';
-import { Button, Space, Tooltip } from 'antd';
-import { BankOutlined, FolderOutlined, GroupOutlined, UnorderedListOutlined } from '@ant-design/icons';
-import { useTransaction } from '../../../../providers/TransactionProvider';
+import { Space, Tooltip } from 'antd';
+import { BankOutlined, FolderOutlined, UnorderedListOutlined } from '@ant-design/icons';
+import { useTransaction } from '../../../../../providers/TransactionProvider';
 import { useTransactionDetails } from '../../providers/TransactionDetailsProvider';
-import Show from '@/components/Show';
 
-export default function TransactionListItemDescription(props: TransactionListItemDescriptionProps) {
+export default function TransactionMetadata() {
     const { setAccount, setCategory } = useTransaction();
     const { account, category, installmentsNumber } = useTransactionDetails();
-    const { handleShowGroupItems } = props;
 
     function handleSelectAccount(e: any) {
         e.preventDefault();

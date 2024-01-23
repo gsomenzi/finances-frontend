@@ -4,8 +4,8 @@ import React from 'react';
 import { Wrapper } from './styles';
 import { TransactionGroupsListProps } from './types';
 import { List } from 'antd';
-import TransactionsListItem from '../TransactionsListItem';
-import TransactionDetailsProvider from '../TransactionsListItem/providers/TransactionDetailsProvider';
+import TransactionsListItem from '../TransactionsList/TransactionListItem';
+import TransactionDetailsProvider from '../TransactionsList/TransactionListItem/providers/TransactionDetailsProvider';
 
 export default function TransactionGroupsList(props: TransactionGroupsListProps) {
     const { groups, loading } = props;

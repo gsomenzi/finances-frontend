@@ -1,11 +1,10 @@
 import React from 'react';
-import { TransactionListItemContentProps } from './types';
 import { Button, Space, Tag, Tooltip, Typography } from 'antd';
 import { CheckCircleOutlined, CheckCircleTwoTone, DeleteOutlined, UngroupOutlined } from '@ant-design/icons';
 import { motion } from 'framer-motion';
 import { useMutation, useQueryClient } from 'react-query';
 import TransactionModel from '@/models/TransactionModel';
-import { useTransaction } from '../../../../providers/TransactionProvider';
+import { useTransaction } from '../../../../../providers/TransactionProvider';
 import { useFeedback } from '@/providers/FeedbackProvider';
 import { useTransactionDetails } from '../../providers/TransactionDetailsProvider';
 import Show from '@/components/Show';
@@ -17,7 +16,7 @@ const contextMenuVariants = {
     visible: { opacity: 1, scale: 1, width: 'auto' },
 };
 
-export default function TransactionListItemContent(props: TransactionListItemContentProps) {
+export default function TransactionActions() {
     const transactionModel = new TransactionModel();
     const transactionGroupModel = new TransactionGroupModel();
     const { showMessage, showNotification } = useFeedback();

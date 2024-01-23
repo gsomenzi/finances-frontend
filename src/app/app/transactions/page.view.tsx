@@ -87,7 +87,7 @@ export default function TransactionsView(props: TransactionsViewProps) {
                     <Row gutter={8}>
                         <Col span={16}>
                             <Space style={{ width: '100%' }} direction="vertical">
-                                <Flex gap={16}>
+                                <Flex gap={16} align="center">
                                     <Search placeholder="Pesquisa" onSearch={setSearch} style={{ flexGrow: 1 }} />
                                     {account && (
                                         <Tag

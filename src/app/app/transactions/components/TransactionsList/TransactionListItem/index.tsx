@@ -1,13 +1,12 @@
 'use client';
 
-import React, { useState } from 'react';
-import { TransactionsListItemProps } from './types';
-import { Checkbox, List, Typography } from 'antd';
-import { useTransaction } from '../../providers/TransactionProvider';
+import React from 'react';
+import { Checkbox, List } from 'antd';
+import { useTransaction } from '../../../providers/TransactionProvider';
 
 import { motion } from 'framer-motion';
-import TransactionListItemDescription from './components/TransactionListItemDescription';
-import TransactionListItemContent from './components/TransactionListItemContent';
+import TransactionMetadata from './components/TransactionMetadata';
+import TransactionActions from './components/TransactionActions';
 import { useTransactionDetails } from './providers/TransactionDetailsProvider';
 
 const contextMenuVariants = {
@@ -15,8 +14,7 @@ const contextMenuVariants = {
     visible: { opacity: 1, scale: 1, width: 'auto' },
 };
 
-export default function TransactionsListItem(props: TransactionsListItemProps) {
-    const [showGroupItems, setShowGroupItems] = useState(false);
+export default function TransactionsListItem() {
     const { selectedTransactions, setSelectedTransaction, setSelectedTransactions } = useTransaction();
     const { transaction, showContext, setShowContext } = useTransactionDetails();
 
@@ -28,12 +26,6 @@ export default function TransactionsListItem(props: TransactionsListItemProps) {
         } else {
             setSelectedTransactions(selectedTransactions.filter((t) => t.id !== transaction.id));
         }
-    }
-
-    function handleShowGroupItems(e: any) {
-        e.preventDefault();
-        e.stopPropagation();
-        setShowGroupItems(!showGroupItems);
     }
 
     return (
@@ -66,9 +58,9 @@ export default function TransactionsListItem(props: TransactionsListItemProps) {
                 <List.Item.Meta
                     style={{ position: 'relative' }}
                     title={transaction.description}
-                    description={<TransactionListItemDescription handleShowGroupItems={handleShowGroupItems} />}
+                    description={<TransactionMetadata />}
                 />
-                <TransactionListItemContent />
+                <TransactionActions />
             </List.Item>
         </>
     );
