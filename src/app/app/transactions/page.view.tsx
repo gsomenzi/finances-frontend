@@ -36,8 +36,9 @@ export default function TransactionsView(props: TransactionsViewProps) {
         transactions,
         getting,
         transactionDates,
+        handleDateChange,
     } = props;
-    const { dateFilter, setAccount, setCategory, setSearch, setSelectedTransaction, setDateFilter } = useTransaction();
+    const { dateFilter, setAccount, setCategory, setSearch, setSelectedTransaction } = useTransaction();
     return (
         <div>
             <Flex justify="space-between" align="center">
@@ -74,10 +75,10 @@ export default function TransactionsView(props: TransactionsViewProps) {
                                 style={{ width: '300px' }}
                                 format="DD/MM/YYYY"
                                 allowClear={false}
-                                defaultValue={[dayjs().startOf('month'), dayjs().endOf('month')]}
+                                value={[dayjs(dateFilter.startDate), dayjs(dateFilter.endDate)]}
                                 onChange={(range) => {
                                     if (range) {
-                                        setDateFilter({
+                                        handleDateChange({
                                             startDate: dayjs(range[0]).format('YYYY-MM-DD'),
                                             endDate: dayjs(range[1]).format('YYYY-MM-DD'),
                                         });

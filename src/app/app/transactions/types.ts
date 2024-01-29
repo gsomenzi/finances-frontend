@@ -16,6 +16,7 @@ export type TransactionsViewProps = {
     generalBalanceOnEndDate: number | undefined;
     generalIncomeOnPeriod: number;
     generalExpenseOnPeriod: number;
+    handleDateChange: (dateFilter: DateFilter) => void;
     remove: UseMutateFunction<any, unknown, number, unknown>;
     getTransactionTypeIcon: (type: string) => React.ReactNode;
 };

@@ -1,5 +1,5 @@
-import React, { ReactNode, useMemo } from 'react';
-import { TransactionsViewProps } from './types';
+import React, { ReactNode, useEffect, useLayoutEffect, useMemo } from 'react';
+import { DateFilter, TransactionsViewProps } from './types';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { ListResponseData } from '@/types/ListResponseData';
 import { Transaction } from '@/types/Transaction';
@@ -9,13 +9,17 @@ import TransactionModel from '@/models/TransactionModel';
 import { useTransaction } from './providers/TransactionProvider';
 import AnalyticModel from '@/models/AnalyticModel';
 import { useFeedback } from '@/providers/FeedbackProvider';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 export default function TransactionsViewModel(): TransactionsViewProps {
     const analyticModel = new AnalyticModel();
     const transactionModel = new TransactionModel();
-    const { account, category, dateFilter, page, search } = useTransaction();
+    const { account, category, dateFilter, page, search, setDateFilter } = useTransaction();
     const { showMessage, showNotification } = useFeedback();
     const queryClient = useQueryClient();
+    const router = useRouter();
+    const pathName = usePathname();
+    const searchParams = useSearchParams();
 
     const { data: transactions, isLoading: gettingTransactions } = useQuery<ListResponseData<Transaction>>(
         [
@@ -128,6 +132,18 @@ export default function TransactionsViewModel(): TransactionsViewProps {
         return [dates, totalIncome, totalExpense];
     }, [filteredTransactions, transactions]);
 
+    function handleDateChange(dateFilter: DateFilter) {
+        setDateFilter(dateFilter);
+        router.replace(pathName + '?' + new URLSearchParams({ ...dateFilter }).toString());
+    }
+
+    useLayoutEffect(() => {
+        setDateFilter({
+            startDate: searchParams.get('startDate') || dateFilter.startDate,
+            endDate: searchParams.get('endDate') || dateFilter.endDate,
+        });
+    }, [searchParams]);
+
     return {
         transactions: filteredTransactions,
         isRemoving,
@@ -140,6 +156,7 @@ export default function TransactionsViewModel(): TransactionsViewProps {
         generalBalanceOnEndDate,
         generalIncomeOnPeriod,
         generalExpenseOnPeriod,
+        handleDateChange,
         remove,
         getTransactionTypeIcon,
     };
