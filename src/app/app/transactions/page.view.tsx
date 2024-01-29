@@ -37,6 +37,7 @@ export default function TransactionsView(props: TransactionsViewProps) {
         getting,
         transactionDates,
         handleDateChange,
+        resetDateFilter,
     } = props;
     const { dateFilter, setAccount, setCategory, setSearch, setSelectedTransaction } = useTransaction();
     return (
@@ -74,7 +75,7 @@ export default function TransactionsView(props: TransactionsViewProps) {
                             <RangePicker
                                 style={{ width: '300px' }}
                                 format="DD/MM/YYYY"
-                                allowClear={false}
+                                allowClear={true}
                                 value={[dayjs(dateFilter.startDate), dayjs(dateFilter.endDate)]}
                                 onChange={(range) => {
                                     if (range) {
@@ -82,6 +83,8 @@ export default function TransactionsView(props: TransactionsViewProps) {
                                             startDate: dayjs(range[0]).format('YYYY-MM-DD'),
                                             endDate: dayjs(range[1]).format('YYYY-MM-DD'),
                                         });
+                                    } else {
+                                        resetDateFilter();
                                     }
                                 }}
                             />

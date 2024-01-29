@@ -10,6 +10,7 @@ import { useTransaction } from './providers/TransactionProvider';
 import AnalyticModel from '@/models/AnalyticModel';
 import { useFeedback } from '@/providers/FeedbackProvider';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import dayjs from 'dayjs';
 
 export default function TransactionsViewModel(): TransactionsViewProps {
     const analyticModel = new AnalyticModel();
@@ -137,6 +138,14 @@ export default function TransactionsViewModel(): TransactionsViewProps {
         router.replace(pathName + '?' + new URLSearchParams({ ...dateFilter }).toString());
     }
 
+    function resetDateFilter() {
+        setDateFilter({
+            startDate: dayjs().startOf('month').format('YYYY-MM-DD'),
+            endDate: dayjs().endOf('month').format('YYYY-MM-DD'),
+        });
+        router.replace(pathName.split('?')[0]);
+    }
+
     useLayoutEffect(() => {
         setDateFilter({
             startDate: searchParams.get('startDate') || dateFilter.startDate,
@@ -157,6 +166,7 @@ export default function TransactionsViewModel(): TransactionsViewProps {
         generalIncomeOnPeriod,
         generalExpenseOnPeriod,
         handleDateChange,
+        resetDateFilter,
         remove,
         getTransactionTypeIcon,
     };

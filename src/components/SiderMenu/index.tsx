@@ -33,7 +33,9 @@ export default function SiderMenu() {
     ];
 
     function handleSelect(item: ItemType<MenuItemType>) {
-        return router.push(String(item?.key) || '/app/dashboard');
+        return router.push(String(item?.key) || '/app/dashboard', {
+            shalow: false,
+        });
     }
 
     useEffect(() => {
