@@ -1,12 +1,13 @@
-import React from 'react';
-import { Space, Tooltip } from 'antd';
+import React, { useState } from 'react';
+import { Button, Space, Tag, Tooltip } from 'antd';
 import { BankOutlined, FolderOutlined, UnorderedListOutlined } from '@ant-design/icons';
 import { useTransaction } from '../../../../../providers/TransactionProvider';
 import { useTransactionDetails } from '../../providers/TransactionDetailsProvider';
+import Show from '@/components/Show';
 
 export default function TransactionMetadata() {
     const { setAccount, setCategory } = useTransaction();
-    const { account, category, installmentsNumber } = useTransactionDetails();
+    const { account, category, installmentsNumber, selectedMenu, setSelectedMenu } = useTransactionDetails();
 
     function handleSelectAccount(e: any) {
         e.preventDefault();
@@ -20,20 +21,24 @@ export default function TransactionMetadata() {
         setCategory(category);
     }
 
+    function handleSelectMenu(e: any, menu: string | null) {
+        e.preventDefault();
+        e.stopPropagation();
+        setSelectedMenu(menu);
+    }
+
     return (
         <Space>
-            <Space size="middle">
+            <Space>
                 <Tooltip title="Conta">
-                    <Space size="small" onClick={(e) => handleSelectAccount(e)}>
-                        <BankOutlined />
-                        <span>{account?.name}</span>
-                    </Space>
+                    <Tag bordered={false} onClick={(e) => handleSelectAccount(e)} icon={<BankOutlined />}>
+                        {account?.name}
+                    </Tag>
                 </Tooltip>
                 <Tooltip title="Categoria">
-                    <Space size="small" onClick={(e) => handleSelectCategory(e)}>
-                        <FolderOutlined />
-                        <span>{category?.name}</span>
-                    </Space>
+                    <Tag bordered={false} onClick={(e) => handleSelectCategory(e)} icon={<FolderOutlined />}>
+                        {category?.name}
+                    </Tag>
                 </Tooltip>
                 {installmentsNumber > 1 ? (
                     <Tooltip title="Lançamento parcelado">
@@ -43,6 +48,13 @@ export default function TransactionMetadata() {
                         </Space>
                     </Tooltip>
                 ) : null}
+                <Show when={installmentsNumber > 1}>
+                    <Tag.CheckableTag
+                        checked={selectedMenu === 'installments'}
+                        onChange={(checked) => setSelectedMenu(checked ? 'installments' : null)}>
+                        Mostrar parcelas
+                    </Tag.CheckableTag>
+                </Show>
             </Space>
         </Space>
     );

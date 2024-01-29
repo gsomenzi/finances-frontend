@@ -10,7 +10,6 @@ export default function TransactionsList(props: TransactionsListProps) {
     const { transactions, loading } = props;
     return (
         <List
-            header="Lançamentos"
             loading={loading}
             dataSource={transactions}
             renderItem={(item) => (

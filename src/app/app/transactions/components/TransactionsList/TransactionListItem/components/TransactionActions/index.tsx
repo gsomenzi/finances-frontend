@@ -37,18 +37,6 @@ export default function TransactionActions() {
         },
     });
 
-    const { mutate: ungroup } = useMutation((id: number) => transactionGroupModel.delete(id), {
-        onSuccess: () => {
-            queryClient.invalidateQueries('transactions');
-        },
-        onError: (e: any) => {
-            console.log(e);
-            showNotification('Erro', e?.response?.data?.message || 'Erro ao desagrupar as transações', {
-                type: 'error',
-            });
-        },
-    });
-
     const { mutate: payTransaction } = useMutation(
         (transactionId: number) => {
             return transactionModel.togglePaid(transactionId);
@@ -74,17 +62,21 @@ export default function TransactionActions() {
         payTransaction(transaction.id);
     }
 
+    function handleRemoveTransaction(e: any) {
+        e.preventDefault();
+        e.stopPropagation();
+        confirm({
+            title: 'Remover transação',
+            description: 'Tem certeza que deseja remover esta transação?',
+            onConfirm: () => {
+                remove(transaction.id);
+            },
+            onCancel: () => {},
+        });
+    }
+
     return (
         <Space size="middle">
-            {transaction.tags && transaction.tags.length > 0 ? (
-                <Space size="small">
-                    {transaction.tags.map((tag) => (
-                        <Tag bordered={false} key={tag.id}>
-                            {tag.name}
-                        </Tag>
-                    ))}
-                </Space>
-            ) : null}
             <Space size="small">
                 <Typography>
                     {Intl.NumberFormat('pt-BR', {
@@ -124,11 +116,7 @@ export default function TransactionActions() {
                     </Show>
                     <Tooltip title="Remover">
                         <Button
-                            onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                remove(transaction.id);
-                            }}
+                            onClick={handleRemoveTransaction}
                             danger
                             type="text"
                             icon={<DeleteOutlined />}

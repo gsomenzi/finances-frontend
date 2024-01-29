@@ -1,10 +1,12 @@
 import { Modal } from 'antd';
 import React, { ReactNode, useState } from 'react';
 
+type ConfirmConfigProps = { title: string; description: ReactNode; onConfirm: () => void; onCancel: () => void };
+
 const ContextProps: {
-    confirm: (props: any) => void;
+    confirm: (props: ConfirmConfigProps) => void;
 } = {
-    confirm: (props: any) => {},
+    confirm: (props: ConfirmConfigProps) => {},
 };
 
 const ConfirmContext = React.createContext(ContextProps);
@@ -18,7 +20,7 @@ export const ConfirmProvider = ({ children }: any) => {
     const [onConfirm, setOnConfirm] = useState<() => void>();
     const [onCancel, setOnCancel] = useState<() => void>();
 
-    function confirm(configs: { title: string; description: ReactNode; onConfirm: () => void; onCancel: () => void }) {
+    function confirm(configs: ConfirmConfigProps) {
         const { title, description, onConfirm, onCancel } = configs;
         setTitle(title);
         setDescription(description);

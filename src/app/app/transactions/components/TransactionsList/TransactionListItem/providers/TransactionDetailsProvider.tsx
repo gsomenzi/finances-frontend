@@ -13,6 +13,8 @@ const ContextProps: {
     transaction: Transaction;
     transactionTypeIcon: React.ReactNode;
     showContext: boolean;
+    selectedMenu: string | null;
+    setSelectedMenu: (selectedMenu: string | null) => void;
     setShowContext: (show: boolean) => void;
 } = {
     account: null,
@@ -22,6 +24,8 @@ const ContextProps: {
     transaction: {} as Transaction,
     transactionTypeIcon: null,
     showContext: false,
+    selectedMenu: null,
+    setSelectedMenu: () => {},
     setShowContext: () => {},
 };
 
@@ -39,6 +43,7 @@ export default function TransactionDetailsProvider({
     transaction: Transaction;
 }) {
     const [showContext, setShowContext] = useState(false);
+    const [selectedMenu, setSelectedMenu] = useState<string | null>(null);
 
     const [account, category, type] = useMemo(() => {
         const mainAccount = transaction?.relatedAccounts?.find((ra) =>
@@ -85,6 +90,8 @@ export default function TransactionDetailsProvider({
                 type,
                 transactionTypeIcon,
                 showContext,
+                selectedMenu,
+                setSelectedMenu,
                 setShowContext,
             }}>
             {children}

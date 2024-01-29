@@ -23,7 +23,7 @@ import TransactionDetails from './components/TransactionDetails';
 import { useTransaction } from './providers/TransactionProvider';
 import { motion } from 'framer-motion';
 import AddGroupForm from './components/AddGroupForm';
-import TransactionGroupsList from './components/TransactionGroupsList';
+import Show from '@/components/Show';
 const { Search } = Input;
 const { RangePicker } = DatePicker;
 
@@ -82,46 +82,42 @@ export default function TransactionsView(props: TransactionsViewProps) {
                     </Flex>
                 )}
             </motion.div>
-            {transactionDates.length > 0 ? (
-                <>
-                    <Row gutter={8}>
-                        <Col span={16}>
-                            <Space style={{ width: '100%' }} direction="vertical">
-                                <Flex gap={16} align="center">
-                                    <Search placeholder="Pesquisa" onSearch={setSearch} style={{ flexGrow: 1 }} />
-                                    {account && (
-                                        <Tag
-                                            color="blue"
-                                            icon={<BankOutlined />}
-                                            closable
-                                            onClose={() => setAccount(null)}>
-                                            {account.name}
-                                        </Tag>
-                                    )}
-                                    {category && (
-                                        <Tag
-                                            color="cyan"
-                                            icon={<FolderOutlined />}
-                                            closable
-                                            onClose={() => setCategory(null)}>
-                                            {category.name}
-                                        </Tag>
-                                    )}
-                                    <RangePicker
-                                        style={{ width: '300px' }}
-                                        format="DD/MM/YYYY"
-                                        allowClear={false}
-                                        defaultValue={[dayjs().startOf('month'), dayjs().endOf('month')]}
-                                        onChange={(range) => {
-                                            if (range) {
-                                                setDateFilter({
-                                                    startDate: dayjs(range[0]).format('YYYY-MM-DD'),
-                                                    endDate: dayjs(range[1]).format('YYYY-MM-DD'),
-                                                });
-                                            }
-                                        }}
-                                    />
-                                </Flex>
+            <>
+                <Row gutter={8}>
+                    <Col span={16}>
+                        <Space style={{ width: '100%' }} direction="vertical">
+                            <Flex gap={16} align="center">
+                                <Search placeholder="Pesquisa" onSearch={setSearch} style={{ flexGrow: 1 }} />
+                                {account && (
+                                    <Tag color="blue" icon={<BankOutlined />} closable onClose={() => setAccount(null)}>
+                                        {account.name}
+                                    </Tag>
+                                )}
+                                {category && (
+                                    <Tag
+                                        color="cyan"
+                                        icon={<FolderOutlined />}
+                                        closable
+                                        onClose={() => setCategory(null)}>
+                                        {category.name}
+                                    </Tag>
+                                )}
+                                <RangePicker
+                                    style={{ width: '300px' }}
+                                    format="DD/MM/YYYY"
+                                    allowClear={false}
+                                    defaultValue={[dayjs().startOf('month'), dayjs().endOf('month')]}
+                                    onChange={(range) => {
+                                        if (range) {
+                                            setDateFilter({
+                                                startDate: dayjs(range[0]).format('YYYY-MM-DD'),
+                                                endDate: dayjs(range[1]).format('YYYY-MM-DD'),
+                                            });
+                                        }
+                                    }}
+                                />
+                            </Flex>
+                            <Show when={transactionDates.length > 0}>
                                 {transactionDates.map((date) => (
                                     <Card
                                         key={date}
@@ -140,70 +136,65 @@ export default function TransactionsView(props: TransactionsViewProps) {
                                             loading={getting}
                                             transactions={transactions.filter((t) => t.date === date)}
                                         />
-                                        <TransactionGroupsList
-                                            loading={getting}
-                                            groups={groups.filter(
-                                                (g) => g.transactions && g.transactions[0].date === date,
-                                            )}
-                                        />
                                     </Card>
                                 ))}
-                            </Space>
-                        </Col>
-                        <Col span={8}>
-                            <Card
-                                title={
-                                    <Flex justify="space-between">
-                                        <Typography>Projeção do saldo</Typography>
-                                        <Typography.Text type="secondary">
-                                            {dayjs(dateFilter.startDate).format('DD/MM/YY')} até{' '}
-                                            {dayjs(dateFilter.endDate).format('DD/MM/YY')}
-                                        </Typography.Text>
-                                    </Flex>
-                                }>
-                                <List size="small">
-                                    <List.Item style={{ paddingLeft: 0, paddingRight: 0 }}>
-                                        <Typography>Saldo inicial</Typography>
-                                        <Typography>
-                                            {Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(
-                                                generalBalanceOnStartDate || 0,
-                                            )}
-                                        </Typography>
-                                    </List.Item>
-                                    <List.Item style={{ paddingLeft: 0, paddingRight: 0 }}>
-                                        <Typography>Entradas</Typography>
-                                        <Typography.Text type="success">
-                                            {Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(
-                                                generalIncomeOnPeriod || 0,
-                                            )}
-                                        </Typography.Text>
-                                    </List.Item>
-                                    <List.Item style={{ paddingLeft: 0, paddingRight: 0 }}>
-                                        <Typography>Saídas</Typography>
-                                        <Typography.Text type="danger">
-                                            {Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(
-                                                generalExpenseOnPeriod || 0,
-                                            )}
-                                        </Typography.Text>
-                                    </List.Item>
-                                    <List.Item style={{ paddingLeft: 0, paddingRight: 0 }}>
-                                        <Typography>Saldo projetado</Typography>
-                                        <Typography.Text strong>
-                                            {Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(
-                                                generalBalanceOnEndDate || 0,
-                                            )}
-                                        </Typography.Text>
-                                    </List.Item>
-                                </List>
-                            </Card>
-                        </Col>
-                    </Row>
-                </>
-            ) : (
-                <Flex align="center" justify="center" style={{ marginTop: '2rem' }}>
-                    <Empty description="Nenhuma transação encontrada" />
-                </Flex>
-            )}
+                            </Show>
+                            <Show when={transactions.length === 0}>
+                                <Flex align="center" justify="center" style={{ marginTop: '2rem' }}>
+                                    <Empty description="Nenhuma transação encontrada" />
+                                </Flex>
+                            </Show>
+                        </Space>
+                    </Col>
+                    <Col span={8}>
+                        <Card
+                            title={
+                                <Flex justify="space-between">
+                                    <Typography>Projeção do saldo</Typography>
+                                    <Typography.Text type="secondary">
+                                        {dayjs(dateFilter.startDate).format('DD/MM/YY')} até{' '}
+                                        {dayjs(dateFilter.endDate).format('DD/MM/YY')}
+                                    </Typography.Text>
+                                </Flex>
+                            }>
+                            <List size="small">
+                                <List.Item style={{ paddingLeft: 0, paddingRight: 0 }}>
+                                    <Typography>Saldo inicial</Typography>
+                                    <Typography>
+                                        {Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(
+                                            generalBalanceOnStartDate || 0,
+                                        )}
+                                    </Typography>
+                                </List.Item>
+                                <List.Item style={{ paddingLeft: 0, paddingRight: 0 }}>
+                                    <Typography>Entradas</Typography>
+                                    <Typography.Text type="success">
+                                        {Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(
+                                            generalIncomeOnPeriod || 0,
+                                        )}
+                                    </Typography.Text>
+                                </List.Item>
+                                <List.Item style={{ paddingLeft: 0, paddingRight: 0 }}>
+                                    <Typography>Saídas</Typography>
+                                    <Typography.Text type="danger">
+                                        {Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(
+                                            generalExpenseOnPeriod || 0,
+                                        )}
+                                    </Typography.Text>
+                                </List.Item>
+                                <List.Item style={{ paddingLeft: 0, paddingRight: 0 }}>
+                                    <Typography>Saldo projetado</Typography>
+                                    <Typography.Text strong>
+                                        {Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(
+                                            generalBalanceOnEndDate || 0,
+                                        )}
+                                    </Typography.Text>
+                                </List.Item>
+                            </List>
+                        </Card>
+                    </Col>
+                </Row>
+            </>
         </div>
     );
 }
