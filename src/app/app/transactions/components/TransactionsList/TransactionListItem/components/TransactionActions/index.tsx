@@ -1,14 +1,12 @@
 import React from 'react';
-import { Button, Space, Tag, Tooltip, Typography } from 'antd';
-import { CheckCircleOutlined, CheckCircleTwoTone, DeleteOutlined, UngroupOutlined } from '@ant-design/icons';
+import { Button, Space, Tooltip, Typography } from 'antd';
+import { CheckCircleOutlined, CheckCircleTwoTone, DeleteOutlined } from '@ant-design/icons';
 import { motion } from 'framer-motion';
 import { useMutation, useQueryClient } from 'react-query';
 import TransactionModel from '@/models/TransactionModel';
-import { useTransaction } from '../../../../../providers/TransactionProvider';
 import { useFeedback } from '@/providers/FeedbackProvider';
 import { useTransactionDetails } from '../../providers/TransactionDetailsProvider';
 import Show from '@/components/Show';
-import TransactionGroupModel from '@/models/TransactionGroupModel';
 import { useConfirm } from '@/providers/ConfirmProvider';
 
 const contextMenuVariants = {
@@ -18,10 +16,8 @@ const contextMenuVariants = {
 
 export default function TransactionActions() {
     const transactionModel = new TransactionModel();
-    const transactionGroupModel = new TransactionGroupModel();
     const { showMessage, showNotification } = useFeedback();
     const { confirm } = useConfirm();
-    const { selectedTransactions } = useTransaction();
     const { transaction, transactionTypeIcon, showContext } = useTransactionDetails();
     const queryClient = useQueryClient();
 
@@ -90,7 +86,7 @@ export default function TransactionActions() {
                 layout
                 variants={contextMenuVariants}
                 initial="hidden"
-                animate={showContext || selectedTransactions.includes(transaction) ? 'visible' : 'hidden'}
+                animate={showContext ? 'visible' : 'hidden'}
                 exit="hidden">
                 <Space>
                     <Show when={transaction.paid}>
@@ -100,7 +96,6 @@ export default function TransactionActions() {
                                 onClick={handlePayTransaction}
                                 type="text"
                                 icon={<CheckCircleOutlined />}
-                                disabled={selectedTransactions.length > 0}
                             />
                         </Tooltip>
                     </Show>
@@ -110,18 +105,11 @@ export default function TransactionActions() {
                                 onClick={handlePayTransaction}
                                 type="text"
                                 icon={<CheckCircleTwoTone twoToneColor="#52c41a" />}
-                                disabled={selectedTransactions.length > 0}
                             />
                         </Tooltip>
                     </Show>
                     <Tooltip title="Remover">
-                        <Button
-                            onClick={handleRemoveTransaction}
-                            danger
-                            type="text"
-                            icon={<DeleteOutlined />}
-                            disabled={selectedTransactions.length > 0}
-                        />
+                        <Button onClick={handleRemoveTransaction} danger type="text" icon={<DeleteOutlined />} />
                     </Tooltip>
                 </Space>
             </motion.div>

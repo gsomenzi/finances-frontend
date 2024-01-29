@@ -5,10 +5,8 @@ import { TransactionGroup } from '@/types/TransactionGroup';
 import { UseMutateFunction } from 'react-query';
 
 export type TransactionsViewProps = {
-    groups: TransactionGroup[];
     transactions: Transaction[];
     getting: boolean;
-    isGrouping: boolean;
     isRemoving: boolean;
     total: number;
     transactionDates: string[];
@@ -19,7 +17,6 @@ export type TransactionsViewProps = {
     generalIncomeOnPeriod: number;
     generalExpenseOnPeriod: number;
     remove: UseMutateFunction<any, unknown, number, unknown>;
-    handleGroupTransactions: () => void;
     getTransactionTypeIcon: (type: string) => React.ReactNode;
 };
 

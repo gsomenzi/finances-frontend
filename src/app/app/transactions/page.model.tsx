@@ -8,24 +8,12 @@ import { ArrowDownOutlined, ArrowUpOutlined } from '@ant-design/icons';
 import TransactionModel from '@/models/TransactionModel';
 import { useTransaction } from './providers/TransactionProvider';
 import AnalyticModel from '@/models/AnalyticModel';
-import TransactionGroupModel from '@/models/TransactionGroupModel';
 import { useFeedback } from '@/providers/FeedbackProvider';
-import { TransactionGroup } from '@/types/TransactionGroup';
 
 export default function TransactionsViewModel(): TransactionsViewProps {
     const analyticModel = new AnalyticModel();
     const transactionModel = new TransactionModel();
-    const transactionGroupModel = new TransactionGroupModel();
-    const {
-        account,
-        category,
-        dateFilter,
-        page,
-        search,
-        selectedTransactions,
-        setSelectedForGroup,
-        setSelectedTransactions,
-    } = useTransaction();
+    const { account, category, dateFilter, page, search } = useTransaction();
     const { showMessage, showNotification } = useFeedback();
     const queryClient = useQueryClient();
 
@@ -50,50 +38,6 @@ export default function TransactionsViewModel(): TransactionsViewProps {
             }),
         {
             refetchOnWindowFocus: false,
-        },
-    );
-
-    const { data: groups, isLoading: gettingGroups } = useQuery<ListResponseData<TransactionGroup>>(
-        [
-            'transaction-groups',
-            {
-                search,
-                accountId: account?.id || null,
-                categoryId: category?.id || null,
-                startDate: dateFilter.startDate,
-                endDate: dateFilter.endDate,
-            },
-        ],
-        () =>
-            transactionGroupModel.findMany({
-                search,
-                accountId: account?.id || null,
-                categoryId: category?.id || null,
-                startDate: dateFilter.startDate,
-                endDate: dateFilter.endDate,
-            }),
-        {
-            refetchOnWindowFocus: false,
-        },
-    );
-
-    const { mutate: groupTransactions, isLoading: isGrouping } = useMutation(
-        (transactionData: any) => {
-            return transactionGroupModel.create(transactionData);
-        },
-        {
-            onSuccess: () => {
-                queryClient.invalidateQueries('transactions');
-                showMessage('success', 'Transação criada com sucesso!');
-            },
-            onError: (e: any) => {
-                showNotification('Erro', e?.response?.data?.message || 'Erro ao criar transação', {
-                    type: 'error',
-                });
-            },
-            onSettled: () => {
-                setSelectedTransactions([]);
-            },
         },
     );
 
@@ -184,20 +128,10 @@ export default function TransactionsViewModel(): TransactionsViewProps {
         return [dates, totalIncome, totalExpense];
     }, [filteredTransactions, transactions]);
 
-    function handleGroupTransactions() {
-        if (selectedTransactions.length <= 1) {
-            return;
-        }
-        setSelectedForGroup([...selectedTransactions]);
-        setSelectedTransactions([]);
-    }
-
     return {
-        groups: groups?.data && groups.data.length > 0 ? groups.data : [],
         transactions: filteredTransactions,
-        isGrouping,
         isRemoving,
-        getting: gettingTransactions || gettingGroups,
+        getting: gettingTransactions,
         total: transactions?.total || 0,
         transactionDates,
         account,
@@ -207,7 +141,6 @@ export default function TransactionsViewModel(): TransactionsViewProps {
         generalIncomeOnPeriod,
         generalExpenseOnPeriod,
         remove,
-        handleGroupTransactions,
         getTransactionTypeIcon,
     };
 }
